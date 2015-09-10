@@ -1,0 +1,25 @@
+/* Sticky footer styles
+------------------------------ */
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+#page-footer{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #FFF5E6;
+}
+
+/* Custom page CSS
+----------------------- */
+#wrapper {
+    padding: 60px 0px 0px 0px;
+}
+
+.asteriskField {
+    color: red;
+}
