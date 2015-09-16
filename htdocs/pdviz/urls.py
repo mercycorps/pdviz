@@ -20,11 +20,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 from .views import HomeView
+from dataviz.views import GlobalDashboard
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^home/', HomeView.as_view(), name='home'),
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
+    url(r'^global/$', GlobalDashboard.as_view(), name='globaldashboard'),
+    url(r'^', HomeView.as_view(), name='home'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
