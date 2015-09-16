@@ -98,6 +98,30 @@ class Sector(models.Model):
         return name
 
 
+class SubSector(models.Model):
+    subsector_id = models.PositiveIntegerField(db_column="SubSectorID", validators=[validate_positive,])
+    name = models.CharField(db_column="SubSector", max_length='50')
+
+    class Meta:
+        managed = True
+        db_table = 'n_subsectortbl';
+
+
+class SectorType(models.Model):
+    sector_id = models.PositiveIntegerField(db_column="SectorTypeID", validators=[validate_positive,])
+    sector_type = models.CharField(db_column="SectorType", max_length="50")
+
+    class Meta:
+        managed = True
+        db_table = "n_sectortypetbl"
+
+    def __unicode__(self):
+        return sector_type
+
+    def __str__(self):
+        return sector_type
+
+
 class Grant(models.Model):
     grant_id = models.PositiveIntegerField(db_column="GrantID", validators=[validate_positive,])
     title = models.CharField(db_column="GrantTitle", max_length=250, null=True, blank=True)
@@ -116,6 +140,8 @@ class Grant(models.Model):
     complex_program = models.BooleanField(db_column="ComplexProgram")
     sensitive_data = models.BooleanField(db_column="SensitiveData")
     project_length = models.PositiveIntegerField(db_column="ProjectLength", validators=[validate_positive,])
+    created = models.DateField(db_column="CreationDate", null=True, blank=True)
+    updated = models.DateField(db_column="LastModifiedDate", null=True, blank=True)
     sectors = models.ManyToManyField(Sector, through="GrantSector")
     countries = models.ManyToManyField(Country, through="GrantCountry")
 
@@ -130,13 +156,17 @@ class Grant(models.Model):
         db_table = "granttbl"
         ordering = ['title',]
 
+
 class GrantSector(models.Model):
     grant = models.ForeignKey(Grant, db_column="GrantID")
     sector = models.ForeignKey(Sector, db_column="SectorID")
+    subsector = models.ForeignKey(SubSector, db_column="SubSectorID", null=True)
+    sector_type = models.ForeignKey(SectorType, db_column="SectorTypeID", null=True)
 
     class Meta:
         managed = True
         db_table = 'n_grantsectortbl'
+        unique_together = (("grant", "sector", "subsector", "sector_type"),)
 
 
 class GrantCountry(models.Model):
@@ -146,6 +176,6 @@ class GrantCountry(models.Model):
     class Meta:
         managed = True
         db_table = 'grantcountrytbl'
-
+        unique_together = (("grant", "country"),)
 
 
