@@ -130,26 +130,21 @@
                 {% block content %} {% endblock %}
             </div>
 
-
             <div id = "loading" class="modal"> </div>
-
-
-            <footer id="page-footer">
-                <div class="container-fluid">
-                    <span style="float: left; padding: 20px; " class="text-muted">
-                        Mercy Corps {% now "Y" %}
-                    </span>
-                    <span style="float:right; padding: 20px; " class="text-muted">
-                        <a href="#" class="text-muted">About</a> | 
-                        <a href="#" id = "contact_id" class="text-muted">Contact</a>
-                    </span>
-                </div>
-            </footer>
-
 
         </div> <!-- END WRAPPER -->
 
-
+        <footer id="page-footer">
+            <div class="container-fluid">
+                <span style="float: left; padding: 20px; " class="text-muted">
+                    Mercy Corps {% now "Y" %}
+                </span>
+                <span style="float:right; padding: 20px; " class="text-muted">
+                    <a href="#" class="text-muted">About</a> | 
+                    <a href="#" id = "contact_id" class="text-muted">Contact</a>
+                </span>
+            </div>
+        </footer>
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script type="text/javascript" src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
         

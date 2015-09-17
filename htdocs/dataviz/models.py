@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.utils.timezone import utc
 
 from django.db import models
-from django.db.models import Q, Sum, Max
+from django.db.models import Q, Sum, Max, Count
 
 from django.contrib.auth.models import User
 
@@ -16,18 +16,19 @@ def validate_positive(value):
 
 class Donor(models.Model):
     donor_id = models.PositiveIntegerField(db_column="DonorID", validators=[validate_positive,])
-    name = models.CharField(db_column="Donor", max_length=3, null=True, blank=True)
+    name = models.CharField(db_column="Donor", max_length=3, null=True)
 
     class Meta:
         managed = True
         db_table = "donortbl"
         ordering = ['name',]
 
-    def __unicode__(self):
-        return name
+    @property
+    def num_of_grants(self):
+        return self.grants.aggregate(num_grants=Count('grant_id'))['num_grants']
 
-    def __str__(self):
-        return name
+    def __unicode__(self):
+        return self.name
 
 
 class DonorDepartment(models.Model):
@@ -41,10 +42,7 @@ class DonorDepartment(models.Model):
         ordering = ['name',]
 
     def __unicode__(self):
-        return name
-
-    def __str__(self):
-        return name
+        return self.name
 
 
 class Region(models.Model):
@@ -57,10 +55,7 @@ class Region(models.Model):
         ordering = ['name',]
 
     def __unicode__(self):
-        return name
-
-    def __str__(self):
-        return name
+        return self.name
 
 
 class Country(models.Model):
@@ -75,11 +70,7 @@ class Country(models.Model):
         ordering = ['name',]
 
     def __unicode__(self):
-        return name
-
-    def __str__(self):
-        return name
-
+        return self.name
 
 
 class Sector(models.Model):
@@ -92,10 +83,7 @@ class Sector(models.Model):
         ordering = ['name',]
 
     def __unicode__(self):
-        return name
-
-    def __str__(self):
-        return name
+        return self.name
 
 
 class SubSector(models.Model):
@@ -116,40 +104,34 @@ class SectorType(models.Model):
         db_table = "n_sectortypetbl"
 
     def __unicode__(self):
-        return sector_type
-
-    def __str__(self):
-        return sector_type
+        return self.sector_type
 
 
 class Grant(models.Model):
     grant_id = models.PositiveIntegerField(db_column="GrantID", validators=[validate_positive,])
-    title = models.CharField(db_column="GrantTitle", max_length=250, null=True, blank=True)
-    currency = models.CharField(db_column="Currency", max_length=3, null=True, blank=True)
-    amount = models.DecimalField(db_column="Amount", max_digits=10, decimal_places=2, null=True, blank=True)
-    amount_usd = models.DecimalField(db_column="USDAmount", max_digits=10, decimal_places=2)
-    amount_icr = models.DecimalField(db_column="ICRAmount", max_digits=10, decimal_places=2)
-    status = models.CharField(db_column="FundingStatus", max_length=50)
-    hq_admin = models.CharField(db_column="HQadmin", max_length=3, null=True, blank=True)
-    donor = models.ForeignKey(Donor, db_column="DonorID", related_name='grants')
-    submission_date = models.DateField(db_column="SubmissionDate")
-    start_date = models.DateField(db_column="StartDate")
-    end_date = models.DateField(db_column="EndDate")
-    rejected_date = models.DateField(db_column="RejectedDate")
-    funding_probability = models.CharField(db_column="FundingProbability", max_length=255)
+    title = models.CharField(db_column="GrantTitle", max_length=250, null=True)
+    currency = models.CharField(db_column="Currency", max_length=3, null=True)
+    amount = models.DecimalField(db_column="Amount", max_digits=20, decimal_places=4, null=True)
+    amount_usd = models.DecimalField(db_column="USDAmount", max_digits=20, decimal_places=4, null=True)
+    amount_icr = models.DecimalField(db_column="ICRAmount", max_digits=20, decimal_places=4, null=True)
+    status = models.CharField(db_column="FundingStatus", max_length=50, null=True)
+    hq_admin = models.CharField(db_column="HQadmin", max_length=3, null=True)
+    donor = models.ForeignKey(Donor, db_column="DonorID", related_name='grants', null=True)
+    submission_date = models.DateField(db_column="SubmissionDate", null=True)
+    start_date = models.DateField(db_column="StartDate", null=True)
+    end_date = models.DateField(db_column="EndDate", null=True)
+    rejected_date = models.DateField(db_column="RejectedDate", null=True)
+    funding_probability = models.CharField(db_column="FundingProbability", max_length=255, null=True)
     complex_program = models.BooleanField(db_column="ComplexProgram")
     sensitive_data = models.BooleanField(db_column="SensitiveData")
-    project_length = models.PositiveIntegerField(db_column="ProjectLength", validators=[validate_positive,])
-    created = models.DateField(db_column="CreationDate", null=True, blank=True)
-    updated = models.DateField(db_column="LastModifiedDate", null=True, blank=True)
+    project_length = models.PositiveIntegerField(db_column="ProjectLength", validators=[validate_positive,], null=True)
+    created = models.DateField(db_column="CreationDate", null=True)
+    updated = models.DateField(db_column="LastModifiedDate", null=True)
     sectors = models.ManyToManyField(Sector, through="GrantSector")
     countries = models.ManyToManyField(Country, through="GrantCountry")
 
     def __unicode__(self):
-        return title
-
-    def __str__(self):
-        return title
+        return self.title
 
     class Meta:
         managed = True

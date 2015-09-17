@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
     url(r'^global/$', GlobalDashboard.as_view(), name='globaldashboard'),
+    url(r'^grant_id/(?P<grant_id>\d+)/$', GlobalDashboard.as_view(), name='home_category'),
     url(r'^', HomeView.as_view(), name='home'),
 ]
 

@@ -1,14 +1,78 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block content %}
-
+<div id="donor_with_num_of_grants" style="display: none;">{{ donors }}</div>
    <div class="jumbotron">
         <h2>Global Dashboard</h2>
         <p class="lead">
             Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
         </p>
-        <p>
-            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-        </p>
+  
     </div>
+    <div id="donor_with_num_of_grants_chart" style="width:100%; height:1140px;"></div>
+    
+    
 {% endblock content %}
+
+{% block extra_js %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+    var donors = $.parseJSON($("#donor_with_num_of_grants").html());
+    var donor_names = [];
+    var donor_grants = [];
+    var i = -1;
+    $.each(donors, function(k,v) {
+        donor_names[i++] = v.name;
+        donor_grants[i] = v.num_grants;
+    });
+    $('#donor_with_num_of_grants_chart').highcharts({
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Grants per Donor'
+        },
+        subtitle: {
+            text: 'Source: <a href="https://gait.mercycorps.org" target="_blank">Grant & Award Information Tracker</a>'
+        },
+        xAxis: {
+            categories: donor_names,
+            title: {
+                text: "Donors"
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Number of Grants',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                dataLabels: {
+                    enabled: true,
+                }
+            }
+        },
+        legend: {
+            enabled: true
+        },
+        series: [
+            {
+                name: "Grants per Donor",
+                colorByPoint: true,
+                data: donor_grants
+            }
+        ]
+    });
+});
+
+</script>
+{% endblock %}

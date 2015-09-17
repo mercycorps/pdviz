@@ -17,8 +17,9 @@ html {
 /* Custom page CSS
 ----------------------- */
 #wrapper {
-    padding: 60px 0px 0px 0px;
+    padding: 60px 0px 60px 0px;
 }
+
 
 .asteriskField {
     color: red;
