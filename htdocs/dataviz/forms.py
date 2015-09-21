@@ -38,12 +38,12 @@ class GrantDonorFilterForm(forms.Form):
         self.helper.form_id = "grants_donor_filter_form"
         self.helper.form_show_labels = False
         self.helper.layout = Layout(
-            Field('region', id='region_dropdown', css_class="input-sm"),
-            Field('country', id='country_dropdown', css_class="input-sm"),
-            Field('submission_date_from', placeholder="From", css_class="input-sm"),
-            Field('submission_date_to', placeholder="To", css_class="input-sm col-sm-2"),
+            Field('region', css_class="input-sm"),
+            Field('country', css_class="input-sm"),
+            Field('submission_date_from', placeholder="From Submission date", css_class="input-sm"),
+            Field('submission_date_to', placeholder="To Submission date", css_class="input-sm"),
         )
         self.helper.form_method = 'get'
-        self.helper.add_input(Submit('submit', 'Submit', css_id="ok", css_class='btn-sm'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm'))
         self.helper.add_input(Reset('rest', 'Reset', css_class='btn-warning btn-sm'))
         super(GrantDonorFilterForm, self).__init__(*args, **kwargs)

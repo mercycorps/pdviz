@@ -20,6 +20,9 @@
         <!-- Bootstrap -->
         <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
 
+        <!-- jQuery UI CSS -->
+        <link href="{% static 'css/jquery-ui.min.css' %}" rel="stylesheet" type="text/css" />
+
         <!-- Custom Application css -->
         <link href="{% static 'css/app.css' %}" rel="stylesheet" type="text/css">
 
@@ -145,18 +148,22 @@
                 </span>
             </div>
         </footer>
+
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script type="text/javascript" src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
-        
+
+        <!-- JQuery UI -->
+        <script type="text/javascript" src="{% static 'js/jquery-ui.min.js' %}"></script>
+
         <!-- Bootstrap compiled javascript plugins -->
         <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
-        
+
         <!-- App specific Javascript -->
         <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
-        
+
         <!-- Highcharts for graphs -->
         <script type="text/javascript" src="{% static  'js/highcharts.js' %}"></script>
-        
+
         {% block extra_js %}{% endblock %}
     </body>
 </html>

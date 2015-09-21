@@ -20,6 +20,28 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
+    // Remove the hasDatePicker class so that the date-range works properly
+    $( "#id_submission_date_from" ).removeClass("hasDatepicker");
+    $( "#id_submission_date_to" ).removeClass("hasDatepicker");
+    
+    // Submission Date Range Picker 
+    $( "#id_submission_date_from" ).datepicker({
+        numberOfMonths: 1,
+        dateFormat: 'yy-mm-dd',
+        onClose: function( selectedDate ) {
+            $( "#id_submission_date_to" ).datepicker( "option", "minDate", selectedDate );
+        }
+    });
+    $( "#id_submission_date_to" ).datepicker({
+        numberOfMonths: 1,
+        dateFormat: 'yy-mm-dd',
+        onClose: function( selectedDate ) {
+            $( "#id_submission_date_from" ).datepicker( "option", "maxDate", selectedDate );
+        }
+    });
+    // End Submission Date Range Picker 
+    
+    
     var donors = $.parseJSON($("#donor_with_num_of_grants").html());
     var donor_names = [];
     var donor_grants = [];
