@@ -32,7 +32,7 @@ class Donor(models.Model):
 
 
 class DonorDepartment(models.Model):
-    department_id = models.PositiveIntegerField(db_column="DepartmentID", validators=[validate_positive,])
+    department_id = models.PositiveIntegerField(primary_key=True, db_column="DepartmentID", validators=[validate_positive,])
     donor = models.ForeignKey(Donor, db_column="DonorID")
     name = models.CharField(db_column="Department", max_length=255)
 
@@ -74,7 +74,7 @@ class Country(models.Model):
 
 
 class Sector(models.Model):
-    sector_id = models.PositiveIntegerField(db_column="SectorID", validators=[validate_positive,])
+    sector_id = models.PositiveIntegerField(primary_key=True, db_column="SectorID", validators=[validate_positive,])
     name = models.CharField(db_column="Sector", max_length=100)
 
     class Meta:
@@ -87,7 +87,7 @@ class Sector(models.Model):
 
 
 class SubSector(models.Model):
-    subsector_id = models.PositiveIntegerField(db_column="SubSectorID", validators=[validate_positive,])
+    subsector_id = models.PositiveIntegerField(primary_key=True, db_column="SubSectorID", validators=[validate_positive,])
     name = models.CharField(db_column="SubSector", max_length='50')
 
     class Meta:
@@ -96,7 +96,7 @@ class SubSector(models.Model):
 
 
 class SectorType(models.Model):
-    sector_id = models.PositiveIntegerField(db_column="SectorTypeID", validators=[validate_positive,])
+    sector_id = models.PositiveIntegerField(primary_key=True, db_column="SectorTypeID", validators=[validate_positive,])
     sector_type = models.CharField(db_column="SectorType", max_length="50")
 
     class Meta:
@@ -108,7 +108,7 @@ class SectorType(models.Model):
 
 
 class Grant(models.Model):
-    grant_id = models.PositiveIntegerField(db_column="GrantID", validators=[validate_positive,])
+    grant_id = models.PositiveIntegerField(primary_key=True, db_column="GrantID", validators=[validate_positive,])
     title = models.CharField(db_column="GrantTitle", max_length=250, null=True)
     currency = models.CharField(db_column="Currency", max_length=3, null=True)
     amount = models.DecimalField(db_column="Amount", max_digits=20, decimal_places=4, null=True)
