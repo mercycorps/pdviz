@@ -1,7 +1,18 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load crispy_forms_tags %}
+
 {% block content %}
-    <div id="donor_with_num_of_grants_chart" style="width:100%; height:1140px;"></div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">Panel heading without title</div>
+            <div class="panel-body">
+                <div class="row">
+                    {% crispy form form.helper %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="donor_with_num_of_grants_chart" style="width:100%; "></div>
     <div id="donor_with_num_of_grants" style="display: none;">{{ donors }}</div>
 {% endblock content %}
 
@@ -20,7 +31,9 @@ $(document).ready(function() {
     });
     $('#donor_with_num_of_grants_chart').highcharts({
         chart: {
-            type: 'bar'
+            type: 'column',
+            renderTo: 'donor_with_num_of_grants_chart',
+            spacingBottom: 0,
         },
         title: {
             text: 'Grants per Donor'

@@ -19,14 +19,15 @@ from django.conf.urls.static import static
 
 from django.contrib import admin
 
-from .views import HomeView
-from dataviz.views import GlobalDashboard
+from .views import *
+from dataviz.views import *
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
     url(r'^global/$', GlobalDashboard.as_view(), name='globaldashboard'),
     url(r'^grant_id/(?P<grant_id>\d+)/$', GlobalDashboard.as_view(), name='home_category'),
+    url(r'^dataviz/countries_by_region/(?P<region>[-\w]+)/$', CountriesByRegion.as_view(), name='cbg'),
     url(r'^', HomeView.as_view(), name='home'),
 ]
 

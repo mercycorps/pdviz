@@ -15,7 +15,7 @@ def validate_positive(value):
 
 
 class Donor(models.Model):
-    donor_id = models.PositiveIntegerField(db_column="DonorID", validators=[validate_positive,])
+    donor_id = models.PositiveIntegerField(primary_key=True, db_column="DonorID", validators=[validate_positive,])
     name = models.CharField(db_column="Donor", max_length=3, null=True)
 
     class Meta:
@@ -46,7 +46,7 @@ class DonorDepartment(models.Model):
 
 
 class Region(models.Model):
-    region_id = models.PositiveIntegerField(db_column="RegionID", validators=[validate_positive,])
+    region_id = models.PositiveIntegerField(primary_key=True, db_column="RegionID", validators=[validate_positive,])
     name = models.CharField(db_column="Region", max_length=100)
     
     class Meta:
@@ -59,7 +59,7 @@ class Region(models.Model):
 
 
 class Country(models.Model):
-    country_id = models.PositiveIntegerField(db_column="CountryID", validators=[validate_positive,])
+    country_id = models.PositiveIntegerField(primary_key=True, db_column="CountryID", validators=[validate_positive,])
     name = models.CharField(db_column="Country", max_length=100)
     region = models.ForeignKey(Region, db_column="RegionID", related_name="countries")
     iso2 = models.CharField(db_column="CountryCode", max_length="2")
