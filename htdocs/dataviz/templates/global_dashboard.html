@@ -11,7 +11,7 @@
         </div>
     </div>
     <div id="donor_with_num_of_grants_chart" style="width:100%; "></div>
-    <div id="donor_with_num_of_grants" style="display: none;">{{ donors }}</div>
+    <div id="donor_with_num_of_grants_data" style="display: none;">{{ donors }}</div>
 {% endblock content %}
 
 {% block extra_js %}
@@ -46,21 +46,21 @@ $(document).ready(function() {
                 filters[this.name] = this.value;
             }
         });
-        filters['grants_count'] = 55;
-        if (Object.keys(filters).length > 0) {
-            $('#donor_with_num_of_grants').empty();
-            $.get("/api/v1/donors/", filters)
-                .done(function(data) {
-                    $("#donor_with_num_of_grants").append(JSON.stringify(data));
-                    draw_chart();
-                });
-        }
+        
+
+        $('#donor_with_num_of_grants_data').empty();
+        $.get("/api/v1/donors/", filters)
+            .done(function(data) {
+                $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
+                draw_chart();
+            });
+
     });
     draw_chart();
 });
 
 function draw_chart(data) {
-    var data =  $("#donor_with_num_of_grants").html();
+    var data =  $("#donor_with_num_of_grants_data").html();
     donors = $.parseJSON(data);
     var donor_names = [];
     var donor_grants = [];
