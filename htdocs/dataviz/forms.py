@@ -44,6 +44,7 @@ class GrantDonorFilterForm(forms.Form):
             Field('submission_date_to', placeholder="To Submission date", css_class="input-sm"),
         )
         self.helper.form_method = 'get'
+        self.helper.form_action = '/global/'
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm'))
-        self.helper.add_input(Reset('rest', 'Reset', css_class='btn-warning btn-sm'))
+        self.helper.add_input(Reset('reset', 'Reset', css_class='btn-warning btn-sm'))
         super(GrantDonorFilterForm, self).__init__(*args, **kwargs)

@@ -19,11 +19,18 @@ from django.conf.urls.static import static
 
 from django.contrib import admin
 
+from rest_framework import routers, serializers, viewsets
+
 from .views import *
 from dataviz.views import *
+from dataviz.api import *
+
+router = routers.DefaultRouter()
+router.register('donors', DonorViewSet, base_name="donors")
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^api/v1/', include(router.urls)),
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
     url(r'^global/$', GlobalDashboard.as_view(), name='globaldashboard'),
     url(r'^grant_id/(?P<grant_id>\d+)/$', GlobalDashboard.as_view(), name='home_category'),

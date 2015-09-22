@@ -8,7 +8,7 @@ class GrantSerializer(serializers.ModelSerializer):
 
 
 class DonorSerializer(serializers.ModelSerializer):
-    num_grants = serializers.IntegerField()
+    grants_count = serializers.IntegerField()
     class Meta:
         model = Donor
 

@@ -6,9 +6,7 @@
     <div class="panel panel-primary">
         <div class="panel-heading">Panel heading without title</div>
             <div class="panel-body">
-                <div class="row">
                     {% crispy form form.helper %}
-                </div>
             </div>
         </div>
     </div>
@@ -40,15 +38,36 @@ $(document).ready(function() {
         }
     });
     // End Submission Date Range Picker 
-    
-    
-    var donors = $.parseJSON($("#donor_with_num_of_grants").html());
+    $('#grants_donor_filter_form').on('submit', function(e) {
+        e.preventDefault();
+        var filters = {};
+        $('#grants_donor_filter_form *').filter(':input').each(function() {
+            if (this.name != 'submit' && this.name != 'reset' && this.value) { 
+                filters[this.name] = this.value;
+            }
+        });
+        filters['grants_count'] = 55;
+        if (Object.keys(filters).length > 0) {
+            $('#donor_with_num_of_grants').empty();
+            $.get("/api/v1/donors/", filters)
+                .done(function(data) {
+                    $("#donor_with_num_of_grants").append(JSON.stringify(data));
+                    draw_chart();
+                });
+        }
+    });
+    draw_chart();
+});
+
+function draw_chart(data) {
+    var data =  $("#donor_with_num_of_grants").html();
+    donors = $.parseJSON(data);
     var donor_names = [];
     var donor_grants = [];
     var i = 0;
     $.each(donors, function(k,v) {
         donor_names[i] = v.name;
-        donor_grants[i] = v.num_grants;
+        donor_grants[i] = v.grants_count;
         i++;
     });
     $('#donor_with_num_of_grants_chart').highcharts({
@@ -96,7 +115,7 @@ $(document).ready(function() {
             }
         ]
     });
-});
+}
 
 </script>
 {% endblock %}
