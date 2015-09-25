@@ -54,7 +54,8 @@ class GlobalDashboard(TemplateView):
         #donors = JSONRenderer().render(serializer.data)
         #context['donors'] = donors
         
-
+        # max_grants = Donor.objects.filter(**kwargs).annotate(grants_count=Count('grants')).aggregate(max_grants=Max('grants_count'))
+        # context['max_grants'] = max_grants
         
         form = GrantDonorFilterForm()
         context['form'] = form
