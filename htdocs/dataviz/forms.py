@@ -15,7 +15,6 @@ class GrantDonorFilterForm(forms.Form):
         empty_label = u'-- Filter by Region --',
         widget = forms.Select(),
     )
-
     country = forms.ModelChoiceField(
         queryset = Country.objects.none(),
         required = False,
@@ -25,14 +24,21 @@ class GrantDonorFilterForm(forms.Form):
     submission_date_from = forms.DateField(
         label = u' From Submission Date',
         required = False,
+        
     )
     submission_date_to = forms.DateField(
         label = u' To Submission Date',
         required = False,
     )
+    grants_count = forms.IntegerField(
+        label= u'# Grants',
+        required = False,
+    )
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
         self.helper.form_class = 'form-inline'
+        #self.helper.label_class = 'col-sm-0'
+        #self.helper.field_class = 'col-sm-1'
         #self.helper.field_template = 'bootstrap3/layout/inline_field.html'
         self.helper.html5_required = True
         self.helper.form_id = "grants_donor_filter_form"
@@ -42,6 +48,7 @@ class GrantDonorFilterForm(forms.Form):
             Field('country', css_class="input-sm"),
             Field('submission_date_from', placeholder="From Submission date", css_class="input-sm"),
             Field('submission_date_to', placeholder="To Submission date", css_class="input-sm"),
+            Field('grants_count', placeholder = '# Grants',css_class='input-sm'),
         )
         self.helper.form_method = 'get'
         self.helper.form_action = '/global/'

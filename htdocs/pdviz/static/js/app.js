@@ -22,3 +22,16 @@ $(document).ready(function() {
     });
 
 });
+
+function createAlert (type, message) {
+    $("#alerts").append(
+        $(
+            "<div class='alert alert-" + type + " alert-dismissable'>" +
+            "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
+            "<p>" + message + "</p>" +
+            "</div>"
+        )
+    );
+    // Remove the alert after 30 seconds if the user does not close it.
+    $(".dynamic-alert").delay(300000).fadeOut("slow", function () { $(this).remove(); });
+}

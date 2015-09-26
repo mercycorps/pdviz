@@ -12,7 +12,6 @@ class DonorViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET)
         num_grants = self.request.GET.get('grants_count', None)
-        print(kwargs)
         if num_grants == None:
             return Donor.objects.filter(**kwargs).annotate(grants_count=Count('grants'))
         else:

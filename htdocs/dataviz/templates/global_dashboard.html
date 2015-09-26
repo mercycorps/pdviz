@@ -6,9 +6,7 @@
     <div class="panel panel-primary">
         <div class="panel-heading">Panel heading without title</div>
             <div class="panel-body">
-                <div class="row">
-                    {% crispy form form.helper %}
-                </div>
+                {% crispy form form.helper %}
             </div>
         </div>
     </div>
@@ -64,9 +62,9 @@ $(document).ready(function() {
                     $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
                     draw_chart();
                 } else {
-                    $("#donor_with_num_of_grants_chart").html("<h1>Sorry there is no data</h1>");
+                    $("#donor_with_num_of_grants_chart").empty();
+                    createAlert("warning dynamic-alert", "There is no data available for the specified criteria");
                 }
-                
             });
     });
     //draw_chart();
