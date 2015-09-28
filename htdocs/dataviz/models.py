@@ -14,6 +14,21 @@ def validate_positive(value):
         raise ValidationError('%s is not greater than zero' % value)
 
 
+class ZeroDateField(models.DateField):
+    """
+    Overriding the DateField from the location below
+    /usr/local/lib/python2.7/site-packages/django/db/models/fields/__init__.py
+    """
+    def get_db_prep_value(self, value, connection, prepared=False):
+        # Casts dates into the format expected by the backend
+        if value.startswith("0000-00-00"):
+            return None
+
+        if not prepared:
+            value = self.get_prep_value(value)
+        return connection.ops.value_to_db_date(value)
+
+
 class Donor(models.Model):
     donor_id = models.PositiveIntegerField(primary_key=True, db_column="DonorID", validators=[validate_positive,])
     name = models.CharField(db_column="Donor", max_length=3, null=True)
@@ -117,16 +132,16 @@ class Grant(models.Model):
     status = models.CharField(db_column="FundingStatus", max_length=50, null=True)
     hq_admin = models.CharField(db_column="HQadmin", max_length=3, null=True)
     donor = models.ForeignKey(Donor, db_column="DonorID", related_name='grants', null=True)
-    submission_date = models.DateField(db_column="SubmissionDate", null=True)
-    start_date = models.DateField(db_column="StartDate", null=True)
-    end_date = models.DateField(db_column="EndDate", null=True)
-    rejected_date = models.DateField(db_column="RejectedDate", null=True)
+    submission_date = ZeroDateField(db_column="SubmissionDate", null=True)
+    start_date = ZeroDateField(db_column="StartDate", null=True)
+    end_date = ZeroDateField(db_column="EndDate", null=True)
+    rejected_date = ZeroDateField(db_column="RejectedDate", null=True)
     funding_probability = models.CharField(db_column="FundingProbability", max_length=255, null=True)
     complex_program = models.BooleanField(db_column="ComplexProgram")
     sensitive_data = models.BooleanField(db_column="SensitiveData")
     project_length = models.PositiveIntegerField(db_column="ProjectLength", validators=[validate_positive,], null=True)
-    created = models.DateField(db_column="CreationDate", null=True)
-    updated = models.DateField(db_column="LastModifiedDate", null=True)
+    created = ZeroDateField(db_column="CreationDate", null=True)
+    updated = ZeroDateField(db_column="LastModifiedDate", null=True)
     sectors = models.ManyToManyField(Sector, through="GrantSector")
     countries = models.ManyToManyField(Country, through="GrantCountry")
 
