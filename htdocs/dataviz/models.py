@@ -14,27 +14,12 @@ def validate_positive(value):
         raise ValidationError('%s is not greater than zero' % value)
 
 
-class ZeroDateField(models.DateField):
-    """
-    Overriding the DateField from the location below
-    /usr/local/lib/python2.7/site-packages/django/db/models/fields/__init__.py
-    """
-    def get_db_prep_value(self, value, connection, prepared=False):
-        # Casts dates into the format expected by the backend
-        if value.startswith("0000-00-00"):
-            return None
-
-        if not prepared:
-            value = self.get_prep_value(value)
-        return connection.ops.value_to_db_date(value)
-
-
 class Donor(models.Model):
     donor_id = models.PositiveIntegerField(primary_key=True, db_column="DonorID", validators=[validate_positive,])
     name = models.CharField(db_column="Donor", max_length=3, null=True)
 
     class Meta:
-        managed = True
+        managed = False
         db_table = "donortbl"
         ordering = ['name',]
 
@@ -52,7 +37,7 @@ class DonorDepartment(models.Model):
     name = models.CharField(db_column="Department", max_length=255)
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'donordepttbl'
         ordering = ['name',]
 
@@ -65,7 +50,7 @@ class Region(models.Model):
     name = models.CharField(db_column="Region", max_length=100)
     
     class Meta:
-        managed = True
+        managed = False
         db_table = "regiontbl"
         ordering = ['name',]
 
@@ -80,7 +65,7 @@ class Country(models.Model):
     iso2 = models.CharField(db_column="CountryCode", max_length="2")
 
     class Meta:
-        managed = True
+        managed = False
         db_table = "countrytbl"
         ordering = ['name',]
 
@@ -93,7 +78,7 @@ class Sector(models.Model):
     name = models.CharField(db_column="Sector", max_length=100)
 
     class Meta:
-        managed = True
+        managed = False
         db_table = "n_sectortbl"
         ordering = ['name',]
 
@@ -106,7 +91,7 @@ class SubSector(models.Model):
     name = models.CharField(db_column="SubSector", max_length='50')
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'n_subsectortbl';
 
 
@@ -115,7 +100,7 @@ class SectorType(models.Model):
     sector_type = models.CharField(db_column="SectorType", max_length="50")
 
     class Meta:
-        managed = True
+        managed = False
         db_table = "n_sectortypetbl"
 
     def __unicode__(self):
@@ -132,16 +117,16 @@ class Grant(models.Model):
     status = models.CharField(db_column="FundingStatus", max_length=50, null=True)
     hq_admin = models.CharField(db_column="HQadmin", max_length=3, null=True)
     donor = models.ForeignKey(Donor, db_column="DonorID", related_name='grants', null=True)
-    submission_date = ZeroDateField(db_column="SubmissionDate", null=True)
-    start_date = ZeroDateField(db_column="StartDate", null=True)
-    end_date = ZeroDateField(db_column="EndDate", null=True)
-    rejected_date = ZeroDateField(db_column="RejectedDate", null=True)
+    submission_date = models.DateField(db_column="SubmissionDate", null=True)
+    start_date = models.DateField(db_column="StartDate", null=True)
+    end_date = models.DateField(db_column="EndDate", null=True)
+    rejected_date = models.DateField(db_column="RejectedDate", null=True)
     funding_probability = models.CharField(db_column="FundingProbability", max_length=255, null=True)
     complex_program = models.BooleanField(db_column="ComplexProgram")
     sensitive_data = models.BooleanField(db_column="SensitiveData")
     project_length = models.PositiveIntegerField(db_column="ProjectLength", validators=[validate_positive,], null=True)
-    created = ZeroDateField(db_column="CreationDate", null=True)
-    updated = ZeroDateField(db_column="LastModifiedDate", null=True)
+    created = models.DateField(db_column="CreationDate", null=True)
+    updated = models.DateField(db_column="LastModifiedDate", null=True)
     sectors = models.ManyToManyField(Sector, through="GrantSector")
     countries = models.ManyToManyField(Country, through="GrantCountry")
 
@@ -149,9 +134,9 @@ class Grant(models.Model):
         return self.title
 
     class Meta:
-        managed = True
+        managed = False
         db_table = "granttbl"
-        ordering = ['title',]
+        #ordering = ['title',]
 
 
 class GrantSector(models.Model):
@@ -161,7 +146,7 @@ class GrantSector(models.Model):
     sector_type = models.ForeignKey(SectorType, db_column="SectorTypeID", null=True)
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'n_grantsectortbl'
         unique_together = (("grant", "sector", "subsector", "sector_type"),)
 
@@ -171,7 +156,7 @@ class GrantCountry(models.Model):
     country = models.ForeignKey(Country, db_column="CountryID")
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'grantcountrytbl'
         unique_together = (("grant", "country"),)
 

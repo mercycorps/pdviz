@@ -43,21 +43,13 @@ class GlobalDashboard(TemplateView):
         Provide context data to the template renderer
         """
         context = super(GlobalDashboard, self).get_context_data(**kwargs)
-
-        #kwargs2 = prepare_related_donor_fields_to_lookup_fields(self.request.GET)
-        #data = Donor.objects.annotate(grants_count=Count('grants')).filter(**kwargs2)
-
-        # Use the rest_framework serializer class to serialize model instance to JSON
-        #serializer = DonorSerializer(data, many=True)
-        
-        # Encode the serialized object to JSON
-        #donors = JSONRenderer().render(serializer.data)
-        #context['donors'] = donors
-        
-        # max_grants = Donor.objects.filter(**kwargs).annotate(grants_count=Count('grants')).aggregate(max_grants=Max('grants_count'))
-        # context['max_grants'] = max_grants
-        
         form = GrantDonorFilterForm()
         context['form'] = form
-        
+        #data = Grant.objects.values("submission_date", "status").distinct()
+        data = Grant.objects.all()
+        context['testdata'] = data
         return context
+
+
+class TestChart(TemplateView):
+    template_name = 'test_chart.html'

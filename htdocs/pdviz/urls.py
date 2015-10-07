@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'^api/v1/', include(router.urls)),
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
     url(r'^global/$', GlobalDashboard.as_view(), name='globaldashboard'),
+    url(r'^test/$', TestChart.as_view(), name='test_chart'),
     url(r'^grant_id/(?P<grant_id>\d+)/$', GlobalDashboard.as_view(), name='home_category'),
     url(r'^dataviz/countries_by_region/(?P<region>[-\w]+)/$', CountriesByRegion.as_view(), name='cbg'),
     url(r'^', HomeView.as_view(), name='home'),
