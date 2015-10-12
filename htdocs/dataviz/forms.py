@@ -36,7 +36,8 @@ class GrantDonorFilterForm(forms.Form):
     )
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
-        self.helper.form_class = 'form-inline'
+        #self.helper.form_class = 'form-inline'
+        self.helper.form_class='form-horizontal'
         #self.helper.label_class = 'col-sm-0'
         #self.helper.field_class = 'col-sm-1'
         #self.helper.field_template = 'bootstrap3/layout/inline_field.html'
@@ -48,7 +49,7 @@ class GrantDonorFilterForm(forms.Form):
             Field('country', css_class="input-sm"),
             Field('submission_date_from', placeholder="From Submission date", css_class="input-sm"),
             Field('submission_date_to', placeholder="To Submission date", css_class="input-sm"),
-            Field('grants_count', placeholder = '# Grants',css_class='input-sm'),
+            Field('grants_count', placeholder = 'donors with X number of proposals',css_class='input-sm'),
         )
         self.helper.form_method = 'get'
         self.helper.form_action = '/global/'
