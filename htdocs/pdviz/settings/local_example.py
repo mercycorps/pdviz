@@ -1,29 +1,21 @@
 from base import *
-import django.conf.global_settings as DEFAULT_SETTINGS
-from django.contrib.messages import constants as message
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
-)
-
-TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
-
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'replace_with_your_db_name',  # Or path to database file if using sqlite3.
+        'USER': 'replace_with_your_db_user',  # Not used with sqlite3.
+        'PASSWORD': 'replace_with_your_db_password',  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'OPTIONS': {
+            'sql_mode': 'traditional',
+        },      
+    }           
+}
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'YOUR_SECRET_KEY_GOES_HERE...MAKE_SURE_TO_UPDATE_IT!!!'
-
-
-CRISPY_TEMPLATE_PACK='bootstrap3'
-
-
-### This is to map Django message levels to Boostrap3 alert levels ########
-MESSAGE_TAGS = {message.DEBUG: 'debug',
-                message.INFO: 'info',
-                message.SUCCESS: 'success',
-                message.WARNING: 'warning',
-                message.ERROR: 'danger',}
                 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.example.org'
