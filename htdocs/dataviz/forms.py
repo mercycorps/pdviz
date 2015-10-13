@@ -16,7 +16,7 @@ class GrantDonorFilterForm(forms.Form):
         widget = forms.Select(),
     )
     country = forms.ModelChoiceField(
-        queryset = Country.objects.none(),
+        queryset = Country.objects.all(),
         required = False,
         empty_label = u'-- Filter by Country --',
         widget = forms.Select(),

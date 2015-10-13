@@ -26,7 +26,8 @@ from dataviz.views import *
 from dataviz.api import *
 
 router = routers.DefaultRouter()
-router.register('donors', DonorViewSet, base_name="donors")
+router.register('donors', DonorViewSet, base_name='donors')
+router.register('countries', CountryViewSet, base_name='countries')
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
