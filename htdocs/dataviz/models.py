@@ -13,10 +13,22 @@ def validate_positive(value):
     if value <= 0:
         raise ValidationError('%s is not greater than zero' % value)
 
+class DonorCategory(models.Model):
+    donor_category_id = models.PositiveIntegerField(primary_key=True, db_column="DonorCategoryID", validators=[validate_positive,])
+    name = models.CharField(db_column="DonorCategory", max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'donorcategorytbl'
+
+    def __unicode__(self):
+        return self.name
+
 
 class Donor(models.Model):
     donor_id = models.PositiveIntegerField(primary_key=True, db_column="DonorID", validators=[validate_positive,])
     name = models.CharField(db_column="Donor", max_length=3, null=True)
+    category = models.ForeignKey(DonorCategory, db_column="DonorCategoryID", related_name="donors")
 
     class Meta:
         managed = False
@@ -48,7 +60,7 @@ class DonorDepartment(models.Model):
 class Region(models.Model):
     region_id = models.PositiveIntegerField(primary_key=True, db_column="RegionID", validators=[validate_positive,])
     name = models.CharField(db_column="Region", max_length=100)
-    
+
     class Meta:
         managed = False
         db_table = "regiontbl"
