@@ -38,7 +38,10 @@ class GrantDonorFilterForm(forms.Form):
     	label = u'Proposals greater than $ Amount',
     	required = False,
     )
-
+    hq_admin = forms.ChoiceField(
+		choices = (),
+		required = False,
+	)
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
         #self.helper.form_class = 'form-inline'
@@ -68,8 +71,8 @@ class GrantDonorFilterForm(forms.Form):
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-warning btn-sm'))
         super(GrantDonorFilterForm, self).__init__(*args, **kwargs)
-        choices_hq_admin = [("0", "--Filter by HQadmin--"),]
+        choices_hq_admin = [("", "--Filter by HQadmin--"),]
         choices =  [(hq['hq_admin'], hq['hq_admin']) for hq in Grant.objects.filter(hq_admin__isnull=False).exclude(hq_admin__exact='').values('hq_admin').distinct()]
         choices.sort()
         choices_hq_admin.extend(choices)
-        self.fields['hq_admin'] = forms.ChoiceField(choices=choices_hq_admin)
+        self.fields['hq_admin'] = forms.ChoiceField(choices=choices_hq_admin, required=False)
