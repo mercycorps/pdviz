@@ -46,8 +46,8 @@ class GlobalDashboard(TemplateView):
         form = GrantDonorFilterForm()
         context['form'] = form
         #data = Grant.objects.values("submission_date", "status").distinct()
-        data = Grant.objects.all()
-        context['testdata'] = data
+        #data = Grant.objects.all()
+        #context['testdata'] = data
         return context
 
 

@@ -34,6 +34,11 @@ class GrantDonorFilterForm(forms.Form):
         label= u'# Grants',
         required = False,
     )
+    grants_amount = forms.IntegerField(
+    	label = u'Proposals greater than $ Amount',
+    	required = False,
+    )
+
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
         #self.helper.form_class = 'form-inline'
@@ -50,9 +55,21 @@ class GrantDonorFilterForm(forms.Form):
             Field('submission_date_from', placeholder="From Submission date", css_class="input-sm"),
             Field('submission_date_to', placeholder="To Submission date", css_class="input-sm"),
             Field('grants_count', placeholder = 'donors with X number of proposals',css_class='input-sm'),
+            Field('grants_amount', placeholder = 'proposals greater than $ amount', css_class='input-sm'),
+ 			Field('hq_admin', css_class='input-sm'),
         )
+        """"
+        self.helper.layout = Layout(Div(Column('region', 'country', css_class='col-sm-6'),
+        								Column('submission_date_from', 'submission_date_to', css_class='col-sm-6'),
+        								css_class='row'))
+    	"""
         self.helper.form_method = 'get'
         self.helper.form_action = '/global/'
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-warning btn-sm'))
         super(GrantDonorFilterForm, self).__init__(*args, **kwargs)
+        choices_hq_admin = [("0", "--Filter by HQadmin--"),]
+        choices =  [(hq['hq_admin'], hq['hq_admin']) for hq in Grant.objects.filter(hq_admin__isnull=False).exclude(hq_admin__exact='').values('hq_admin').distinct()]
+        choices.sort()
+        choices_hq_admin.extend(choices)
+        self.fields['hq_admin'] = forms.ChoiceField(choices=choices_hq_admin)

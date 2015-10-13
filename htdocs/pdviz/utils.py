@@ -20,6 +20,8 @@ def prepare_related_donor_fields_to_lookup_fields(params):
             kwargs['grants__submission_date__gt'] = v
         elif k == 'submission_date_to':
             kwargs['grants__submission_date__lt'] = v
+        elif k == 'grants_amount':
+        	kwargs['grants__amount_usd__gte'] = v
         else:
             kwargs['grants__' + k] = v
 
