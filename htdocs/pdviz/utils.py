@@ -1,9 +1,13 @@
+import datetime
 
 def prepare_related_donor_fields_to_lookup_fields(params):
     """
     Prefix each key in the URL params with 'grants__' so that Donor's related entries 
     in Grant table are filtered by following the relationship in reverse fashion
     """
+    today_date  = datetime.datetime.now()
+    date_3_years_ago = str(datetime.date(today_date.year -3 , today_date.month, today_date.day))
+    
     kwargs = {}
     for k,v in params.iteritems():
         if k == 'format':
@@ -26,5 +30,6 @@ def prepare_related_donor_fields_to_lookup_fields(params):
             kwargs['grants__' + k] = v
 
         # Do not show donors that have no Grants
+        kwargs['grants__submission_date__gte'] = date_3_years_ago
         kwargs['grants__isnull'] = False
     return kwargs

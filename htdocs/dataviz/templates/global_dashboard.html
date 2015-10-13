@@ -51,7 +51,7 @@ $(document).ready(function() {
         var filters = {};
         $('#grants_donor_filter_form *').filter(':input').each(function() {
             if (this.name != 'submit' && this.name != 'reset' && this.value) {
-            	console.log(this.name + " : " + this.value);
+            	//console.log(this.name + " : " + this.value);
                 filters[this.name] = this.value;
             }
         });
