@@ -12,7 +12,7 @@ class DonorViewSet(viewsets.ModelViewSet):
     serializer_class = DonorSerializer
 
     def get_queryset(self):
-        kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET)
+        kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, prefix='')
         num_grants = self.request.GET.get('grants_count', None)
         if num_grants == None:
             return Donor.objects.filter(**kwargs).annotate(grants_count=Count('grants'))
@@ -32,3 +32,12 @@ data = Grant.objects.filter(submission_date__gt='2010-01-01').extra(select=
 class CountryViewSet(viewsets.ModelViewSet):
     serializer_class = CountrySerializer
     queryset = Country.objects.all()
+
+class DonorCategoryViewSet(viewsets.ModelViewSet):
+    serializer_class = DonorCategorySerializer
+    #queryset = DonorCategory.objects.all()
+
+    def get_queryset(self):
+        kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'donors__')
+        #cs = DonorCategory.objects.filter(donors__grants__submission_date__gte='2011-10-12').values('name', 'donors__donor_id', 'donors__name').annotate(categorycount = Count('donors')).prefetch_related('donors')
+        return DonorCategory.objects.filter(donors__grants__submission_date__gte='2011-10-12').annotate(donors_count = Count('donors')).prefetch_related('donors')

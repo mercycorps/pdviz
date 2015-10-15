@@ -13,6 +13,12 @@ class DonorSerializer(serializers.ModelSerializer):
         model = Donor
 
 
+class DonorCategorySerializer(serializers.ModelSerializer):
+    donors_count = serializers.IntegerField()
+    class Meta:
+        model = DonorCategory
+
+
 class DonorDepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = DonorDepartment
