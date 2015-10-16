@@ -34,6 +34,7 @@ router.register('donorcategories', DonorCategoryViewSet, base_name='donorcategor
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/v1/', include(router.urls)),
+    url(r'^api/docs/', include('rest_framework_swagger.urls')),
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
     url(r'^global/$', GlobalDashboard.as_view(), name='globaldashboard'),
     url(r'^test/$', TestChart.as_view(), name='test_chart'),
