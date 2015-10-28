@@ -11,28 +11,29 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
         if k == 'format':
             pass
         elif k == 'region':
-            kwargs[prefix + 'grants__countries__' + k] = v
+            kwargs[prefix + 'countries__' + k] = v
         elif k == 'sector':
-            kwargs[prefix + 'grants__sectors__' + k] = v
+            kwargs[prefix + 'sectors__' + k] = v
         elif k == 'country':
-            kwargs[prefix + 'grants__countries__country_id'] = v
+            kwargs[prefix + 'countries__country_id'] = v
         elif k == 'grants_count':
             pass
         elif k == 'submission_date_from':
-            kwargs[prefix + 'grants__submission_date__gt'] = v
+            kwargs[prefix + 'submission_date__gt'] = v
         elif k == 'submission_date_to':
-            kwargs[prefix + 'grants__submission_date__lt'] = v
+            kwargs[prefix + 'submission_date__lt'] = v
         elif k == 'grants_amount':
-            kwargs[prefix + 'grants__amount_usd__gte'] = v
+            kwargs[prefix + 'amount_usd__gte'] = v
         else:
-            kwargs[prefix + 'grants__' + k] = v
+            kwargs[prefix + k] = v
 
     # Grants submission_date is not specified then, by default, restrict it to the last three years
-    if not prefix + 'grants__submission_date__gt' in kwargs and not prefix + 'grants__submission_date__lt' in kwargs:
+    if not prefix + 'ubmission_date__gt' in kwargs and not prefix + 'submission_date__lt' in kwargs:
         today_date  = datetime.datetime.now()
         date_3_years_ago = str(datetime.date(today_date.year -3 , today_date.month, today_date.day))
-        kwargs[prefix + 'grants__submission_date__gt'] = date_3_years_ago
+        kwargs[prefix + 'submission_date__gt'] = date_3_years_ago
 
     # Do not show donors that have no Grants
-    kwargs[prefix + 'grants__isnull'] = False
+    if prefix:
+        kwargs[prefix + 'isnull'] = False
     return kwargs

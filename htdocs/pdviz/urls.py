@@ -40,7 +40,8 @@ urlpatterns = [
     url(r'^test/$', TestChart.as_view(), name='test_chart'),
     url(r'^grant_id/(?P<grant_id>\d+)/$', GlobalDashboard.as_view(), name='home_category'),
     url(r'^dataviz/countries_by_region/(?P<region>[-\w]+)/$', CountriesByRegion.as_view(), name='cbg'),
-    url(r'^', HomeView.as_view(), name='home'),
+    url(r'^z/$', DonorCategoriesView.as_view(), name='z'),
+    url(r'^$', HomeView.as_view(), name='home'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

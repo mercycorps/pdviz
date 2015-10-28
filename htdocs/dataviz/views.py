@@ -1,6 +1,9 @@
+from collections import OrderedDict
+
 from django.core import serializers
-from django.db.models import Avg, Max, Min, Count
-from django.http import HttpResponse
+from django.db.models import Avg, Max, Min, Count, F
+
+from django.http import HttpResponse, JsonResponse
 from django.views.generic import TemplateView, ListView, View
 
 from django.contrib import messages
@@ -34,7 +37,7 @@ class CountriesByRegion(JSONResponseMixin, ListView):
 
 class GlobalDashboard(TemplateView):
     template_name='global_dashboard.html'
-    
+
     def get(self, request, *args, **kwargs):
         return super(GlobalDashboard, self).get(request, *args, **kwargs)
 
@@ -53,3 +56,101 @@ class GlobalDashboard(TemplateView):
 
 class TestChart(TemplateView):
     template_name = 'test_chart.html'
+
+
+
+class DonorCategoriesView(View):
+        # grants = Grant.objects.filter(submission_date__gte='2014-10-12').values('grant_id', 'submission_date', 'donor__donor_id', 'donor__name', 'donor__category', 'donor__category__name')
+        # data = DonorCategory.objects.filter(donors__grants__submission_date__gte='2014-10-12').annotate(donors_count = Count('donors')).prefetch_related('donors')
+        # donors = Donor.objects.filter(grants__submission_date__gte='2014-10-12').annotate(grants_count=Count('grants')).filter(grants_count__gte=3).prefetch_related('grants')
+        # grants = Grant.objects.filter(submission_date__gte='2014-10-12', donor=855)
+    def get_donor_categories_dataset(self, kwargs):
+        kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'donors__grants__')
+        num_grants = 0
+        """
+        return DonorCategory.objects.filter(**kwargs).annotate(
+            donors_count = Count('donors'),
+            grants_count = Count('donors__grants')
+            ).filter(grants_count__gt=num_grants).prefetch_related('donors')
+        """
+        donor_categories = DonorCategory.objects.filter(**kwargs).annotate(drilldown=F('name'), y=Count('donors')).values('name', 'drilldown', 'y').prefetch_related('donors')
+        return list(donor_categories)
+
+    def get_donors_dataset(self, kwargs):
+        kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'grants__')
+        num_grants = 0
+        print(kwargs)
+        donors = Donor.objects.filter(**kwargs).annotate(id=F('category__name'), y=Count('grants')).filter(y__gte=num_grants).values('id', 'name', 'y').prefetch_related('grants').order_by('id')
+        return donors
+
+    def get_grants_dataset(self, kwargs):
+        kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
+        grants = Grant.objects.filter(**kwargs).filter(donor__isnull=False).order_by('donor') #submission_date__gte='2014-10-12'
+        return grants
+
+    def get(self, request, *args, **kwargs):
+        donor_categories = self.get_donor_categories_dataset(kwargs)
+        donors = self.get_donors_dataset(kwargs)
+        grants = self.get_grants_dataset(kwargs)
+
+        series = []
+        graph = {}
+        id = None
+        graph_name = 'Donor Categories'
+        data = []
+        bar = {}
+        bar_name = None
+
+        """
+        bar = represent a donor
+        data = represents a set of donors that belong to the same donor category
+        y = represents the num of donors that a category has
+        """
+        for d in donors:
+            if id is not None and id != d['id']:
+                graph['id'] = id
+                graph['name'] = graph_name
+                graph['data'] = data
+                series.append(graph)
+                data = [] # Initialize the data list for the new graph
+                graph = {} # initialize a new graph
+            id = d['id'] # setting the id of the graph, which corresponds to the parent graph drilldown attribute
+            bar_name = d['name'] # assign the barname to a variable for reuse
+            bar['name'] = bar_name # set the name of the bar on the X-axis
+            bar['y'] = d['y'] # set the bar's value for the Y-axis
+            bar['drilldown'] = d['name'] # set the name of the drilldown graph for this bar
+            data.append(bar) # append the bar to the graph's data list
+            bar = {} # Initialize a new bar
+        graph['id']  = id
+        graph['name'] = graph_name
+        graph['data'] = data
+        series.append(graph)
+
+        id = None
+        data = []
+        bar = {}
+        tooltip = {'valuePrefix': '$', 'valueSuffix': ' USD'}
+        for g in grants:
+            if id is not None and id != g.donor.name:
+                graph['id'] = id
+                graph['name'] = "Grants Per Donor"
+                graph['data'] = data
+                graph['tooltip'] = tooltip
+                series.append(graph)
+                data = []
+                graph = {}
+            id = g.donor.name
+            bar['grant_id'] = g.grant_id
+            bar['name'] = g.title
+            bar['drilldown'] = g.grant_id
+            bar['y'] = g.amount_usd
+            data.append(bar)
+            bar = {}
+        graph['id'] = id
+        graph['name'] = "Grants Per Donor"
+        graph['data'] = data
+        #graph['tooltip'] =
+        series.append(data)
+
+        final_dict = {'donor_categories': donor_categories, 'donors': series}
+        return JsonResponse(final_dict, safe=False)

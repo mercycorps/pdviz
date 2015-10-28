@@ -24,7 +24,7 @@ class GrantDonorFilterForm(forms.Form):
     submission_date_from = forms.DateField(
         label = u' From Submission Date',
         required = False,
-
+        widget = forms.DateInput()
     )
     submission_date_to = forms.DateField(
         label = u' To Submission Date',
@@ -55,6 +55,7 @@ class GrantDonorFilterForm(forms.Form):
         self.helper.layout = Layout(
             Field('region', css_class="input-sm"),
             Field('country', css_class="input-sm"),
+            #Field(AppendedText('submission_date_from', '<span class="glyphicon glyphicon-calendar"></span>'), placeholder="From Submission date", css_class="input-sm"),
             Field('submission_date_from', placeholder="From Submission date", css_class="input-sm"),
             Field('submission_date_to', placeholder="To Submission date", css_class="input-sm"),
             Field('grants_count', placeholder = 'donors with X number of proposals',css_class='input-sm'),

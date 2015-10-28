@@ -14,8 +14,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-10" style="border-left:0.5px solid #ccc">
-            <div id="donor_with_num_of_grants_chart" style="width:100%; "></div>
+        <div class="col-sm-10">
+            <div id="donor_with_num_of_grants_chart"></div>
         </div>
     </div>
 
@@ -57,9 +57,11 @@ $(document).ready(function() {
         
 
         $('#donor_with_num_of_grants_data').empty();
-        $.get("/api/v1/donors/", filters)
+        //$.get("/api/v1/donors/", filters)
+        //$.get("/api/v1/donorcategories/", filters)
+        $.get("/z/", filters)
             .done(function(data) {
-                if (data.length > 0 ) {
+                if (Object.keys(data['donor_categories']).length > 0) {
                     $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
                     draw_chart();
                 } else {
@@ -71,33 +73,39 @@ $(document).ready(function() {
 
 });
 
-function draw_chart(data) {
-    var data =  $("#donor_with_num_of_grants_data").html();
-    donors = $.parseJSON(data);
-    var donor_names = [];
-    var donor_grants = [];
-    var i = 0;
-    $.each(donors, function(k,v) {
-        donor_names[i] = v.name;
-        donor_grants[i] = v.grants_count;
-        i++;
-    });
+function draw_chart() {
+    var data_raw =  $("#donor_with_num_of_grants_data").html();
+    var data = $.parseJSON(data_raw);
     $('#donor_with_num_of_grants_chart').highcharts({
         chart: {
+            zoomType: 'x',
             type: 'column',
+            margin: [80, 0, 90, 60],
             renderTo: 'donor_with_num_of_grants_chart',
             spacingBottom: 0,
+            events: {
+                drilldown: function (e) {
+                    console.log(e.point.grant_id);
+                },
+                click: function(e) {
+                    console.log(e.xAxis[0].value + " : " + e.yAxis[0].value)
+                },
+            },
         },
         title: {
-            text: 'Grants per Donor'
+            text: 'Donors per Category'
         },
         subtitle: {
             text: 'Source: <a href="https://gait.mercycorps.org" target="_blank">Grant & Award Information Tracker</a>'
         },
         xAxis: {
-            categories: donor_names,
-            title: {
-                text: "Donors"
+            type: 'category',
+            labels: {
+                //rotation: -45,
+                style: {
+                    fontSize: '10px',
+                    //fontFamily: 'Verdana, sans-serif'
+                }
             }
         },
         yAxis: {
@@ -109,23 +117,58 @@ function draw_chart(data) {
         },
         plotOptions: {
             column: {
-                pointPadding: 0.2,
-                borderWidth: 0,
-                dataLabels: {
-                    enabled: true,
-                }
-            }
+                colorByPoint: true,
+            },
+            pointPadding: 0.2,
+            groupPadding: 0,
+            borderWidth: 1,
+            
+            dataLabels: {
+                enabled: true,
+                align: 'top',
+                rotation: -90,
+                color: '#FFFFFF',
+                y: -10
+            },
+            series: {
+                allowPointSelect: true,
+                animation: {
+                    duration: 2000
+                },
+            },
+        },
+        tooltip: {
+            backgroundColor: '#FCFFC5',
+            //borderColor: 'black',
+            borderRadius: 10,
+            borderWidth: 1,
+            //shared: true,
+            shadow: false,
+            useHTML: true,
+            style: {
+                padding: 10
+            },
+            //valueDecimals: 2,
+            //valuePrefix: '$',
+            //valueSuffix: ' USD',
+            /*
+            formatter: function() {
+                //return '<b>' + this.point.name + '</b>, has <b>' + this.y + '</b> grants. <br /> '+ this.series.name;
+                return this.y;
+            },
+            */
         },
         legend: {
-            enabled: true
+            enabled: false
         },
-        series: [
-            {
-                name: "Grants per Donor",
-                colorByPoint: true,
-                data: donor_grants
-            }
-        ]
+        series: [{
+            //type: 'pie',
+            name: "Donors per Category",
+            data: data['donor_categories'],
+        }],
+        drilldown: {
+            series: data['donors']
+        },
     });
 }
 
