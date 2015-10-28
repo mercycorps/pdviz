@@ -67,25 +67,23 @@ class DonorCategoriesView(View):
     def get_donor_categories_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'donors__grants__')
         num_grants = 0
-        """
-        return DonorCategory.objects.filter(**kwargs).annotate(
-            donors_count = Count('donors'),
-            grants_count = Count('donors__grants')
-            ).filter(grants_count__gt=num_grants).prefetch_related('donors')
-        """
+        print("donor_categories: %s" % kwargs)
         donor_categories = DonorCategory.objects.filter(**kwargs).annotate(drilldown=F('name'), y=Count('donors')).values('name', 'drilldown', 'y').prefetch_related('donors')
         return list(donor_categories)
 
     def get_donors_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'grants__')
         num_grants = 0
-        print(kwargs)
+        print("donors: %s: " % kwargs)
         donors = Donor.objects.filter(**kwargs).annotate(id=F('category__name'), y=Count('grants')).filter(y__gte=num_grants).values('id', 'name', 'y').prefetch_related('grants').order_by('id')
         return donors
 
     def get_grants_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
-        grants = Grant.objects.filter(**kwargs).filter(donor__isnull=False).order_by('donor') #submission_date__gte='2014-10-12'
+        print("grants: %s" % kwargs)
+        grants = Grant.objects.filter(**kwargs).order_by('donor') #submission_date__gte='2014-10-12'
+        #grants = Grant.objects.filter(grant_id = 5873);
+        #print("grant_ID: %s startDate: %s" % (grants[0].grant_id, grants[0].start_date))
         return grants
 
     def get(self, request, *args, **kwargs):
@@ -95,6 +93,7 @@ class DonorCategoriesView(View):
 
         series = []
         graph = {}
+        prev_id = None
         id = None
         graph_name = 'Donor Categories'
         data = []
@@ -107,38 +106,35 @@ class DonorCategoriesView(View):
         y = represents the num of donors that a category has
         """
         for d in donors:
-            if id is not None and id != d['id']:
-                graph['id'] = id
-                graph['name'] = graph_name
-                graph['data'] = data
-                series.append(graph)
-                data = [] # Initialize the data list for the new graph
-                graph = {} # initialize a new graph
-            id = d['id'] # setting the id of the graph, which corresponds to the parent graph drilldown attribute
+            id = d['id'] # donor_category setting the id of the graph, which corresponds to the parent graph drilldown attribute
+            if prev_id != id:
+                if data:
+                    graph['id'] = prev_id
+                    graph['name'] = graph_name
+                    graph['data'] = data
+                    series.append(graph)
+                    data = [] # Initialize the data list for the new graph
+                    graph = {} # initialize a new graph
+                prev_id = id
             bar_name = d['name'] # assign the barname to a variable for reuse
             bar['name'] = bar_name # set the name of the bar on the X-axis
             bar['y'] = d['y'] # set the bar's value for the Y-axis
             bar['drilldown'] = d['name'] # set the name of the drilldown graph for this bar
             data.append(bar) # append the bar to the graph's data list
             bar = {} # Initialize a new bar
-        graph['id']  = id
+
+        graph = {}
+        graph['id'] = prev_id
         graph['name'] = graph_name
         graph['data'] = data
         series.append(graph)
-
+        """
+        prev_id  = None
         id = None
         data = []
         bar = {}
         tooltip = {'valuePrefix': '$', 'valueSuffix': ' USD'}
         for g in grants:
-            if id is not None and id != g.donor.name:
-                graph['id'] = id
-                graph['name'] = "Grants Per Donor"
-                graph['data'] = data
-                graph['tooltip'] = tooltip
-                series.append(graph)
-                data = []
-                graph = {}
             id = g.donor.name
             bar['grant_id'] = g.grant_id
             bar['name'] = g.title
@@ -146,11 +142,20 @@ class DonorCategoriesView(View):
             bar['y'] = g.amount_usd
             data.append(bar)
             bar = {}
+            if prev_id is None or id != g.donor.name:
+                prev_id = id
+                graph['id'] = id
+                graph['name'] = "Grants Per Donor"
+                graph['data'] = data
+                graph['tooltip'] = tooltip
+                #series.append(graph)
+                data = []
+                graph = {}
         graph['id'] = id
         graph['name'] = "Grants Per Donor"
         graph['data'] = data
-        #graph['tooltip'] =
-        series.append(data)
-
+        graph['tooltip'] = tooltip
+        #series.append(graph)
+        """
         final_dict = {'donor_categories': donor_categories, 'donors': series}
         return JsonResponse(final_dict, safe=False)
