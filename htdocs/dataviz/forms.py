@@ -60,7 +60,7 @@ class GrantDonorFilterForm(forms.Form):
             Field('submission_date_to', placeholder="To Submission date", css_class="input-sm"),
             Field('grants_count', placeholder = 'donors with X number of proposals',css_class='input-sm'),
             Field('grants_amount', placeholder = 'proposals greater than $ amount', css_class='input-sm'),
-             Field('hq_admin', css_class='input-sm'),
+            Field('hq_admin', css_class='input-sm'),
         )
         """"
         self.helper.layout = Layout(Div(Column('region', 'country', css_class='col-sm-6'),
@@ -73,7 +73,7 @@ class GrantDonorFilterForm(forms.Form):
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-warning btn-sm'))
         super(GrantDonorFilterForm, self).__init__(*args, **kwargs)
         choices_hq_admin = [("", "--Filter by HQadmin--"),]
-        choices =  [(hq['hq_admin'], hq['hq_admin']) for hq in Grant.objects.filter(hq_admin__isnull=False).exclude(hq_admin__exact='').values('hq_admin').distinct()]
+        choices =  [(hq['hq_admin'], hq['hq_admin']) for hq in Grant.objects.filter(hq_admin__isnull=False).exclude(hq_admin__exact = '').exclude(hq_admin__exact='Hong Kong').values('hq_admin').distinct()]
         choices.sort()
         choices_hq_admin.extend(choices)
         self.fields['hq_admin'] = forms.ChoiceField(choices=choices_hq_admin, required=False)
