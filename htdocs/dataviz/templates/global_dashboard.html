@@ -101,7 +101,7 @@ function draw_chart() {
             },
         },
         title: {
-            text: 'Donors per Category'
+            text: 'Number of Grants Per Donor Category or Donor'
         },
         subtitle: {
             text: 'Source: <a href="https://gait.mercycorps.org" target="_blank">Grant & Award Information Tracker</a>'
@@ -112,7 +112,6 @@ function draw_chart() {
                 //rotation: -45,
                 style: {
                     fontSize: '10px',
-                    //fontFamily: 'Verdana, sans-serif'
                 }
             }
         },
@@ -130,8 +129,6 @@ function draw_chart() {
             pointPadding: 0.2,
             groupPadding: 0,
             borderWidth: 1,
-            
-            
             series: {
                 allowPointSelect: true,
                 animation: {
@@ -151,13 +148,16 @@ function draw_chart() {
             //borderColor: 'black',
             borderRadius: 10,
             borderWidth: 1,
-            //shared: true,
+            shared: true,
             shadow: false,
             useHTML: true,
             style: {
                 padding: 10
             },
-            //valueDecimals: 2,
+            headerFormat: '<small>{point.key}</small><table>',
+            pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
+                '<td style="text-align: right"><b>{point.y} </b></td></tr>',
+            footerFormat: '</table>',
             /*
             formatter: function() {
                 //return '<b>' + this.point.name + '</b>, has <b>' + this.y + '</b> grants. <br /> '+ this.series.name;
@@ -169,8 +169,8 @@ function draw_chart() {
             enabled: false
         },
         series: [{
-            //type: 'pie',
-            name: "Donors per Category",
+            type: 'pie',
+            name: "Number of Grants: ",
             data: data['donor_categories'],
         }],
         drilldown: {

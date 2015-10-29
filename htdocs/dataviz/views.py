@@ -95,7 +95,7 @@ class DonorCategoriesView(View):
         graph = {}
         prev_id = None
         id = None
-        graph_name = 'Donor Categories'
+        graph_name = 'Number of Grants: '
         data = []
         bar = {}
         bar_name = None
@@ -131,6 +131,7 @@ class DonorCategoriesView(View):
 
         prev_id  = None
         id = None
+        graph_name = 'Total USD Amount: '
         data = []
         bar = {}
         tooltip = {'valuePrefix': '$', 'valueSuffix': ' USD', 'valueDecimals': 2}
@@ -140,7 +141,7 @@ class DonorCategoriesView(View):
             if prev_id != id:
                 if data:
                     graph['id'] = prev_id
-                    graph['name'] = "Grants Per Donor"
+                    graph['name'] = graph_name
                     graph['data'] = data
                     graph['tooltip'] = tooltip
                     series.append(graph)
@@ -155,7 +156,7 @@ class DonorCategoriesView(View):
             bar = {}
         graph = {}
         graph['id'] = id
-        graph['name'] = "Grants Per Donor"
+        graph['name'] = graph_name
         graph['data'] = data
         graph['tooltip'] = tooltip
         series.append(graph)
