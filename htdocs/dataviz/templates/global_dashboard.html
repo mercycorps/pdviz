@@ -79,8 +79,16 @@ function draw_chart() {
     $('#donor_with_num_of_grants_chart').highcharts({
         chart: {
             zoomType: 'x',
+            resetZoomButton: {
+                position: {
+                    // align: 'right', // by default
+                    // verticalAlign: 'top', // by default
+                    x: -5,
+                    y: -30
+                }
+            },
             type: 'column',
-            margin: [80, 0, 90, 60],
+            margin: [80, 0, 90, 70],
             renderTo: 'donor_with_num_of_grants_chart',
             spacingBottom: 0,
             events: {
@@ -88,7 +96,7 @@ function draw_chart() {
                     console.log(e.point.grant_id);
                 },
                 click: function(e) {
-                    console.log(e.xAxis[0].value + " : " + e.yAxis[0].value)
+                    //console.log(e.xAxis[0].value + " : " + e.yAxis[0].value);
                 },
             },
         },
@@ -123,17 +131,18 @@ function draw_chart() {
             groupPadding: 0,
             borderWidth: 1,
             
-            dataLabels: {
-                enabled: true,
-                align: 'top',
-                rotation: -90,
-                color: '#FFFFFF',
-                y: -10
-            },
+            
             series: {
                 allowPointSelect: true,
                 animation: {
-                    duration: 2000
+                    duration: 1000
+                },
+                dataLabels: {
+                    enabled: true,
+                    //align: 'top',
+                    // rotation: -90,
+                    //color: '#FFFFFF',
+                    //y: -10
                 },
             },
         },
@@ -149,8 +158,6 @@ function draw_chart() {
                 padding: 10
             },
             //valueDecimals: 2,
-            //valuePrefix: '$',
-            //valueSuffix: ' USD',
             /*
             formatter: function() {
                 //return '<b>' + this.point.name + '</b>, has <b>' + this.y + '</b> grants. <br /> '+ this.series.name;
