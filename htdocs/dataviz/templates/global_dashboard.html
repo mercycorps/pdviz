@@ -19,6 +19,7 @@
         </div>
     </div>
 
+    <div id="test"> </div>
 {% endblock content %}
 
 
@@ -93,7 +94,21 @@ function draw_chart() {
             spacingBottom: 0,
             events: {
                 drilldown: function (e) {
-                    console.log(e.point.grant_id);
+                    /*
+                    //console.log(e.point.grant_id);
+                    console.log(e.point.name);
+                    var thedonor = $.grep(data['donors'], function(event){ return event.id == e.point.name; });
+                    if (thedonor.length == 0) {
+                        console.log(e.point.name + "  NOT FOUND!");
+                    } else if (thedonor.length == 1) {
+                        console.log(" FOUND IT: " + thedonor[0].id);
+                        //console.log(thedonor[0].data);
+                        var c = new tableObject(thedonor[0].data);
+                        document.getElementById("test").appendChild(c);
+                    } else {
+                        console.log("FOUND SEVERAL");
+                    }
+                    */
                 },
                 click: function(e) {
                     //console.log(e.xAxis[0].value + " : " + e.yAxis[0].value);
@@ -170,7 +185,7 @@ function draw_chart() {
         },
         series: [{
             type: 'pie',
-            name: "Number of Grants: ",
+            name: "Number of Grants Per Donor Category: ",
             data: data['donor_categories'],
         }],
         drilldown: {

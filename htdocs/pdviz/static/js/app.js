@@ -35,3 +35,69 @@ function createAlert (type, message) {
     // Remove the alert after 30 seconds if the user does not close it.
     $(".dynamic-alert").delay(3000).fadeOut("slow", function () { $(this).remove(); });
 }
+
+       
+var tableObject = function (json) {
+   var headerCount = new Object();
+   var createTR = function (id) {
+       var tr = document.createElement("tr");
+       tr.ID = id;
+       return tr;
+   };
+   var createTH = function (html) {
+       var th = document.createElement("th");
+       th.innerHTML = html;
+       return th;
+   };
+   var createTD = function (html) {
+       var td = document.createElement("td");
+       td.innerHTML = html;
+       return td;
+   };
+   var getName = function (id) {
+       for (var name in headerCount) {
+           if (eval("headerCount." + name) == id) {
+               return name;
+           }
+       }
+   };
+   var pTable;
+   if (json.length > 0) {
+       var index = 0;
+       pTable = document.createElement("table");
+       var head = createTR();
+       for (var i = 0; i < json.length; i++)
+           for (var item in json[i]) {
+               if (!headerCount.hasOwnProperty(item)) {
+                   head.appendChild(createTH(item));
+                   eval('headerCount.' + item + "=" + index);
+                   index++;
+               }
+           }
+       pTable.appendChild(head);
+       for (var i = 0; i < json.length; i++) {
+           var row = new createTR(i);
+           for (var j = 0; j < index; j++) {
+               var name = getName(j);
+               if (eval("json[" + i + "].hasOwnProperty('" + name + "')")) {
+                   row.appendChild(createTD(eval('json[' + i + '].' + name)));
+               }
+               else
+                   row.appendChild(createTD(''));
+           }
+           pTable.appendChild(row);
+       }
+   }
+   return pTable;
+
+};
+// <div id="test"> </div>
+/*
+var table = "[{'Country':'mycity','Name':'abc','Age':'29','Email':'test@mail.com'}," +
+       "{'Name':'abcd','Age':'39','Email':'test1@mail.com'}," +
+       "{'Name':'abcde','Age':'30','Email':'test2@mail.com'}," +
+       "{'Age':'30','Sex':'male','Name':'abcde'}]";
+*/
+//table = eval('' + table + '');
+//var c = new tableObject(table);
+//document.getElementById("test").appendChild(c);

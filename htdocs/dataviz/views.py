@@ -95,7 +95,7 @@ class DonorCategoriesView(View):
         graph = {}
         prev_id = None
         id = None
-        graph_name = 'Number of Grants: '
+        graph_name = 'Number of Grants Per Donor: '
         data = []
         bar = {}
         bar_name = None
