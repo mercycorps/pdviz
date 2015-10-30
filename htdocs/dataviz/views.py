@@ -124,13 +124,15 @@ class DonorCategoriesView(View):
             bar = {} # Initialize a new bar
 
         graph = {}
-        graph['id'] = prev_id
+        graph['id'] = id
         graph['name'] = graph_name
         graph['data'] = data
         series.append(graph)
 
+
         prev_id  = None
         id = None
+        graph = {}
         graph_name = 'Total USD Amount: '
         data = []
         bar = {}

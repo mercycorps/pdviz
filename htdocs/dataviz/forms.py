@@ -38,6 +38,14 @@ class GrantDonorFilterForm(forms.Form):
         label = u'Proposals greater than $ Amount',
         required = False,
     )
+    sector = forms.ChoiceField(
+        choices =(),
+        required = False,
+    )
+    status = forms.ChoiceField(
+        choices = (),
+        required = False,
+    )
     hq_admin = forms.ChoiceField(
         choices = (),
         required = False,
@@ -60,6 +68,8 @@ class GrantDonorFilterForm(forms.Form):
             Field('submission_date_to', placeholder="To Submission date", css_class="input-sm"),
             Field('grants_count', placeholder = 'donors with X number of proposals',css_class='input-sm'),
             Field('grants_amount', placeholder = 'proposals greater than $ amount', css_class='input-sm'),
+            Field('sector', css_class='input-sm'),
+            Field('status', css_class='input-sm'),
             Field('hq_admin', css_class='input-sm'),
         )
         """"
@@ -77,3 +87,24 @@ class GrantDonorFilterForm(forms.Form):
         choices.sort()
         choices_hq_admin.extend(choices)
         self.fields['hq_admin'] = forms.ChoiceField(choices=choices_hq_admin, required=False)
+
+        status_choices = [("", "--Funding Status--"),]
+        choices = None
+        choices = [(status['status'], status['status']) for status in Grant.objects.filter(status__isnull=False).values('status').distinct()]
+        choices.sort()
+        status_choices.extend(choices)
+        self.fields['status'] = forms.ChoiceField(choices=status_choices, required=False)
+
+        sector_choices = [("", "--Sector--"),]
+        choices = None
+        choices = [(sector.sector_id, sector.name) for sector in Sector.objects.all()]
+        sector_choices.extend(choices)
+        self.fields['sector'] = forms.ChoiceField(choices=sector_choices, required=False)
+
+
+
+
+
+
+
+

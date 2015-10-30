@@ -8,12 +8,13 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
 
     kwargs = {}
     for k,v in params.iteritems():
+        #print(k + ' : ' + prefix)
         if k == 'format':
             pass
         elif k == 'region':
             kwargs[prefix + 'countries__' + k] = v
         elif k == 'sector':
-            kwargs[prefix + 'sectors__' + k] = v
+            kwargs[prefix + 'sectors__sector_id'] = v
         elif k == 'country':
             kwargs[prefix + 'countries__country_id'] = v
         elif k == 'grants_count':
@@ -24,11 +25,13 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
             kwargs[prefix + 'submission_date__lt'] = v
         elif k == 'grants_amount':
             kwargs[prefix + 'amount_usd__gte'] = v
+        elif k == 'status':
+            kwargs[prefix + 'status__exact'] = v
         else:
             kwargs[prefix + k] = v
 
     # Grants submission_date is not specified then, by default, restrict it to the last three years
-    if not prefix + 'ubmission_date__gt' in kwargs and not prefix + 'submission_date__lt' in kwargs:
+    if not prefix + 'submission_date__gt' in kwargs and not prefix + 'submission_date__lt' in kwargs:
         today_date  = datetime.datetime.now()
         date_3_years_ago = str(datetime.date(today_date.year -3 , today_date.month, today_date.day))
         kwargs[prefix + 'submission_date__gt'] = date_3_years_ago
