@@ -101,10 +101,20 @@ class Sector(models.Model):
 class SubSector(models.Model):
     subsector_id = models.PositiveIntegerField(primary_key=True, db_column="SubSectorID", validators=[validate_positive,])
     name = models.CharField(db_column="SubSector", max_length='50')
+    sectors = models.ManyToManyField(Sector, through="SectorSubSector")
 
     class Meta:
         managed = False
-        db_table = 'n_subsectortbl';
+        db_table = 'n_subsectortbl'
+
+
+class SectorSubSector(models.Model):
+    sector = models.ForeignKey(Sector, db_column="SectorID")
+    subsector = models.ForeignKey(SubSector, db_column="SubSectorID")
+
+    class Meta:
+        managed = False
+        db_table = 'n_sectorsubsectortbl'
 
 
 class SectorType(models.Model):
@@ -117,6 +127,30 @@ class SectorType(models.Model):
 
     def __unicode__(self):
         return self.sector_type
+
+
+class Theme(models.Model):
+    theme_id = models.PositiveIntegerField(primary_key=True, db_column='ThemeID')
+    name = models.CharField(db_column="Theme", max_length="50")
+
+    class Meta:
+        managed = False
+        db_table = 'n_themetbl'
+
+    def __unicode__(self):
+        return self.name
+
+
+class Methodology(models.Model):
+    methodology_id = models.PositiveIntegerField(primary_key=True, db_column='MethodologyID')
+    name = models.CharField(db_column='Methodology', max_length="50")
+
+    class Meta:
+        managed = False
+        db_table = 'n_methodologytbl'
+
+    def __unicode__(self):
+        return self.name
 
 
 class Grant(models.Model):
