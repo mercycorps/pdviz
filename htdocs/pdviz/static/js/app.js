@@ -17,6 +17,24 @@ $(document).ready(function() {
         });
     });
 
+    $('body').on('change', 'select#id_sector', function() {
+        var selected_sector = $(this).val();
+        var url;
+        if (selected_sector == undefined || selected_sector == -1 || selected_sector == '' || selected_sector == 0) {
+            url = '/api/v1/subsector/';
+        } else {
+            url = '/api/v1/subsector/?sector=' + selected_sector;
+        }
+        $.getJSON(url, function(subsectors) {
+            var options = "<option value=''>--Area of Focus--</option>";
+            for (var i = 0; i < subsectors.length; i++) {
+                options += '<option value="' + subsectors[i].subsector_id + '">' + subsectors[i].name + '</option>';
+            }
+            $('select#id_subsector').html(options);
+            $('select#id_subsector option:first').attr('selected', 'selected');
+        });
+    });
+
     $('.dateinput').datepicker({
         dateFormat: 'yy-mm-dd',
     });

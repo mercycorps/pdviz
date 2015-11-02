@@ -67,8 +67,8 @@ class DonorCategoriesView(View):
     def get_donor_categories_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'donors__grants__')
         num_grants = 0
-        #print("donor_categories: %s" % kwargs)
-        donor_categories = DonorCategory.objects.filter(**kwargs).annotate(drilldown=F('name'), y=Count('donors')).values('name', 'drilldown', 'y').prefetch_related('donors')
+        print("donor_categories: %s" % kwargs)
+        donor_categories = DonorCategory.objects.filter(**kwargs).annotate(drilldown=F('name'), y=Count('donors')).values('name', 'drilldown', 'y').distinct().prefetch_related('donors')
         return list(donor_categories)
 
     def get_donors_dataset(self, kwargs):
@@ -162,6 +162,7 @@ class DonorCategoriesView(View):
         graph['data'] = data
         graph['tooltip'] = tooltip
         series.append(graph)
+        kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
 
-        final_dict = {'donor_categories': donor_categories, 'donors': series}
+        final_dict = {'donor_categories': donor_categories, 'donors': series, 'criteria': kwargs}
         return JsonResponse(final_dict, safe=False)

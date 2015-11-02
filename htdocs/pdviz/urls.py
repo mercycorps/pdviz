@@ -26,9 +26,14 @@ from dataviz.views import *
 from dataviz.api import *
 
 router = routers.DefaultRouter()
+router.register('grants', GrantViewSet, base_name='grants')
 router.register('donors', DonorViewSet, base_name='donors')
 router.register('countries', CountryViewSet, base_name='countries')
 router.register('donorcategories', DonorCategoryViewSet, base_name='donorcategories')
+router.register('sector', SectorViewSet, base_name='sectors')
+router.register('subsector', SubSectorViewSet, base_name='subsectors')
+router.register('methodologies', MethodologyViewSet, base_name='methodologies')
+router.register('themes', ThemeViewSet, base_name='themes')
 
 
 urlpatterns = [

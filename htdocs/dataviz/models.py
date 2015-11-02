@@ -174,6 +174,9 @@ class Grant(models.Model):
     created = models.DateField(db_column="CreationDate", null=True)
     updated = models.DateField(db_column="LastModifiedDate", null=True)
     sectors = models.ManyToManyField(Sector, through="GrantSector")
+    subsectors = models.ManyToManyField(SubSector, through='GrantSector')
+    themes = models.ManyToManyField(Theme, through='GrantTheme')
+    methodologies = models.ManyToManyField(Methodology, through='GrantMethodology')
     countries = models.ManyToManyField(Country, through="GrantCountry")
 
     def __unicode__(self):
@@ -183,6 +186,23 @@ class Grant(models.Model):
         managed = False
         db_table = "granttbl"
         #ordering = ['title',]
+
+class GrantTheme(models.Model):
+    grant = models.ForeignKey(Grant, db_column="GrantID")
+    theme = models.ForeignKey(Theme, db_column="ThemeID")
+
+    class Meta:
+        managed = False
+        db_table = 'n_grantthemetbl'
+        unique_together = (('grant', 'theme'),)
+
+class GrantMethodology(models.Model):
+    grant = models.ForeignKey(Grant, db_column="GrantID")
+    methodology = models.ForeignKey(Methodology, db_column="MethodologyID")
+
+    class Meta:
+        managed = False
+        db_table = "n_grantmethodologytbl"
 
 
 class GrantSector(models.Model):

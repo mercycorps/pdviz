@@ -42,6 +42,18 @@ class GrantDonorFilterForm(forms.Form):
         choices =(),
         required = False,
     )
+    subsector = forms.ChoiceField(
+        choices = (),
+        required = False,
+    )
+    theme = forms.ChoiceField(
+        choices = (),
+        required = False,
+    )
+    methodology = forms.ChoiceField(
+        choices = (),
+        required = False,
+    )
     status = forms.ChoiceField(
         choices = (),
         required = False,
@@ -69,6 +81,9 @@ class GrantDonorFilterForm(forms.Form):
             Field('grants_count', placeholder = 'donors with X number of proposals',css_class='input-sm'),
             Field('grants_amount', placeholder = 'proposals greater than $ amount', css_class='input-sm'),
             Field('sector', css_class='input-sm'),
+            Field('subsector', css_class='input-sm'),
+            Field('theme', css_class='input-sm'),
+            Field('methodology', css_class='input-sm'),
             Field('status', css_class='input-sm'),
             Field('hq_admin', css_class='input-sm'),
         )
@@ -101,8 +116,23 @@ class GrantDonorFilterForm(forms.Form):
         sector_choices.extend(choices)
         self.fields['sector'] = forms.ChoiceField(choices=sector_choices, required=False)
 
+        subsector_choices = [("", "--Area of Focus--"),]
+        choices = None
+        choices = [(subsector.subsector_id, subsector.name) for subsector in SubSector.objects.all()]
+        subsector_choices.extend(choices)
+        self.fields['subsector'] = forms.ChoiceField(choices=subsector_choices, required=False)
 
+        theme_choices = [("", "--Theme--"),]
+        choices = None
+        choices = [(theme.theme_id, theme.name) for theme in Theme.objects.all()]
+        theme_choices.extend(choices)
+        self.fields['theme'] = forms.ChoiceField(choices=theme_choices, required=False)
 
+        methodology_choices = [("", "--Methodology--"),]
+        choices = None
+        choices = [(methodology.methodology_id, methodology.name) for methodology in Methodology.objects.all()]
+        methodology_choices.extend(choices)
+        self.fields['methodology'] = forms.ChoiceField(choices=methodology_choices, required=False)
 
 
 

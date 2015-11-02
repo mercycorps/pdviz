@@ -15,6 +15,12 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
             kwargs[prefix + 'countries__' + k] = v
         elif k == 'sector':
             kwargs[prefix + 'sectors__sector_id'] = v
+        elif k == 'subsector':
+            kwargs[prefix + 'subsectors__subsector_id'] = v
+        elif k == 'methodology':
+            kwargs[prefix + 'methodologies__methodology_id'] = v
+        elif k == 'theme':
+            kwargs[prefix + 'themes__theme_id'] = v
         elif k == 'country':
             kwargs[prefix + 'countries__country_id'] = v
         elif k == 'grants_count':

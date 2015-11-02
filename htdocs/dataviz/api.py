@@ -5,6 +5,14 @@ from rest_framework.viewsets import GenericViewSet
 from .models import *
 from .serializers import *
 from pdviz.utils import *
+
+
+class GrantViewSet(viewsets.ModelViewSet):
+    serializer_class = GrantSerializer
+
+    def get_queryset(self):
+        queryset = Grant.objects.all()[:20]
+        return queryset
 """
 data = Grant.objects.filter(submission_date__gt='2010-01-01').extra(select={'fy':'strftime("%%Y", "submissionDate")', 'period': 'case when cast(strftime("%%m", "submissionDate") as integer) between 1 and 6 then "Jan-Jun" else "Jul-Dec" END', 'month': 'strftime("%%m", "submissionDate")'}).values('fy', 'hq_admin', 'period', 'submission_date', 'month')
 """
@@ -56,15 +64,33 @@ class DonorCategoryViewSet(viewsets.ModelViewSet):
         # grants = Grant.objects.filter(submission_date__gte='2014-10-12', donor=855)
 
 
+class SectorViewSet(viewsets.ModelViewSet):
+    serializer_class = SectorSerializer
+    queryset = Sector.objects.all()
 
 
+class SubSectorViewSet(viewsets.ModelViewSet):
+    serializer_class = SubSectorSerializer
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned purchases to a given user,
+        by filtering against a `username` query parameter in the URL.
+        """
+        queryset = SubSector.objects.all()
+        sector_id = self.request.query_params.get('sector', None)
+        if sector_id is not None:
+            queryset = queryset.filter(sectors=sector_id).prefetch_related('sectors')
+        return queryset
 
 
+class MethodologyViewSet(viewsets.ModelViewSet):
+    serializer_class = MethodologySerializer
+    queryset = Methodology.objects.all()
 
 
-
-
-
-
+class ThemeViewSet(viewsets.ModelViewSet):
+    serializer_class = ThemeSerializer
+    queryset = Theme.objects.all()
 
 

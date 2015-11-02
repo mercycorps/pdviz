@@ -64,6 +64,8 @@ $(document).ready(function() {
             .done(function(data) {
                 if (Object.keys(data['donor_categories']).length > 0) {
                     $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
+                    console.log(data['criteria']);
+                    createAlert('info', data['criteria']);
                     draw_chart();
                 } else {
                     $("#donor_with_num_of_grants_chart").empty();

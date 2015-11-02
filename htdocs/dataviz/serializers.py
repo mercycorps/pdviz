@@ -27,3 +27,24 @@ class DonorDepartmentSerializer(serializers.ModelSerializer):
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
+
+
+class SectorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sector
+
+
+class SubSectorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubSector
+        depth = 1
+
+
+class MethodologySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Methodology
+
+
+class ThemeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Theme
