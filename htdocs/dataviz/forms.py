@@ -12,13 +12,13 @@ class GrantDonorFilterForm(forms.Form):
     region = forms.ModelChoiceField(
         queryset = Region.objects.all(),
         required = False,
-        empty_label = u'-- Filter by Region --',
+        empty_label = u'-- Region --',
         widget = forms.Select(),
     )
     country = forms.ModelChoiceField(
         queryset = Country.objects.all(),
         required = False,
-        empty_label = u'-- Filter by Country --',
+        empty_label = u'-- Country --',
         widget = forms.Select(),
     )
     submission_date_from = forms.DateField(
@@ -97,7 +97,7 @@ class GrantDonorFilterForm(forms.Form):
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-warning btn-sm'))
         super(GrantDonorFilterForm, self).__init__(*args, **kwargs)
-        choices_hq_admin = [("", "--Filter by HQadmin--"),]
+        choices_hq_admin = [("", "--HQadmin--"),]
         choices =  [(hq['hq_admin'], hq['hq_admin']) for hq in Grant.objects.filter(hq_admin__isnull=False).exclude(hq_admin__exact = '').exclude(hq_admin__exact='Hong Kong').values('hq_admin').distinct()]
         choices.sort()
         choices_hq_admin.extend(choices)

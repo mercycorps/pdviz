@@ -8,7 +8,7 @@ $(document).ready(function() {
             url = "/dataviz/countries_by_region/" + selected_region + "/";
         }    
         $.getJSON(url, function(countries) {
-            var options = "<option value=''>-- Filter by Country --</option>";
+            var options = "<option value=''>-- Country --</option>";
             for (var i = 0; i < countries.length; i++) {
                 options += '<option value="' + countries[i].country_id + '">' + countries[i].name + '</option>';
             }

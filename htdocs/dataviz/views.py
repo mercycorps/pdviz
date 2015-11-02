@@ -95,7 +95,7 @@ class DonorCategoriesView(View):
         graph = {}
         prev_id = None
         id = None
-        graph_name = 'Number of Grants Per Donor: '
+        graph_name = '# Grants Per Donor'
         data = []
         bar = {}
         bar_name = None
@@ -133,7 +133,7 @@ class DonorCategoriesView(View):
         prev_id  = None
         id = None
         graph = {}
-        graph_name = 'Total USD Amount: '
+        graph_name = 'Total USD Amount'
         data = []
         bar = {}
         tooltip = {'valuePrefix': '$', 'valueSuffix': ' USD', 'valueDecimals': 2}

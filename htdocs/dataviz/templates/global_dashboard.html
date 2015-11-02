@@ -25,8 +25,11 @@
 
 {% block extra_js %}
 <script type="text/javascript">
+"use strict";
+var drilldown_levels = [];
 
 $(document).ready(function() {
+    
     // Remove the hasDatePicker class so that the date-range works properly
     $( "#id_submission_date_from" ).removeClass("hasDatepicker");
     $( "#id_submission_date_to" ).removeClass("hasDatepicker");
@@ -64,9 +67,8 @@ $(document).ready(function() {
             .done(function(data) {
                 if (Object.keys(data['donor_categories']).length > 0) {
                     $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
-                    console.log(data['criteria']);
-                    createAlert('info', data['criteria']);
-                    draw_chart();
+                    //createAlert('info', data['criteria']);
+                    draw_chart(filters);
                 } else {
                     $("#donor_with_num_of_grants_chart").empty();
                     createAlert("warning dynamic-alert", "There is no data available for the specified criteria");
@@ -76,9 +78,10 @@ $(document).ready(function() {
 
 });
 
-function draw_chart() {
+function draw_chart(filters) {
     var data_raw =  $("#donor_with_num_of_grants_data").html();
     var data = $.parseJSON(data_raw);
+    var chart_title = '# Grants Per Donor Category'
     $('#donor_with_num_of_grants_chart').highcharts({
         chart: {
             zoomType: 'x',
@@ -111,17 +114,28 @@ function draw_chart() {
                         console.log("FOUND SEVERAL");
                     }
                     */
+                    
+                    if (this.series[0].name != 'Total USD Amount') {
+                        var current_level = this.series[0].name + '  <span style="color: red;"> - ' + e.point.name + '</span>';
+                        drilldown_levels.push(current_level);
+                        this.setTitle({ text: current_level});
+                    }
                 },
-                click: function(e) {
-                    //console.log(e.xAxis[0].value + " : " + e.yAxis[0].value);
+                drillup: function(e) {
+                    drilldown_levels.pop();
+                    var name = drilldown_levels[drilldown_levels.length - 1 ];
+                    if (name == undefined ) {
+                        name = '# Grants per Donor Category';
+                    }
+                    this.setTitle({ text: name});
                 },
             },
         },
         title: {
-            text: 'Number of Grants Per Donor Category or Donor'
+            text: chart_title
         },
         subtitle: {
-            text: 'Source: <a href="https://gait.mercycorps.org" target="_blank">Grant & Award Information Tracker</a>'
+            text: JSON.stringify(filters)//'Source: <a href="https://gait.mercycorps.org" target="_blank">GAIT</a>'
         },
         xAxis: {
             type: 'category',
@@ -153,7 +167,7 @@ function draw_chart() {
                 },
                 dataLabels: {
                     enabled: true,
-                    //align: 'top',
+                    align: 'top',
                     // rotation: -90,
                     //color: '#FFFFFF',
                     //y: -10
@@ -169,7 +183,7 @@ function draw_chart() {
             shadow: false,
             useHTML: true,
             style: {
-                padding: 10
+                padding: 5
             },
             headerFormat: '<small>{point.key}</small><table>',
             pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
@@ -187,7 +201,7 @@ function draw_chart() {
         },
         series: [{
             type: 'pie',
-            name: "Number of Grants Per Donor Category: ",
+            name: chart_title,
             data: data['donor_categories'],
         }],
         drilldown: {
