@@ -30,10 +30,10 @@ class GrantDonorFilterForm(forms.Form):
         label = u' To Submission Date',
         required = False,
     )
-    grants_count = forms.IntegerField(
-        label= u'# Grants',
-        required = False,
-    )
+    #grants_count = forms.IntegerField(
+    #    label= u'# Grants',
+    #    required = False,
+    #)
     grants_amount = forms.IntegerField(
         label = u'Proposals greater than $ Amount',
         required = False,
@@ -78,7 +78,7 @@ class GrantDonorFilterForm(forms.Form):
             #Field(AppendedText('submission_date_from', '<span class="glyphicon glyphicon-calendar"></span>'), placeholder="From Submission date", css_class="input-sm"),
             Field('submission_date_from', placeholder="From Submission date", css_class="input-sm"),
             Field('submission_date_to', placeholder="To Submission date", css_class="input-sm"),
-            Field('grants_count', placeholder = 'donors with X number of proposals',css_class='input-sm'),
+            #Field('grants_count', placeholder = 'donors with X number of proposals',css_class='input-sm'),
             Field('grants_amount', placeholder = 'proposals greater than $ amount', css_class='input-sm'),
             Field('sector', css_class='input-sm'),
             Field('subsector', css_class='input-sm'),

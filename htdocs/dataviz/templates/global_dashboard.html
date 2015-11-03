@@ -68,7 +68,8 @@ $(document).ready(function() {
                 if (Object.keys(data['donor_categories']).length > 0) {
                     $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
                     //createAlert('info', data['criteria']);
-                    draw_chart(filters);
+                    var criteria = data['criteria'];
+                    draw_chart(criteria);
                 } else {
                     $("#donor_with_num_of_grants_chart").empty();
                     createAlert("warning dynamic-alert", "There is no data available for the specified criteria");
@@ -82,6 +83,7 @@ function draw_chart(filters) {
     var data_raw =  $("#donor_with_num_of_grants_data").html();
     var data = $.parseJSON(data_raw);
     var chart_title = '# Grants Per Donor Category'
+    drilldown_levels = [];
     $('#donor_with_num_of_grants_chart').highcharts({
         chart: {
             zoomType: 'x',
@@ -119,9 +121,11 @@ function draw_chart(filters) {
                         var current_level = this.series[0].name + '  <span style="color: red;"> - ' + e.point.name + '</span>';
                         drilldown_levels.push(current_level);
                         this.setTitle({ text: current_level});
+                        console.log(drilldown_levels);
                     }
                 },
                 drillup: function(e) {
+                    console.log(drilldown_levels);
                     drilldown_levels.pop();
                     var name = drilldown_levels[drilldown_levels.length - 1 ];
                     if (name == undefined ) {

@@ -138,7 +138,11 @@ class DonorCategoriesView(View):
         bar = {}
         tooltip = {'valuePrefix': '$', 'valueSuffix': ' USD', 'valueDecimals': 2}
         for g in grants:
-            if g.donor == None: continue
+            try:
+                if g.donor == None: continue
+            except Exception as e:
+                #print(e.message)
+                continue
             id = g.donor.name
             if prev_id != id:
                 if data:
@@ -163,6 +167,6 @@ class DonorCategoriesView(View):
         graph['tooltip'] = tooltip
         series.append(graph)
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
-
+        print(kwargs)
         final_dict = {'donor_categories': donor_categories, 'donors': series, 'criteria': kwargs}
         return JsonResponse(final_dict, safe=False)
