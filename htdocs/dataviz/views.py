@@ -48,42 +48,27 @@ class GlobalDashboard(TemplateView):
         context = super(GlobalDashboard, self).get_context_data(**kwargs)
         form = GrantDonorFilterForm()
         context['form'] = form
-        #data = Grant.objects.values("submission_date", "status").distinct()
-        #data = Grant.objects.all()
-        #context['testdata'] = data
         return context
 
 
-class TestChart(TemplateView):
-    template_name = 'test_chart.html'
-
-
-
 class DonorCategoriesView(View):
-        # grants = Grant.objects.filter(submission_date__gte='2014-10-12').values('grant_id', 'submission_date', 'donor__donor_id', 'donor__name', 'donor__category', 'donor__category__name')
-        # data = DonorCategory.objects.filter(donors__grants__submission_date__gte='2014-10-12').annotate(donors_count = Count('donors')).prefetch_related('donors')
-        # donors = Donor.objects.filter(grants__submission_date__gte='2014-10-12').annotate(grants_count=Count('grants')).filter(grants_count__gte=3).prefetch_related('grants')
-        # grants = Grant.objects.filter(submission_date__gte='2014-10-12', donor=855)
+
     def get_donor_categories_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'donors__grants__')
-        num_grants = 0
-        print("donor_categories: %s" % kwargs)
+        #print("donor_categories: %s" % kwargs)
         donor_categories = DonorCategory.objects.filter(**kwargs).annotate(drilldown=F('name'), y=Count('donors')).values('name', 'drilldown', 'y').distinct().prefetch_related('donors')
         return list(donor_categories)
 
     def get_donors_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'grants__')
-        num_grants = 0
         #print("donors: %s: " % kwargs)
-        donors = Donor.objects.filter(**kwargs).annotate(id=F('category__name'), y=Count('grants')).filter(y__gte=num_grants).values('id', 'name', 'y').prefetch_related('grants').order_by('id')
+        donors = Donor.objects.filter(**kwargs).annotate(id=F('category__name'), y=Count('grants')).values('id', 'name', 'y').prefetch_related('grants').order_by('id')
         return donors
 
     def get_grants_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
         #print("grants: %s" % kwargs)
-        grants = Grant.objects.filter(**kwargs).order_by('donor') #submission_date__gte='2014-10-12'
-        #grants = Grant.objects.filter(grant_id = 5873);
-        #print("grant_ID: %s startDate: %s" % (grants[0].grant_id, grants[0].start_date))
+        grants = Grant.objects.filter(**kwargs).order_by('donor')
         return grants
 
     def get(self, request, *args, **kwargs):
@@ -141,7 +126,6 @@ class DonorCategoriesView(View):
             try:
                 if g.donor == None: continue
             except Exception as e:
-                #print(e.message)
                 continue
             id = g.donor.name
             if prev_id != id:
@@ -167,6 +151,6 @@ class DonorCategoriesView(View):
         graph['tooltip'] = tooltip
         series.append(graph)
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
-        print(kwargs)
+        #print(kwargs)
         final_dict = {'donor_categories': donor_categories, 'donors': series, 'criteria': kwargs}
         return JsonResponse(final_dict, safe=False)
