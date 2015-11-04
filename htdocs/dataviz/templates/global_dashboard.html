@@ -19,200 +19,204 @@
         </div>
     </div>
 
-    <div id="test"> </div>
+    <div id="table_for_chart_data"> </div>
 {% endblock content %}
 
 
 {% block extra_js %}
 <script type="text/javascript">
-"use strict";
-var drilldown_levels = [];
+    "use strict";
+    var drilldown_levels = [];
 
-$(document).ready(function() {
+    $(document).ready(function() {
     
-    // Remove the hasDatePicker class so that the date-range works properly
-    $( "#id_submission_date_from" ).removeClass("hasDatepicker");
-    $( "#id_submission_date_to" ).removeClass("hasDatepicker");
+        // Remove the hasDatePicker class so that the date-range works properly
+        $( "#id_submission_date_from" ).removeClass("hasDatepicker");
+        $( "#id_submission_date_to" ).removeClass("hasDatepicker");
     
-    // Submission Date Range Picker 
-    $( "#id_submission_date_from" ).datepicker({
-        numberOfMonths: 1,
-        dateFormat: 'yy-mm-dd',
-        onClose: function( selectedDate ) {
-            $( "#id_submission_date_to" ).datepicker( "option", "minDate", selectedDate );
-        }
-    });
-    $( "#id_submission_date_to" ).datepicker({
-        numberOfMonths: 1,
-        dateFormat: 'yy-mm-dd',
-        onClose: function( selectedDate ) {
-            $( "#id_submission_date_from" ).datepicker( "option", "maxDate", selectedDate );
-        }
-    });
-    // End Submission Date Range Picker 
-    $('#grants_donor_filter_form').on('submit', function(e) {
-        e.preventDefault();
-        var filters = {};
-        $('#grants_donor_filter_form *').filter(':input').each(function() {
-            if (this.name != 'submit' && this.name != 'reset' && this.value) {
-                filters[this.name] = this.value;
+        // Submission Date Range Picker 
+        $( "#id_submission_date_from" ).datepicker({
+            numberOfMonths: 1,
+            dateFormat: 'yy-mm-dd',
+            onClose: function( selectedDate ) {
+                $( "#id_submission_date_to" ).datepicker( "option", "minDate", selectedDate );
             }
         });
-        
-
-        $('#donor_with_num_of_grants_data').empty();
-        //$.get("/api/v1/donors/", filters)
-        //$.get("/api/v1/donorcategories/", filters)
-        $.get("/z/", filters)
-            .done(function(data) {
-                if (Object.keys(data['donor_categories']).length > 0) {
-                    $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
-                    //createAlert('info', data['criteria']);
-                    var criteria = data['criteria'];
-                    draw_chart(criteria);
-                } else {
-                    $("#donor_with_num_of_grants_chart").empty();
-                    createAlert("warning dynamic-alert", "There is no data available for the specified criteria");
+        $( "#id_submission_date_to" ).datepicker({
+            numberOfMonths: 1,
+            dateFormat: 'yy-mm-dd',
+            onClose: function( selectedDate ) {
+                $( "#id_submission_date_from" ).datepicker( "option", "maxDate", selectedDate );
+            }
+        });
+        // End Submission Date Range Picker 
+        $('#grants_donor_filter_form').on('submit', function(e) {
+            e.preventDefault();
+            var filters = {};
+            $('#grants_donor_filter_form *').filter(':input').each(function() {
+                if (this.name != 'submit' && this.name != 'reset' && this.value) {
+                    filters[this.name] = this.value;
                 }
             });
-    });
 
-});
-
-function draw_chart(filters) {
-    var data_raw =  $("#donor_with_num_of_grants_data").html();
-    var data = $.parseJSON(data_raw);
-    var chart_title = '# Grants Per Donor Category'
-    drilldown_levels = [];
-    $('#donor_with_num_of_grants_chart').highcharts({
-        chart: {
-            zoomType: 'x',
-            resetZoomButton: {
-                position: {
-                    // align: 'right', // by default
-                    // verticalAlign: 'top', // by default
-                    x: -5,
-                    y: -30
-                }
-            },
-            type: 'column',
-            margin: [80, 0, 90, 70],
-            renderTo: 'donor_with_num_of_grants_chart',
-            spacingBottom: 0,
-            events: {
-                drilldown: function (e) {
-                    /*
-                    //console.log(e.point.grant_id);
-                    console.log(e.point.name);
-                    var thedonor = $.grep(data['donors'], function(event){ return event.id == e.point.name; });
-                    if (thedonor.length == 0) {
-                        console.log(e.point.name + "  NOT FOUND!");
-                    } else if (thedonor.length == 1) {
-                        console.log(" FOUND IT: " + thedonor[0].id);
-                        //console.log(thedonor[0].data);
-                        var c = new tableObject(thedonor[0].data);
-                        document.getElementById("test").appendChild(c);
+            $('#donor_with_num_of_grants_data').empty();
+            $.get("/z/", filters)
+                .done(function(data) {
+                    if (Object.keys(data['donor_categories']).length > 0) {
+                        $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
+                        //createAlert('info', data['criteria']);
+                        var criteria = data['criteria'];
+                        draw_chart(criteria);
                     } else {
-                        console.log("FOUND SEVERAL");
+                        $("#donor_with_num_of_grants_chart").empty();
+                        createAlert("warning dynamic-alert", "There is no data available for the specified criteria");
                     }
-                    */
-                    
-                    if (this.series[0].name != 'Total USD Amount') {
-                        var current_level = this.series[0].name + '  <span style="color: red;"> - ' + e.point.name + '</span>';
-                        drilldown_levels.push(current_level);
-                        this.setTitle({ text: current_level});
-                        console.log(drilldown_levels);
-                    }
-                },
-                drillup: function(e) {
-                    console.log(drilldown_levels);
-                    drilldown_levels.pop();
-                    var name = drilldown_levels[drilldown_levels.length - 1 ];
-                    if (name == undefined ) {
-                        name = '# Grants per Donor Category';
-                    }
-                    this.setTitle({ text: name});
-                },
-            },
-        },
-        title: {
-            text: chart_title
-        },
-        subtitle: {
-            text: JSON.stringify(filters)//'Source: <a href="https://gait.mercycorps.org" target="_blank">GAIT</a>'
-        },
-        xAxis: {
-            type: 'category',
-            labels: {
-                //rotation: -45,
-                style: {
-                    fontSize: '10px',
-                }
-            }
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: 'Values',
-                align: 'high'
-            }
-        },
-        plotOptions: {
-            column: {
-                colorByPoint: true,
-            },
-            pointPadding: 0.2,
-            groupPadding: 0,
-            borderWidth: 1,
-            series: {
-                allowPointSelect: true,
-                animation: {
-                    duration: 1000
-                },
-                dataLabels: {
-                    enabled: true,
-                    align: 'top',
-                    // rotation: -90,
-                    //color: '#FFFFFF',
-                    //y: -10
-                },
-            },
-        },
-        tooltip: {
-            backgroundColor: '#FCFFC5',
-            //borderColor: 'black',
-            borderRadius: 10,
-            borderWidth: 1,
-            shared: true,
-            shadow: false,
-            useHTML: true,
-            style: {
-                padding: 5
-            },
-            headerFormat: '<small>{point.key}</small><table>',
-            pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
-                '<td style="text-align: right"><b>{point.y} </b></td></tr>',
-            footerFormat: '</table>',
-            /*
-            formatter: function() {
-                //return '<b>' + this.point.name + '</b>, has <b>' + this.y + '</b> grants. <br /> '+ this.series.name;
-                return this.y;
-            },
-            */
-        },
-        legend: {
-            enabled: false
-        },
-        series: [{
-            type: 'pie',
-            name: chart_title,
-            data: data['donor_categories'],
-        }],
-        drilldown: {
-            series: data['donors']
-        },
+                });
+        });
     });
-}
+
+    function draw_chart(filters) {
+        var data_raw =  $("#donor_with_num_of_grants_data").html();
+        var data = $.parseJSON(data_raw);
+        var chart_title = '# Grants Per Donor Category'
+        drilldown_levels = [];
+        $('#donor_with_num_of_grants_chart').highcharts({
+            chart: {
+                zoomType: 'x',
+                resetZoomButton: {
+                    position: {
+                        // align: 'right', // by default
+                        // verticalAlign: 'top', // by default
+                        x: -5,
+                        y: -30
+                    }
+                },
+                type: 'column',
+                margin: [80, 0, 90, 70],
+                renderTo: 'donor_with_num_of_grants_chart',
+                spacingBottom: 0,
+                events: {
+                    drilldown: function (e) {
+                        
+                        //console.log(e.point.grant_id);
+                        //console.log(e.point.name);
+                        var thedonor = $.grep(data['donors'], function(event){ return event.id == e.point.name; });
+                        if (thedonor.length == 0) {
+                            console.log(e.point.name + "  NOT FOUND!");
+                        } else if (thedonor.length == 1) {
+                            console.log(" FOUND IT: " + thedonor[0].id);
+                            //console.log(thedonor[0].data);
+                            var c = new tableObject(thedonor[0].data);
+                            $("#table_for_chart_data").empty();
+                            $("#table_for_chart_data").append(c);
+                            //$("#table_for_chart_data").next('table').DataTable();
+                            $("#chart_data").DataTable({
+                                "columnDefs": [ {
+                                    "targets": 'drilldown',
+                                    "searchable": false,
+                                    "visible": false
+                                } ]
+                            });
+                        } else {
+                            console.log("FOUND SEVERAL");
+                        }
+                        
+                        if (this.series[0].name != 'Total USD Amount') {
+                            var current_level = this.series[0].name + '  <span style="color: red;"> - ' + e.point.name + '</span>';
+                            drilldown_levels.push(current_level);
+                            this.setTitle({ text: current_level});
+                            //console.log(drilldown_levels);
+                        }
+                    },
+                    drillup: function(e) {
+                        //console.log(drilldown_levels);
+                        drilldown_levels.pop();
+                        var name = drilldown_levels[drilldown_levels.length - 1 ];
+                        if (name == undefined ) {
+                            name = '# Grants per Donor Category';
+                        }
+                        this.setTitle({ text: name});
+                    },
+                },
+            },
+            title: {
+                text: chart_title
+            },
+            subtitle: {
+                text: JSON.stringify(filters)//'Source: <a href="https://gait.mercycorps.org" target="_blank">GAIT</a>'
+            },
+            xAxis: {
+                type: 'category',
+                labels: {
+                    //rotation: -45,
+                    style: {
+                        fontSize: '10px',
+                    }
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Values',
+                    align: 'high'
+                }
+            },
+            plotOptions: {
+                column: {
+                    colorByPoint: true,
+                },
+                pointPadding: 0.2,
+                groupPadding: 0,
+                borderWidth: 1,
+                series: {
+                    allowPointSelect: true,
+                    animation: {
+                        duration: 1000
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        align: 'top',
+                        // rotation: -90,
+                        //color: '#FFFFFF',
+                        //y: -10
+                    },
+                },
+            },
+            tooltip: {
+                backgroundColor: '#FCFFC5',
+                //borderColor: 'black',
+                borderRadius: 10,
+                borderWidth: 1,
+                shared: true,
+                shadow: false,
+                useHTML: true,
+                style: {
+                    padding: 5
+                },
+                headerFormat: '<small>{point.key}</small><table>',
+                pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
+                    '<td style="text-align: right"><b>{point.y} </b></td></tr>',
+                footerFormat: '</table>',
+                /*
+                formatter: function() {
+                    //return '<b>' + this.point.name + '</b>, has <b>' + this.y + '</b> grants. <br /> '+ this.series.name;
+                    return this.y;
+                },
+                */
+            },
+            legend: {
+                enabled: false
+            },
+            series: [{
+                type: 'pie',
+                name: chart_title,
+                data: data['donor_categories'],
+            }],
+            drilldown: {
+                series: data['donors']
+            },
+        });
+    }
 
 </script>
 {% endblock %}

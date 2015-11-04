@@ -56,58 +56,87 @@ function createAlert (type, message) {
 
        
 var tableObject = function (json) {
-   var headerCount = new Object();
-   var createTR = function (id) {
-       var tr = document.createElement("tr");
-       tr.ID = id;
-       return tr;
-   };
-   var createTH = function (html) {
-       var th = document.createElement("th");
-       th.innerHTML = html;
-       return th;
-   };
-   var createTD = function (html) {
-       var td = document.createElement("td");
-       td.innerHTML = html;
-       return td;
-   };
-   var getName = function (id) {
-       for (var name in headerCount) {
-           if (eval("headerCount." + name) == id) {
-               return name;
-           }
-       }
-   };
-   var pTable;
-   if (json.length > 0) {
-       var index = 0;
-       pTable = document.createElement("table");
-       var head = createTR();
-       for (var i = 0; i < json.length; i++)
-           for (var item in json[i]) {
-               if (!headerCount.hasOwnProperty(item)) {
-                   head.appendChild(createTH(item));
-                   eval('headerCount.' + item + "=" + index);
-                   index++;
-               }
-           }
-       pTable.appendChild(head);
-       for (var i = 0; i < json.length; i++) {
-           var row = new createTR(i);
-           for (var j = 0; j < index; j++) {
-               var name = getName(j);
-               if (eval("json[" + i + "].hasOwnProperty('" + name + "')")) {
-                   row.appendChild(createTD(eval('json[' + i + '].' + name)));
-               }
-               else
-                   row.appendChild(createTD(''));
-           }
-           pTable.appendChild(row);
-       }
-   }
-   return pTable;
+    var headerCount = new Object();
 
+    var createTHEAD = function () {
+        var thead = document.createElement('thead');
+        return thead;
+    }
+
+    var createTBODY = function () {
+        var tbody = document.createElement('tbody');
+        return tbody;
+    }
+
+    var createTR = function (id) {
+        var tr = document.createElement("tr");
+        tr.ID = id;
+        return tr;
+    };
+
+    var createTH = function (html) {
+        var th = document.createElement("th");
+        th.innerHTML = html;
+        return th;
+    };
+
+    var createTD = function (html) {
+        var td = document.createElement("td");
+        td.innerHTML = html;
+        return td;
+    };
+
+    var getName = function (id) {
+        for (var name in headerCount) {
+            if (eval("headerCount." + name) == id) {
+                return name;
+            }
+        }
+    };
+    var data = json.slice();
+    //data.forEach(function(v){ delete v.drilldown });
+    var pTable;
+    if (data.length > 0) {
+        var index = 0;
+        pTable = document.createElement("table");
+        var thead = createTHEAD();
+        var head = createTR();
+        for (var i = 0; i < data.length; i++) {
+            for (var item in data[i]) {
+                if (item == 'drilldown') { continue };
+                if (!headerCount.hasOwnProperty(item)) {
+                    head.appendChild(createTH(item));
+                    eval('headerCount.' + item + "=" + index);
+                    index++;
+                }
+            }
+        }
+        thead.appendChild(head);
+        pTable.appendChild(thead);
+        var tbody = createTBODY();
+        for (var i = 0; i < data.length; i++) {
+            var row = new createTR(i);
+            for (var j = 0; j < index; j++) {
+                var name = getName(j);
+                //console.log(name);
+                if (name == 'drilldown') {
+                    continue;
+                }
+                if (eval("data[" + i + "].hasOwnProperty('" + name + "')")) {
+                    row.appendChild(createTD(eval('data[' + i + '].' + name)));
+                } else {
+                    row.appendChild(createTD(''));
+                }
+            }
+            tbody.appendChild(row);
+        }
+        pTable.appendChild(tbody);
+        pTable.setAttribute("id", "chart_data");
+        pTable.setAttribute("class", "table table-striped table-bordered");
+        pTable.setAttribute("cellspacing", "0");
+        //pTable.setAttribute("width", "100%");
+    }
+    return pTable;
 };
 // <div id="test"> </div>
 /*

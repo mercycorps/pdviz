@@ -23,6 +23,8 @@
         <!-- jQuery UI CSS -->
         <link href="{% static 'css/jquery-ui.min.css' %}" rel="stylesheet" type="text/css" />
 
+        <link href="{% static 'css/datatables.min.css' %}" rel="stylesheet" type="text/css" />
+
         <!-- Custom Application css -->
         <link href="{% static 'css/app.css' %}" rel="stylesheet" type="text/css">
 
@@ -169,6 +171,9 @@
 
         <!-- Plugin for hicharts to add grouping functionality -->
         <script type="text/javascript" src="{% static 'js/grouped-categories.js' %}"></script>
+
+        <script type="text/javascript" src="{% static 'js/datatables.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/underscore-min.js' %}"></script>
 
         {% block extra_js %}{% endblock %}
     </body>
