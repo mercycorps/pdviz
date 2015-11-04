@@ -11,7 +11,19 @@ class GrantViewSet(viewsets.ModelViewSet):
     serializer_class = GrantSerializer
 
     def get_queryset(self):
-        queryset = Grant.objects.all()[:20]
+        kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, prefix='')
+        queryset = Grant.objects.filter(**kwargs)[:50]
+        return queryset
+
+
+class CountryViewSet(viewsets.ModelViewSet):
+    serializer_class = CountrySerializer
+
+    def get_queryset(self):
+        queryset = Country.objects.all()
+        region_id = self.request.query_params.get('region', None)
+        if region_id:
+            queryset = queryset.filter(region=region_id)
         return queryset
 
 
@@ -20,16 +32,7 @@ class DonorViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, prefix='grants__')
-        num_grants = self.request.GET.get('grants_count', None)
-        if num_grants == None:
-            return Donor.objects.filter(**kwargs).annotate(grants_count=Count('grants'))
-        else:
-            return Donor.objects.filter(**kwargs).annotate(grants_count=Count('grants')).filter(grants_count__gt=num_grants)
-
-
-class CountryViewSet(viewsets.ModelViewSet):
-    serializer_class = CountrySerializer
-    queryset = Country.objects.all()
+        return Donor.objects.filter(**kwargs).annotate(grants_count=Count('grants'))
 
 
 class DonorCategoryViewSet(viewsets.ModelViewSet):

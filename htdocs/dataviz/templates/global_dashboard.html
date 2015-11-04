@@ -60,7 +60,7 @@
             });
 
             $('#donor_with_num_of_grants_data').empty();
-            $.get("/z/", filters)
+            $.get("/global_dashboard_data/", filters)
                 .done(function(data) {
                     if (Object.keys(data['donor_categories']).length > 0) {
                         $("#donor_with_num_of_grants_data").append(JSON.stringify(data));

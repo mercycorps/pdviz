@@ -41,10 +41,10 @@ urlpatterns = [
     url(r'^api/v1/', include(router.urls)),
     url(r'^api/docs/', include('rest_framework_swagger.urls')),
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
-    url(r'^global/$', GlobalDashboard.as_view(), name='globaldashboard'),
-    url(r'^dataviz/countries_by_region/(?P<region>[-\w]+)/$', CountriesByRegion.as_view(), name='cbg'),
-    url(r'^z/$', DonorCategoriesView.as_view(), name='z'),
     url(r'^$', HomeView.as_view(), name='home'),
+    url(r'^global_dashboard/$', GlobalDashboard.as_view(), name='global_dashboard'),
+    url(r'^global_dashboard_data/$', DonorCategoriesView.as_view(), name='global_dashboard_data'),
+    #url(r'^dataviz/countries_by_region/(?P<region>[-\w]+)/$', CountriesByRegion.as_view(), name='cbg'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -5,6 +5,7 @@ from .models import *
 class GrantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grant
+        depth = 1
 
 
 class DonorSerializer(serializers.ModelSerializer):

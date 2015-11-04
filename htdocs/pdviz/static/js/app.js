@@ -1,11 +1,9 @@
 $(document).ready(function() {
     $('body').on('change', 'select#id_region', function() {
         var selected_region = $(this).val();
-        var url ;
-        if (selected_region == undefined || selected_region == -1 || selected_region == '' || selected_region == 0) {
-            url = '/api/v1/countries/';
-        } else {
-            url = "/dataviz/countries_by_region/" + selected_region + "/";
+        var url = '/api/v1/countries/';
+        if (selected_region != undefined && selected_region != -1 && selected_region != '' && selected_region != 0) {
+           url = url + '?region=' + selected_region;
         }    
         $.getJSON(url, function(countries) {
             var options = "<option value=''>-- Country --</option>";
@@ -19,11 +17,9 @@ $(document).ready(function() {
 
     $('body').on('change', 'select#id_sector', function() {
         var selected_sector = $(this).val();
-        var url;
-        if (selected_sector == undefined || selected_sector == -1 || selected_sector == '' || selected_sector == 0) {
-            url = '/api/v1/subsector/';
-        } else {
-            url = '/api/v1/subsector/?sector=' + selected_sector;
+        var url = '/api/v1/subsector/';
+        if (selected_sector != undefined && selected_sector != -1 && selected_sector != '' && selected_sector != 0) {
+            url = url + '?sector=' + selected_sector;
         }
         $.getJSON(url, function(subsectors) {
             var options = "<option value=''>--Area of Focus--</option>";

@@ -18,7 +18,7 @@ from .forms import *
 from .mixins import *
 from .api import *
 
-
+"""
 class CountriesByRegion(JSONResponseMixin, ListView):
     model = Country
 
@@ -33,6 +33,7 @@ class CountriesByRegion(JSONResponseMixin, ListView):
 
     def render_to_response(self, context, **response_kwargs):
         return self.render_to_json_response(context, **response_kwargs)
+"""
 
 
 class GlobalDashboard(TemplateView):
