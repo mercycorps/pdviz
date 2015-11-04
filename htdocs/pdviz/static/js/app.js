@@ -37,7 +37,7 @@ $(document).ready(function() {
 
 });
 
-function createAlert (type, message) {
+function createAlert (type, message, fade=true) {
     $("#alerts").append(
         $(
             "<div class='alert alert-" + type + " alert-dismissable'>" +
@@ -46,8 +46,10 @@ function createAlert (type, message) {
             "</div>"
         )
     );
-    // Remove the alert after 30 seconds if the user does not close it.
-    $(".dynamic-alert").delay(3000).fadeOut("slow", function () { $(this).remove(); });
+    if (fade == true) {
+        // Remove the alert after 30 seconds if the user does not close it.
+        $(".dynamic-alert").delay(3000).fadeOut("slow", function () { $(this).remove(); });
+    }
 }
 
        

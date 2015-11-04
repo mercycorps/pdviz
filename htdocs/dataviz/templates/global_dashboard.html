@@ -15,10 +15,15 @@
             </div>
         </div>
         <div class="col-sm-10">
+            <div id='criteria-panel' class="panel panel-success" style="display: none;">
+                <div class="panel-heading"> Filter Criteria </div>
+                <div class="panel-body" id="criteria"> No criteria specified </div>
+            </div>
             <div id="donor_with_num_of_grants_chart"></div>
             <div id="donor_with_num_of_grants_table_div" class="table-responsive"> </div>
         </div>
     </div>
+
 
 {% endblock content %}
 
@@ -64,8 +69,9 @@
                 .done(function(data) {
                     if (Object.keys(data['donor_categories']).length > 0) {
                         $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
-                        //createAlert('info', data['criteria']);
                         var criteria = data['criteria'];
+                        $("#criteria").html(JSON.stringify(criteria));
+                        $("#criteria-panel").show();
                         draw_chart(criteria);
                     } else {
                         $("#donor_with_num_of_grants_chart").empty();
