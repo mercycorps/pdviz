@@ -16,10 +16,10 @@
         </div>
         <div class="col-sm-10">
             <div id="donor_with_num_of_grants_chart"></div>
+            <div id="donor_with_num_of_grants_table_div"> </div>
         </div>
     </div>
 
-    <div id="table_for_chart_data"> </div>
 {% endblock content %}
 
 
@@ -75,6 +75,19 @@
         });
     });
 
+    /*
+     *  Show the corresponding table for the donor_with_num_grants chart
+     */
+    function show_donor_with_num_of_grants_table(drillupdown_data) {
+        var donor_with_num_of_grants_table = new tableObject(drillupdown_data[0].data);
+        $("#donor_with_num_of_grants_table_div").empty();
+        $("#donor_with_num_of_grants_table_div").append(donor_with_num_of_grants_table);
+        $("#donor_with_num_of_grants_table").DataTable();
+    }
+
+    /*
+     * Draw the chart to visualize grants per donor or donor categories.
+     */
     function draw_chart(filters) {
         var data_raw =  $("#donor_with_num_of_grants_data").html();
         var data = $.parseJSON(data_raw);
@@ -97,45 +110,37 @@
                 spacingBottom: 0,
                 events: {
                     drilldown: function (e) {
-                        
-                        //console.log(e.point.grant_id);
-                        //console.log(e.point.name);
-                        var thedonor = $.grep(data['donors'], function(event){ return event.id == e.point.name; });
-                        if (thedonor.length == 0) {
+                        var drilldown_data = $.grep(data['donors'], function(event){ return event.id == e.point.name; });
+                        if (drilldown_data.length == 0) {
                             console.log(e.point.name + "  NOT FOUND!");
-                        } else if (thedonor.length == 1) {
-                            console.log(" FOUND IT: " + thedonor[0].id);
-                            //console.log(thedonor[0].data);
-                            var c = new tableObject(thedonor[0].data);
-                            $("#table_for_chart_data").empty();
-                            $("#table_for_chart_data").append(c);
-                            //$("#table_for_chart_data").next('table').DataTable();
-                            $("#chart_data").DataTable({
-                                "columnDefs": [ {
-                                    "targets": 'drilldown',
-                                    "searchable": false,
-                                    "visible": false
-                                } ]
-                            });
+                        } else if (drilldown_data.length == 1) {
+                            show_donor_with_num_of_grants_table(drilldown_data);
                         } else {
-                            console.log("FOUND SEVERAL");
+                            createAlert("warning", "Found several objects with name: " + e.point.name);
                         }
-                        
+
                         if (this.series[0].name != 'Total USD Amount') {
-                            var current_level = this.series[0].name + '  <span style="color: red;"> - ' + e.point.name + '</span>';
+                            var current_level = this.series[0].name + ' - <span style="color: red;">' + e.point.name + '</span>';
                             drilldown_levels.push(current_level);
                             this.setTitle({ text: current_level});
-                            //console.log(drilldown_levels);
                         }
                     },
                     drillup: function(e) {
-                        //console.log(drilldown_levels);
                         drilldown_levels.pop();
                         var name = drilldown_levels[drilldown_levels.length - 1 ];
                         if (name == undefined ) {
                             name = '# Grants per Donor Category';
                         }
                         this.setTitle({ text: name});
+
+                        name = name.split('<span style="color: red;">');
+                        if (name.length > 1) {
+                            name = name[1].replace(/<\/span>$/, '');
+                            var drillup_data = $.grep(data['donors'], function(event){ return event.id == name; });
+                            show_donor_with_num_of_grants_table(drillup_data);
+                        } else {
+                            $("#donor_with_num_of_grants_table_div").empty();
+                        }
                     },
                 },
             },
@@ -143,7 +148,7 @@
                 text: chart_title
             },
             subtitle: {
-                text: JSON.stringify(filters)//'Source: <a href="https://gait.mercycorps.org" target="_blank">GAIT</a>'
+                text: 'Source: <a href="https://gait.mercycorps.org" target="_blank">GAIT</a>'
             },
             xAxis: {
                 type: 'category',
@@ -182,6 +187,7 @@
                     },
                 },
             },
+            
             tooltip: {
                 backgroundColor: '#FCFFC5',
                 //borderColor: 'black',
@@ -213,6 +219,13 @@
                 data: data['donor_categories'],
             }],
             drilldown: {
+                drillUpButton: {
+                    relativeTo: 'spacingBox',
+                    position: {
+                        y: 20,
+                        x: 0
+                    },
+                },
                 series: data['donors']
             },
         });

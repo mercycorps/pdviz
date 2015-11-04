@@ -131,9 +131,9 @@ var tableObject = function (json) {
             tbody.appendChild(row);
         }
         pTable.appendChild(tbody);
-        pTable.setAttribute("id", "chart_data");
+        pTable.setAttribute("id", "donor_with_num_of_grants_table");
         pTable.setAttribute("class", "table table-striped table-bordered");
-        pTable.setAttribute("cellspacing", "0");
+        // pTable.setAttribute("cellspacing", "0");
         //pTable.setAttribute("width", "100%");
     }
     return pTable;
