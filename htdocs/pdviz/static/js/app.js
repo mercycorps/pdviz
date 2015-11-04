@@ -99,7 +99,7 @@ var tableObject = function (json) {
         var head = createTR();
         for (var i = 0; i < data.length; i++) {
             for (var item in data[i]) {
-                if (item == 'drilldown') { continue };
+                if (item == 'drilldown'  || item == 'y') { continue };
                 if (!headerCount.hasOwnProperty(item)) {
                     head.appendChild(createTH(item));
                     eval('headerCount.' + item + "=" + index);
@@ -114,33 +114,32 @@ var tableObject = function (json) {
             var row = new createTR(i);
             for (var j = 0; j < index; j++) {
                 var name = getName(j);
-                //console.log(name);
-                if (name == 'drilldown') {
-                    continue;
-                }
                 if (eval("data[" + i + "].hasOwnProperty('" + name + "')")) {
-                    row.appendChild(createTD(eval('data[' + i + '].' + name)));
-                } else {
-                    row.appendChild(createTD(''));
+                    var cell_value = eval('data[' + i + '].' + name);
+                    if (name == 'gait_id') {
+                        cell_value = "<a href='https://gait.mercycorps.org/editgrant.vm?GrantID=" + cell_value + "' target='_blank'>" + cell_value + "</a>";
+                    }
+                    row.appendChild(createTD(cell_value));
                 }
             }
             tbody.appendChild(row);
         }
         pTable.appendChild(tbody);
         pTable.setAttribute("id", "donor_with_num_of_grants_table");
-        pTable.setAttribute("class", "table table-striped table-bordered");
-        // pTable.setAttribute("cellspacing", "0");
-        //pTable.setAttribute("width", "100%");
+        pTable.setAttribute("class", "table table-striped table-bordered table-hover table-condensed");
     }
     return pTable;
 };
-// <div id="test"> </div>
-/*
-var table = "[{'Country':'mycity','Name':'abc','Age':'29','Email':'test@mail.com'}," +
+/* 
+ * ********* USAGE *******
+ * <div id="test"> </div>
+ * var table = "[{'Country':'mycity','Name':'abc','Age':'29','Email':'test@mail.com'}," +
        "{'Name':'abcd','Age':'39','Email':'test1@mail.com'}," +
        "{'Name':'abcde','Age':'30','Email':'test2@mail.com'}," +
        "{'Age':'30','Sex':'male','Name':'abcde'}]";
-*/
-//table = eval('' + table + '');
-//var c = new tableObject(table);
-//document.getElementById("test").appendChild(c);
+ *
+ * table = eval('' + table + '');
+ * var c = new tableObject(table);
+ * document.getElementById("test").appendChild(c);
+ *
+ */

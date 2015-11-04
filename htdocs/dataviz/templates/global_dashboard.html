@@ -16,7 +16,7 @@
         </div>
         <div class="col-sm-10">
             <div id="donor_with_num_of_grants_chart"></div>
-            <div id="donor_with_num_of_grants_table_div"> </div>
+            <div id="donor_with_num_of_grants_table_div" class="table-responsive"> </div>
         </div>
     </div>
 
@@ -100,8 +100,8 @@
                     position: {
                         // align: 'right', // by default
                         // verticalAlign: 'top', // by default
-                        x: -5,
-                        y: -30
+                        x: -10,
+                        y: -25
                     }
                 },
                 type: 'column',
@@ -111,8 +111,9 @@
                 events: {
                     drilldown: function (e) {
                         var drilldown_data = $.grep(data['donors'], function(event){ return event.id == e.point.name; });
-                        if (drilldown_data.length == 0) {
-                            console.log(e.point.name + "  NOT FOUND!");
+                        if (drilldown_data.length == 0) { // must be at the grants level of drilldown
+                            //console.log(e.point.name + "  NOT FOUND!");
+                            window.open('https://gait.mercycorps.org/editgrant.vm?GrantID=' + e.point.gait_id, '_blank');
                         } else if (drilldown_data.length == 1) {
                             show_donor_with_num_of_grants_table(drilldown_data);
                         } else {

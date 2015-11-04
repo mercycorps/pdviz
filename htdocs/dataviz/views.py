@@ -57,19 +57,19 @@ class DonorCategoriesView(View):
     def get_donor_categories_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'donors__grants__')
         #print("donor_categories: %s" % kwargs)
-        donor_categories = DonorCategory.objects.filter(**kwargs).annotate(drilldown=F('name'), y=Count('donors')).values('name', 'drilldown', 'y').distinct().prefetch_related('donors')
+        donor_categories = DonorCategory.objects.filter(**kwargs).annotate(drilldown=F('name'), donors_count=Count('donors')).annotate(y=F('donors_count')).values('name', 'drilldown', 'donors_count', 'y').distinct()
         return list(donor_categories)
 
     def get_donors_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'grants__')
         #print("donors: %s: " % kwargs)
-        donors = Donor.objects.filter(**kwargs).annotate(id=F('category__name'), y=Count('grants')).values('id', 'name', 'y').prefetch_related('grants').order_by('id')
+        donors = Donor.objects.filter(**kwargs).annotate(id=F('category__name'), grants_count=Count('grants')).annotate(y=F('grants_count')).values('id', 'name', 'grants_count', 'y').order_by('id')
         return donors
 
     def get_grants_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
         #print("grants: %s" % kwargs)
-        grants = Grant.objects.filter(**kwargs).order_by('donor')
+        grants = Grant.objects.filter(**kwargs).prefetch_related('donor').order_by('donor')
         return grants
 
     def get(self, request, *args, **kwargs):
@@ -105,6 +105,7 @@ class DonorCategoriesView(View):
             bar_name = d['name'] # assign the barname to a variable for reuse
             bar['name'] = bar_name # set the name of the bar on the X-axis
             bar['y'] = d['y'] # set the bar's value for the Y-axis
+            bar['grants_count'] = d['grants_count'] # set the bar's value for the Y-axis
             bar['drilldown'] = d['name'] # set the name of the drilldown graph for this bar
             data.append(bar) # append the bar to the graph's data list
             bar = {} # Initialize a new bar
@@ -139,10 +140,11 @@ class DonorCategoriesView(View):
                     data = []
                     graph = {}
                 prev_id = id
-            bar['grant_id'] = g.grant_id
+            bar['gait_id'] = g.grant_id
             bar['name'] = g.title
             bar['drilldown'] = g.grant_id
             bar['y'] = g.amount_usd
+            bar['amount_usd'] = g.amount_usd
             data.append(bar)
             bar = {}
         graph = {}
@@ -152,6 +154,6 @@ class DonorCategoriesView(View):
         graph['tooltip'] = tooltip
         series.append(graph)
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
-        #print(kwargs)
+
         final_dict = {'donor_categories': donor_categories, 'donors': series, 'criteria': kwargs}
         return JsonResponse(final_dict, safe=False)
