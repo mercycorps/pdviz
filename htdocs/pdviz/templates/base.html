@@ -57,9 +57,9 @@
                         <ul class="nav navbar-nav">
                             <li class="{{ home_tab }}"><a href="{% url 'home' %}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
                             <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Views<b class="caret"></b></a>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-modal-window"></span>  Views<b class="caret"></b></a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="{{ prs_list_tab }}" href="{% url 'global_dashboard' %}"><span class="glyphicon glyphicon-list"></span> Global Dashboard</a></li>
+                                    <li><a class="{{ prs_list_tab }}" href="{% url 'global_dashboard' %}"><span class="glyphicon glyphicon-globe"></span> Global Dashboard</a></li>
                                     <li><a class="{{ prs_monthly_tab }}" href="#"><span class="glyphicon glyphicon-dashboard"></span> Regional Dashboard</a></li>
                                 </ul>
                             </li>
@@ -77,7 +77,7 @@
                                 <ul class="dropdown-menu">
                                     <li class="dropdown-header">External Services</li>
                                     <li><a class="{{ googledrive_tab }}" href="#"><span class="glyphicon glyphicon-cloud"></span> Google Drive</a></li>
-                                    <li><a href="#"><span class="glyphicon glyphicon-list"></span> My Reports</a></li>
+                                    <li><a href="#"><span class="glyphicon glyphicon-stats"></span> My Reports</a></li>
                                     <li><a href="{% url 'django.contrib.auth.views.logout' %}?next=/"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
                                 </ul>
                             </li>

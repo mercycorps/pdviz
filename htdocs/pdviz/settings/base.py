@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework_swagger',
     'crispy_forms',
+    'djangocosign',
     'dataviz',
 )
 
@@ -130,4 +131,8 @@ MESSAGE_TAGS = {message.DEBUG: 'debug',
 # https://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-LOGIN_REDIRECT_URL
 LOGIN_REDIRECT_URL = '/'
 
+AUTHENTICATION_BACKENDS = (
+        'djangocosign.cosign.CosignBackend',
+        'django.contrib.auth.backends.ModelBackend',
+    )
 
