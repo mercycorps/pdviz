@@ -76,8 +76,9 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li class="dropdown-header">External Services</li>
-                                    <li><a class="{{ googledrive_tab }}" href="#"><span class="glyphicon glyphicon-cloud"></span>Google Drive</a></li>
-                                    <li><a href="#"><span class="glyphicon glyphicon-list"></span>My Reports</a></li>
+                                    <li><a class="{{ googledrive_tab }}" href="#"><span class="glyphicon glyphicon-cloud"></span> Google Drive</a></li>
+                                    <li><a href="#"><span class="glyphicon glyphicon-list"></span> My Reports</a></li>
+                                    <li><a href="{% url 'django.contrib.auth.views.logout' %}?next=/"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
                                 </ul>
                             </li>
                         </ul>

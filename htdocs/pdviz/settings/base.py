@@ -127,3 +127,7 @@ MESSAGE_TAGS = {message.DEBUG: 'debug',
                 message.WARNING: 'warning',
                 message.ERROR: 'danger',}
 
+# https://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-LOGIN_REDIRECT_URL
+LOGIN_REDIRECT_URL = '/'
+
+
