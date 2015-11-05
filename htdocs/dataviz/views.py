@@ -57,19 +57,19 @@ class DonorCategoriesView(View):
     def get_donor_categories_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'donors__grants__')
         #print("donor_categories: %s" % kwargs)
-        donor_categories = DonorCategory.objects.filter(**kwargs).annotate(drilldown=F('name'), donors_count=Count('donors')).annotate(y=F('donors_count')).values('name', 'drilldown', 'donors_count', 'y').distinct()
+        donor_categories = DonorCategory.objects.filter(**kwargs).annotate(drilldown=F('name'), donors_count=Count('donors', distinct=True)).annotate(y=F('donors_count')).values('name', 'drilldown', 'donors_count', 'y')
         return list(donor_categories)
 
     def get_donors_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'grants__')
         #print("donors: %s: " % kwargs)
-        donors = Donor.objects.filter(**kwargs).annotate(id=F('category__name'), grants_count=Count('grants')).annotate(y=F('grants_count')).values('id', 'name', 'grants_count', 'y').order_by('id')
+        donors = Donor.objects.filter(**kwargs).annotate(id=F('category__name'), grants_count=Count('grants', distinct=True)).annotate(y=F('grants_count')).values('id', 'name', 'grants_count', 'y').order_by('id')
         return donors
 
     def get_grants_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
         #print("grants: %s" % kwargs)
-        grants = Grant.objects.filter(**kwargs).prefetch_related('donor').order_by('donor')
+        grants = Grant.objects.filter(**kwargs).distinct().prefetch_related('donor').order_by('donor')
         return grants
 
     def get(self, request, *args, **kwargs):
