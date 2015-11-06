@@ -8,7 +8,7 @@ local.py
 conf/
 extras/
 djangocosign/
-scipts/
+scripts/
 
 # C extensions
 *.so
