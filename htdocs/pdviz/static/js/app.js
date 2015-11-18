@@ -37,7 +37,7 @@ $(document).ready(function() {
 
 });
 
-function createAlert (type, message, fade=true) {
+function createAlert (type, message, fade) {
     $("#alerts").append(
         $(
             "<div class='alert alert-" + type + " alert-dismissable'>" +
