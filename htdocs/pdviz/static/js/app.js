@@ -1,19 +1,21 @@
 $(document).ready(function() {
 
     $("#id_region").select2({
-        placeholder: "Select a Region",
+        placeholder: "Region",
         allowClear: true
     });
     $("#id_country").select2({
-        placeholder: "Select a Country",
+        placeholder: "Country",
         allowClear: true
     });
     $("#id_sector").select2();
     $("#id_subsector").select2();
     $("#id_theme").select2();
     $("#id_methodology").select2();
-    $("#id_status").select2();
-    $("#id_status").select2();
+    $("#id_status").select2({
+        placeholder: "Status",
+        allowClear: true
+    });
     
     $('.dateinput').datepicker({
         dateFormat: 'yy-mm-dd',

@@ -32,7 +32,7 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
         elif k == 'grants_amount':
             kwargs[prefix + 'amount_usd__gte'] = params[k]
         elif k == 'status':
-            kwargs[prefix + 'status__exact'] = params[k]
+            kwargs[prefix + 'status__in'] = params[k].split(',')
         else:
             kwargs[prefix + k] = list(params[k])
 

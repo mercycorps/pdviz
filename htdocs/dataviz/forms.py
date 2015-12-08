@@ -55,9 +55,13 @@ class GrantDonorFilterForm(forms.Form):
         choices = (),
         required = False,
     )
+
     status = forms.ChoiceField(
+        #queryset = Grant.objects.filter(status__isnull=False).values('status').distinct(),
         choices = (),
         required = False,
+        #empty_label = None,
+        widget = forms.SelectMultiple(),
     )
     hq_admin = forms.ChoiceField(
         choices = (),
@@ -95,12 +99,13 @@ class GrantDonorFilterForm(forms.Form):
         choices_hq_admin.extend(choices)
         self.fields['hq_admin'] = forms.ChoiceField(choices=choices_hq_admin, required=False)
 
-        status_choices = [("", "--Funding Status--"),]
+        #status_choices = [("", "--Funding Status--"),]
+        status_choices = []
         choices = None
         choices = [(status['status'], status['status']) for status in Grant.objects.filter(status__isnull=False).values('status').distinct()]
         choices.sort()
         status_choices.extend(choices)
-        self.fields['status'] = forms.ChoiceField(choices=status_choices, required=False)
+        self.fields['status'] = forms.ChoiceField(choices=status_choices, required=False, widget = forms.SelectMultiple(),)
 
         sector_choices = [("", "--Sector--"),]
         choices = None

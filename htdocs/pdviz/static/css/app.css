@@ -24,3 +24,8 @@ html {
 .asteriskField {
     color: red;
 }
+
+.select2-result-label {
+    font-size: 12px;
+    color: #555;
+}
