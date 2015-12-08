@@ -122,7 +122,7 @@ class DonorCategoriesView(View):
         graph = {}
         graph_name = 'Total USD Amount'
         data = []
-        bar = {}
+        bar = OrderedDict()
         tooltip = {'valuePrefix': '$', 'valueSuffix': ' USD', 'valueDecimals': 2}
         for g in grants:
             try:
@@ -141,12 +141,15 @@ class DonorCategoriesView(View):
                     graph = {}
                 prev_id = id
             bar['gait_id'] = g.grant_id
+            bar['country'] = ','.join([c.name for c in g.countries.all()])
             bar['name'] = g.title
             bar['drilldown'] = g.grant_id
             bar['y'] = g.amount_usd
             bar['amount_usd'] = g.amount_usd
+            bar['start_date'] = g.start_date
+            bar['end_date'] = g.end_date
             data.append(bar)
-            bar = {}
+            bar = OrderedDict()
         graph = {}
         graph['id'] = id
         graph['name'] = graph_name
