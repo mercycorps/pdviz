@@ -12,14 +12,15 @@ class GrantDonorFilterForm(forms.Form):
     region = forms.ModelChoiceField(
         queryset = Region.objects.all(),
         required = False,
-        empty_label = u'-- Region --',
-        widget = forms.Select(),
+        #empty_label = u'-- Region --',
+        empty_label = None,
+        widget = forms.SelectMultiple(),
     )
     country = forms.ModelChoiceField(
         queryset = Country.objects.all(),
         required = False,
-        empty_label = u'-- Country --',
-        widget = forms.Select(),
+        empty_label = None,
+        widget = forms.SelectMultiple(),
     )
     submission_date_from = forms.DateField(
         label = u' From Submission Date',
@@ -64,11 +65,7 @@ class GrantDonorFilterForm(forms.Form):
     )
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
-        #self.helper.form_class = 'form-inline'
         self.helper.form_class='form-horizontal'
-        #self.helper.label_class = 'col-sm-0'
-        #self.helper.field_class = 'col-sm-1'
-        #self.helper.field_template = 'bootstrap3/layout/inline_field.html'
         self.helper.html5_required = True
         self.helper.form_id = "grants_donor_filter_form"
         self.helper.form_show_labels = False
@@ -87,15 +84,10 @@ class GrantDonorFilterForm(forms.Form):
             Field('status', css_class='input-sm'),
             Field('hq_admin', css_class='input-sm'),
         )
-        """"
-        self.helper.layout = Layout(Div(Column('region', 'country', css_class='col-sm-6'),
-                                        Column('submission_date_from', 'submission_date_to', css_class='col-sm-6'),
-                                        css_class='row'))
-        """
         self.helper.form_method = 'get'
         self.helper.form_action = '/global/'
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm'))
-        self.helper.add_input(Reset('reset', 'Reset', css_class='btn-warning btn-sm'))
+        self.helper.add_input(Reset('reset', 'Reset', css_id='id_search_form_reset_btn', css_class='btn-warning btn-sm'))
         super(GrantDonorFilterForm, self).__init__(*args, **kwargs)
         choices_hq_admin = [("", "--HQadmin--"),]
         choices =  [(hq['hq_admin'], hq['hq_admin']) for hq in Grant.objects.filter(hq_admin__isnull=False).exclude(hq_admin__exact = '').exclude(hq_admin__exact='Hong Kong').values('hq_admin').distinct()]

@@ -7,34 +7,34 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
     """
 
     kwargs = {}
-    for k,v in params.iteritems():
-        #print(k + ' : ' + prefix)
+
+    for k in params:
         if k == 'format':
             pass
         elif k == 'region':
-            kwargs[prefix + 'countries__' + k] = v
-        elif k == 'sector':
-            kwargs[prefix + 'sectors__sector_id'] = v
-        elif k == 'subsector':
-            kwargs[prefix + 'subsectors__subsector_id'] = v
-        elif k == 'methodology':
-            kwargs[prefix + 'methodologies__methodology_id'] = v
-        elif k == 'theme':
-            kwargs[prefix + 'themes__theme_id'] = v
+            kwargs[prefix + 'countries__region__in'] = params[k].split(',')
         elif k == 'country':
-            kwargs[prefix + 'countries__country_id'] = v
+            kwargs[prefix + 'countries__country_id__in'] = params[k].split(',')
+        elif k == 'sector':
+            kwargs[prefix + 'sectors__sector_id'] = params[k]
+        elif k == 'subsector':
+            kwargs[prefix + 'subsectors__subsector_id'] = params[k]
+        elif k == 'methodology':
+            kwargs[prefix + 'methodologies__methodology_id'] = params[k]
+        elif k == 'theme':
+            kwargs[prefix + 'themes__theme_id'] = params[k]
         elif k == 'grants_count':
             pass
         elif k == 'submission_date_from':
-            kwargs[prefix + 'submission_date__gt'] = v
+            kwargs[prefix + 'submission_date__gt'] = params[k]
         elif k == 'submission_date_to':
-            kwargs[prefix + 'submission_date__lt'] = v
+            kwargs[prefix + 'submission_date__lt'] = params[k]
         elif k == 'grants_amount':
-            kwargs[prefix + 'amount_usd__gte'] = v
+            kwargs[prefix + 'amount_usd__gte'] = params[k]
         elif k == 'status':
-            kwargs[prefix + 'status__exact'] = v
+            kwargs[prefix + 'status__exact'] = params[k]
         else:
-            kwargs[prefix + k] = v
+            kwargs[prefix + k] = list(params[k])
 
     # Grants submission_date is not specified then, by default, restrict it to the last three years
     if not prefix + 'submission_date__gt' in kwargs and not prefix + 'submission_date__lt' in kwargs:

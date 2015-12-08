@@ -1,40 +1,57 @@
 $(document).ready(function() {
-    $('body').on('change', 'select#id_region', function() {
-        var selected_region = $(this).val();
-        var url = '/api/v1/countries/';
-        if (selected_region != undefined && selected_region != -1 && selected_region != '' && selected_region != 0) {
-           url = url + '?region=' + selected_region;
-        }    
-        $.getJSON(url, function(countries) {
-            var options = "<option value=''>-- Country --</option>";
-            for (var i = 0; i < countries.length; i++) {
-                options += '<option value="' + countries[i].country_id + '">' + countries[i].name + '</option>';
-            }
-            $("select#id_country").html(options);
-            $("select#id_country option:first").attr('selected', 'selected'); 
-        });
-    });
 
-    $('body').on('change', 'select#id_sector', function() {
-        var selected_sector = $(this).val();
-        var url = '/api/v1/subsector/';
-        if (selected_sector != undefined && selected_sector != -1 && selected_sector != '' && selected_sector != 0) {
-            url = url + '?sector=' + selected_sector;
-        }
-        $.getJSON(url, function(subsectors) {
-            var options = "<option value=''>--Area of Focus--</option>";
-            for (var i = 0; i < subsectors.length; i++) {
-                options += '<option value="' + subsectors[i].subsector_id + '">' + subsectors[i].name + '</option>';
-            }
-            $('select#id_subsector').html(options);
-            $('select#id_subsector option:first').attr('selected', 'selected');
-        });
+    $("#id_region").select2({
+        placeholder: "Select a Region",
+        allowClear: true
     });
-
+    $("#id_country").select2({
+        placeholder: "Select a Country",
+        allowClear: true
+    });
+    $("#id_sector").select2();
+    $("#id_subsector").select2();
+    $("#id_theme").select2();
+    $("#id_methodology").select2();
+    $("#id_status").select2();
+    $("#id_status").select2();
+    
     $('.dateinput').datepicker({
         dateFormat: 'yy-mm-dd',
     });
 
+});
+
+$('body').on('change', 'select#id_region', function() {
+    var selected_region = $(this).val();
+    var url = '/api/v1/countries/';
+    if (selected_region != undefined && selected_region != -1 && selected_region != '' && selected_region != 0) {
+       url = url + '?region=' + selected_region;
+    }
+    $.getJSON(url, function(countries) {
+        var options = "";
+        for (var i = 0; i < countries.length; i++) {
+            options += '<option value="' + countries[i].country_id + '">' + countries[i].name + '</option>';
+        }
+
+        $("select#id_country").html(options);
+        $("select#id_country").val('').trigger("change");
+    });
+});
+
+$('body').on('change', 'select#id_sector', function() {
+    var selected_sector = $(this).val();
+    var url = '/api/v1/subsector/';
+    if (selected_sector != undefined && selected_sector != -1 && selected_sector != '' && selected_sector != 0) {
+        url = url + '?sector=' + selected_sector;
+    }
+    $.getJSON(url, function(subsectors) {
+        var options = "<option value=''>--Area of Focus--</option>";
+        for (var i = 0; i < subsectors.length; i++) {
+            options += '<option value="' + subsectors[i].subsector_id + '">' + subsectors[i].name + '</option>';
+        }
+        $('select#id_subsector').html(options);
+        $('select#id_subsector option:first').attr('selected', 'selected');
+    });
 });
 
 function createAlert (type, message, fade) {

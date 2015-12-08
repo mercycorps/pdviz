@@ -1,3 +1,6 @@
+from operator import and_, or_
+from django.db.models import Q
+
 from rest_framework import viewsets
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet
@@ -21,9 +24,10 @@ class CountryViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Country.objects.all()
-        region_id = self.request.query_params.get('region', None)
-        if region_id:
-            queryset = queryset.filter(region=region_id)
+        region_ids = self.request.query_params.get('region', None)
+        if region_ids:
+            region_list = region_ids.split(',')
+            queryset = queryset.filter( reduce(or_, [Q(region=r) for r in region_list]) )
         return queryset
 
 
