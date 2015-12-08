@@ -22,6 +22,12 @@ class GrantDonorFilterForm(forms.Form):
         empty_label = None,
         widget = forms.SelectMultiple(),
     )
+    donor = forms.ModelChoiceField(
+        queryset = Donor.objects.all(),
+        required = False,
+        empty_label = '',
+        widget = forms.SelectMultiple(),
+    )
     submission_date_from = forms.DateField(
         label = u' From Submission Date',
         required = False,
@@ -31,28 +37,28 @@ class GrantDonorFilterForm(forms.Form):
         label = u' To Submission Date',
         required = False,
     )
-    #grants_count = forms.IntegerField(
-    #    label= u'# Grants',
-    #    required = False,
-    #)
     grants_amount = forms.IntegerField(
         label = u'Proposals greater than $ Amount',
         required = False,
     )
-    sector = forms.ChoiceField(
-        choices =(),
+    sector = forms.ModelChoiceField(
+        queryset = Sector.objects.all(),
+        empty_label = '',
         required = False,
     )
-    subsector = forms.ChoiceField(
-        choices = (),
+    subsector = forms.ModelChoiceField(
+        queryset = SubSector.objects.all(),
+        empty_label = '',
         required = False,
     )
-    theme = forms.ChoiceField(
-        choices = (),
+    theme = forms.ModelChoiceField(
+        queryset = Theme.objects.all(),
+        empty_label = '',
         required = False,
     )
-    methodology = forms.ChoiceField(
-        choices = (),
+    methodology = forms.ModelChoiceField(
+        queryset = Methodology.objects.all(),
+        empty_label = '',
         required = False,
     )
 
@@ -60,7 +66,6 @@ class GrantDonorFilterForm(forms.Form):
         #queryset = Grant.objects.filter(status__isnull=False).values('status').distinct(),
         choices = (),
         required = False,
-        #empty_label = None,
         widget = forms.SelectMultiple(),
     )
     hq_admin = forms.ChoiceField(
@@ -76,10 +81,10 @@ class GrantDonorFilterForm(forms.Form):
         self.helper.layout = Layout(
             Field('region', css_class="input-sm"),
             Field('country', css_class="input-sm"),
+            Field('donor', css_class="input-sm"),
             #Field(AppendedText('submission_date_from', '<span class="glyphicon glyphicon-calendar"></span>'), placeholder="From Submission date", css_class="input-sm"),
             Field('submission_date_from', placeholder="From Submission date", css_class="input-sm"),
             Field('submission_date_to', placeholder="To Submission date", css_class="input-sm"),
-            #Field('grants_count', placeholder = 'donors with X number of proposals',css_class='input-sm'),
             Field('grants_amount', placeholder = 'proposals greater than $ amount', css_class='input-sm'),
             Field('sector', css_class='input-sm'),
             Field('subsector', css_class='input-sm'),
@@ -106,32 +111,4 @@ class GrantDonorFilterForm(forms.Form):
         choices.sort()
         status_choices.extend(choices)
         self.fields['status'] = forms.ChoiceField(choices=status_choices, required=False, widget = forms.SelectMultiple(),)
-
-        sector_choices = [("", "--Sector--"),]
-        choices = None
-        choices = [(sector.sector_id, sector.name) for sector in Sector.objects.all()]
-        sector_choices.extend(choices)
-        self.fields['sector'] = forms.ChoiceField(choices=sector_choices, required=False)
-
-        subsector_choices = [("", "--Area of Focus--"),]
-        choices = None
-        choices = [(subsector.subsector_id, subsector.name) for subsector in SubSector.objects.all()]
-        subsector_choices.extend(choices)
-        self.fields['subsector'] = forms.ChoiceField(choices=subsector_choices, required=False)
-
-        theme_choices = [("", "--Theme--"),]
-        choices = None
-        choices = [(theme.theme_id, theme.name) for theme in Theme.objects.all()]
-        theme_choices.extend(choices)
-        self.fields['theme'] = forms.ChoiceField(choices=theme_choices, required=False)
-
-        methodology_choices = [("", "--Methodology--"),]
-        choices = None
-        choices = [(methodology.methodology_id, methodology.name) for methodology in Methodology.objects.all()]
-        methodology_choices.extend(choices)
-        self.fields['methodology'] = forms.ChoiceField(choices=methodology_choices, required=False)
-
-
-
-
 

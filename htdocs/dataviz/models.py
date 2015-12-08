@@ -107,6 +107,8 @@ class SubSector(models.Model):
         managed = False
         db_table = 'n_subsectortbl'
 
+    def __unicode__(self):
+        return self.name
 
 class SectorSubSector(models.Model):
     sector = models.ForeignKey(Sector, db_column="SectorID")

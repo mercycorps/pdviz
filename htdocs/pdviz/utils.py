@@ -7,6 +7,7 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
     """
 
     kwargs = {}
+    #print(prefix)
 
     for k in params:
         if k == 'format':
@@ -15,6 +16,11 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
             kwargs[prefix + 'countries__region__in'] = params[k].split(',')
         elif k == 'country':
             kwargs[prefix + 'countries__country_id__in'] = params[k].split(',')
+        elif k == 'donor':
+            if prefix == 'donors__grants__':
+                kwargs['donors__donor_id__in'] = params[k].split(',')
+            else:
+                kwargs['donor_id__in'] = params[k].split(',')
         elif k == 'sector':
             kwargs[prefix + 'sectors__sector_id'] = params[k]
         elif k == 'subsector':

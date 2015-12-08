@@ -8,10 +8,14 @@ $(document).ready(function() {
         placeholder: "Country",
         allowClear: true
     });
-    $("#id_sector").select2();
-    $("#id_subsector").select2();
-    $("#id_theme").select2();
-    $("#id_methodology").select2();
+    $("#id_donor").select2({
+        placeholder: "Donor",
+        allowClear: true
+    });
+    $("#id_sector").select2({placeholder: "Sector",});
+    $("#id_subsector").select2({placeholder: "Area of Focus",});
+    $("#id_theme").select2({placeholder: 'Theme',});
+    $("#id_methodology").select2({placeholder: 'Methodology',});
     $("#id_status").select2({
         placeholder: "Status",
         allowClear: true

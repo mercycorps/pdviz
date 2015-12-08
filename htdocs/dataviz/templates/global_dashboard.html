@@ -118,6 +118,11 @@
         var chart_title = '# Grants Per Donor Category'
         drilldown_levels = [];
         $('#donor_with_num_of_grants_chart').highcharts({
+            credits: {
+                text: 'mercycorps.org',
+                href: 'http://www.mercycorps.org',
+                enabled: false,
+            },
             chart: {
                 zoomType: 'x',
                 resetZoomButton: {
