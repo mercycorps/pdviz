@@ -17,7 +17,7 @@
         <div class="col-sm-10">
             <div id='criteria-panel' class="panel panel-success" style="display: none;">
                 <div class="panel-heading"> Filter Criteria </div>
-                <div class="panel-body" id="criteria"> No criteria specified </div>
+                <div class="panel-body" id="criteria" style="display: block;"> No criteria specified </div>
             </div>
             <div id="donor_with_num_of_grants_chart"></div>
             <div id="donor_with_num_of_grants_table_div" class="table-responsive"> </div>
@@ -90,9 +90,10 @@
                     if (Object.keys(data['donor_categories']).length > 0) {
                         $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
                         var criteria = data['criteria'];
-                        format_criteria(criteria);
+                        var formatted_criteria = format_criteria(criteria);
                         
-                        $("#criteria").html(JSON.stringify(criteria));
+                        //$("#criteria").html(JSON.stringify(formatted_criteria));
+                        $("#criteria").html(formatted_criteria);
                         $("#criteria-panel").show();
                         draw_chart(criteria);
                     } else {
@@ -103,45 +104,75 @@
         });
     });
     function format_criteria(criteria) {
+        var formatted_criteria = '';
         $.each(criteria, function(key, value) {
-            key = key.replace('__in', ' = ');
-            key = key.replace('__gt', ' >');
+            console.log(key + "=" + value);
+            
+            key = key.replace('__in', '=');
+            key = key.replace('__gte', '>=');
+            key = key.replace('__gt', '>');
+            key = key.replace('__lt', '<');
             key = key.replace('_id', '');
             key = key.split("__");
             key = key[key.length - 1];
+            console.log(key);
             switch (key) {
-                case 'region = ':
-                   var values = $( "#id_region option:selected" ).map(function() {
+                case 'region=':
+                    key = "Region=";
+                    var values = $( "#id_region option:selected" ).map(function() {
                         return $(this).text();
                     }).get().join(', ');
                     value = values;
                     break;
-                case 'country = ':
+                case 'country=':
+                    key = "Country=";
                     var values = $( "#id_country option:selected" ).map(function() {
                         return $(this).text();
                     }).get().join(', ');
                     value = values;
                     //value = $( "#id_country option:selected" ).text();
                     break;
-                case 'donor = ':
+                case 'donor=':
+                    key = "Donor=";
                     var values = $( "#id_donor option:selected" ).map(function() {
                         return $(this).text();
                     }).get().join(', ');
                     value = values;
                     break;
                 case 'sector':
-                    value = $( "#id_sector option:selected" ).text();
+                    key =  "Sector=";
+                    value = $("#id_sector option:selected").text();
+                    break;
                 case 'subsector':
+                    key =  "Area of Focus=";
                     value = $( "#id_subsector option:selected" ).text();
+                    break;
                 case 'theme':
+                    key =  "Theme=";
                     value = $( "#id_theme option:selected" ).text();
+                    break;
                 case 'methodology':
+                    key = "Methodology=";
                     value = $( "#id_methodology option:selected" ).text();
+                    break;
+                case 'hq_admin':
+                    key = "HQ Admin=";
+                case 'submission_date>':
+                    key = "Submission Date > ";
+                    break;
+                case 'submission_date<':
+                    key = "Submission Date < ";
+                    break;
+                case 'amount_usd>=':
+                    key = 'Amount USD >= ';
+                    break;
                 default:
                     break;
             }
-            console.log(key + value);
+            
+            formatted_criteria += '<span class="label label-default" style="margin-left:2px; white-space:normal; line-height:2;">' + key + value + '</span>';
         });
+        return formatted_criteria;
         
     }
     /*

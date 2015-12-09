@@ -1,29 +1,15 @@
 $(document).ready(function() {
 
-    $("#id_region").select2({
-        placeholder: "Region",
-        allowClear: true
-    });
-    $("#id_country").select2({
-        placeholder: "Country",
-        allowClear: true
-    });
-    $("#id_donor").select2({
-        placeholder: "Donor",
-        allowClear: true
-    });
-    $("#id_sector").select2({placeholder: "Sector",});
-    $("#id_subsector").select2({placeholder: "Area of Focus",});
-    $("#id_theme").select2({placeholder: 'Theme',});
-    $("#id_methodology").select2({placeholder: 'Methodology',});
-    $("#id_status").select2({
-        placeholder: "Status",
-        allowClear: true
-    });
+    $("#id_region").select2({ placeholder: "Region", allowClear: true });
+    $("#id_country").select2({ placeholder: "Country", allowClear: true });
+    $("#id_donor").select2({ placeholder: "Donor", allowClear: true });
+    $("#id_sector").select2({placeholder: "Sector", allowClear: true,});
+    $("#id_subsector").select2({placeholder: "Area of Focus", allowClear: true,});
+    $("#id_theme").select2({placeholder: 'Theme', allowClear: true,});
+    $("#id_methodology").select2({placeholder: 'Methodology', allowClear: true,});
+    $("#id_status").select2({  placeholder: "Status", allowClear: true });
     
-    $('.dateinput').datepicker({
-        dateFormat: 'yy-mm-dd',
-    });
+    $('.dateinput').datepicker({  dateFormat: 'yy-mm-dd', });
 
 });
 

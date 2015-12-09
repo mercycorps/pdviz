@@ -29,8 +29,6 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
             kwargs[prefix + 'methodologies__methodology_id'] = params[k]
         elif k == 'theme':
             kwargs[prefix + 'themes__theme_id'] = params[k]
-        elif k == 'grants_count':
-            pass
         elif k == 'submission_date_from':
             kwargs[prefix + 'submission_date__gt'] = params[k]
         elif k == 'submission_date_to':
@@ -40,7 +38,7 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
         elif k == 'status':
             kwargs[prefix + 'status__in'] = params[k].split(',')
         else:
-            kwargs[prefix + k] = list(params[k])
+            kwargs[prefix + k] = params[k]
 
     # Grants submission_date is not specified then, by default, restrict it to the last three years
     if not prefix + 'submission_date__gt' in kwargs and not prefix + 'submission_date__lt' in kwargs:

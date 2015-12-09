@@ -62,7 +62,7 @@ class DonorCategoriesView(View):
 
     def get_donors_dataset(self, kwargs):
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, 'grants__')
-        print("donors: %s: " % kwargs)
+        #print("donors: %s: " % kwargs)
         donors = Donor.objects.filter(**kwargs).annotate(id=F('category__name'), grants_count=Count('grants', distinct=True)).annotate(y=F('grants_count')).values('id', 'name', 'grants_count', 'y').order_by('id')
         return donors
 

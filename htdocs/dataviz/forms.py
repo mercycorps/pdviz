@@ -25,7 +25,7 @@ class GrantDonorFilterForm(forms.Form):
     donor = forms.ModelChoiceField(
         queryset = Donor.objects.all(),
         required = False,
-        empty_label = '',
+        empty_label = None,
         widget = forms.SelectMultiple(),
     )
     submission_date_from = forms.DateField(
