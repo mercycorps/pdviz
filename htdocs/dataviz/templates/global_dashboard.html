@@ -3,7 +3,6 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-
     <div id="donor_with_num_of_grants_data" style="display: none;">{{ donors }}</div>
     <div class="row">
         <div class="col-sm-2">
@@ -17,14 +16,12 @@
         <div class="col-sm-10">
             <div id='criteria-panel' class="panel panel-success" style="display: none;">
                 <div class="panel-heading"> Filter Criteria </div>
-                <div class="panel-body" id="criteria" style="display: block;"> No criteria specified </div>
+                <div class="panel-body" id="criteria" style="padding:5px;"> No criteria specified </div>
             </div>
             <div id="donor_with_num_of_grants_chart"></div>
             <div id="donor_with_num_of_grants_table_div" class="table-responsive"> </div>
         </div>
     </div>
-
-
 {% endblock content %}
 
 
@@ -32,7 +29,6 @@
 <script type="text/javascript">
     "use strict";
     var drilldown_levels = [];
-
 
     // On the search form reset event, clear all of the select2 dorpdowns.
     $("body").on("reset", "#grants_donor_filter_form", function(e) {
@@ -50,6 +46,7 @@
         $("#id_status").val('').trigger("change");
         //e.stopPropagation();
     });
+
     $(document).ready(function() {
     
         // Remove the hasDatePicker class so that the date-range works properly
@@ -72,42 +69,42 @@
             }
         }); // End Submission Date Range Picker 
 
+    });
 
-        // Upon search form submission, format filter values so Django understands it.
-        $('#grants_donor_filter_form').on('submit', function(e) {
-            e.preventDefault();
-            var filters = {};
-            $('#grants_donor_filter_form *').filter(':input').each(function() {
-                if (this.name != 'submit' && this.name != 'reset' && this.value && this.name != '') {
-                    var values_array = new Array($(this).val());
-                    filters[this.name] = values_array.join(",");
+    // Upon search form submission, format filter values so Django understands it.
+    $('#grants_donor_filter_form').on('submit', function(e) {
+        e.preventDefault();
+        var filters = {};
+        $('#grants_donor_filter_form *').filter(':input').each(function() {
+            if (this.name != 'submit' && this.name != 'reset' && this.value && this.name != '') {
+                var values_array = new Array($(this).val());
+                filters[this.name] = values_array.join(",");
+            }
+        });
+
+        $('#donor_with_num_of_grants_data').empty();
+        $.get("/global_dashboard_data/", filters)
+            .done(function(data) {
+                if (Object.keys(data['donor_categories']).length > 0) {
+                    $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
+                    var criteria = data['criteria'];
+                    var formatted_criteria = format_criteria(criteria);
+                    
+                    //$("#criteria").html(JSON.stringify(formatted_criteria));
+                    $("#criteria").html(formatted_criteria);
+                    $("#criteria-panel").show();
+                    draw_chart(criteria);
+                } else {
+                    $("#donor_with_num_of_grants_chart").empty();
+                    createAlert("warning dynamic-alert", "There is no data available for the specified criteria");
                 }
             });
-
-            $('#donor_with_num_of_grants_data').empty();
-            $.get("/global_dashboard_data/", filters)
-                .done(function(data) {
-                    if (Object.keys(data['donor_categories']).length > 0) {
-                        $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
-                        var criteria = data['criteria'];
-                        var formatted_criteria = format_criteria(criteria);
-                        
-                        //$("#criteria").html(JSON.stringify(formatted_criteria));
-                        $("#criteria").html(formatted_criteria);
-                        $("#criteria-panel").show();
-                        draw_chart(criteria);
-                    } else {
-                        $("#donor_with_num_of_grants_chart").empty();
-                        createAlert("warning dynamic-alert", "There is no data available for the specified criteria");
-                    }
-                });
-        });
     });
+
+    // Format the criteria from the search form in a more readable fashion.
     function format_criteria(criteria) {
         var formatted_criteria = '';
         $.each(criteria, function(key, value) {
-            console.log(key + "=" + value);
-            
             key = key.replace('__in', '=');
             key = key.replace('__gte', '>=');
             key = key.replace('__gt', '>');
@@ -115,7 +112,6 @@
             key = key.replace('_id', '');
             key = key.split("__");
             key = key[key.length - 1];
-            console.log(key);
             switch (key) {
                 case 'region=':
                     key = "Region=";
@@ -157,6 +153,7 @@
                     break;
                 case 'hq_admin':
                     key = "HQ Admin=";
+                    break;
                 case 'submission_date>':
                     key = "Submission Date > ";
                     break;
@@ -175,9 +172,8 @@
         return formatted_criteria;
         
     }
-    /*
-     *  Show the corresponding table for the donor_with_num_grants chart
-     */
+
+    //Show the corresponding table for the donor_with_num_grants chart
     function show_donor_with_num_of_grants_table(drillupdown_data) {
         var donor_with_num_of_grants_table = new tableObject(drillupdown_data[0].data);
         $("#donor_with_num_of_grants_table_div").empty();
@@ -185,9 +181,8 @@
         $("#donor_with_num_of_grants_table").DataTable();
     }
 
-    /*
-     * Draw the chart to visualize grants per donor or donor categories.
-     */
+    
+    //Draw the chart to visualize grants per donor or donor categories.
     function draw_chart(filters) {
         var data_raw =  $("#donor_with_num_of_grants_data").html();
         var data = $.parseJSON(data_raw);
