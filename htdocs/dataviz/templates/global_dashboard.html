@@ -39,6 +39,7 @@
         e.preventDefault();
         $("select#id_region").val('').trigger("change");
         $("select#id_country").val('').trigger("change");
+        $("select#id_donor").val('').trigger("change");
         $("#id_submission_date_from").val('');
         $("#id_submission_date_to").val('');
         $("#id_grants_amount").val('');
@@ -47,6 +48,7 @@
         $("#id_theme").val('').trigger("change");
         $("#id_methodology").val('').trigger("change");
         $("#id_status").val('').trigger("change");
+        //e.stopPropagation();
     });
     $(document).ready(function() {
     
@@ -88,6 +90,8 @@
                     if (Object.keys(data['donor_categories']).length > 0) {
                         $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
                         var criteria = data['criteria'];
+                        format_criteria(criteria);
+                        
                         $("#criteria").html(JSON.stringify(criteria));
                         $("#criteria-panel").show();
                         draw_chart(criteria);
@@ -98,7 +102,48 @@
                 });
         });
     });
-
+    function format_criteria(criteria) {
+        $.each(criteria, function(key, value) {
+            key = key.replace('__in', ' = ');
+            key = key.replace('__gt', ' >');
+            key = key.replace('_id', '');
+            key = key.split("__");
+            key = key[key.length - 1];
+            switch (key) {
+                case 'region = ':
+                   var values = $( "#id_region option:selected" ).map(function() {
+                        return $(this).text();
+                    }).get().join(', ');
+                    value = values;
+                    break;
+                case 'country = ':
+                    var values = $( "#id_country option:selected" ).map(function() {
+                        return $(this).text();
+                    }).get().join(', ');
+                    value = values;
+                    //value = $( "#id_country option:selected" ).text();
+                    break;
+                case 'donor = ':
+                    var values = $( "#id_donor option:selected" ).map(function() {
+                        return $(this).text();
+                    }).get().join(', ');
+                    value = values;
+                    break;
+                case 'sector':
+                    value = $( "#id_sector option:selected" ).text();
+                case 'subsector':
+                    value = $( "#id_subsector option:selected" ).text();
+                case 'theme':
+                    value = $( "#id_theme option:selected" ).text();
+                case 'methodology':
+                    value = $( "#id_methodology option:selected" ).text();
+                default:
+                    break;
+            }
+            console.log(key + value);
+        });
+        
+    }
     /*
      *  Show the corresponding table for the donor_with_num_grants chart
      */
@@ -125,6 +170,8 @@
             },
             chart: {
                 zoomType: 'x',
+                panning: true,
+                panKey: 'shift',
                 resetZoomButton: {
                     position: {
                         // align: 'right', // by default
