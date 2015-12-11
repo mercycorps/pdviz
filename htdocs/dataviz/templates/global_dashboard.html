@@ -4,8 +4,6 @@
 
 {% block content %}
     <div id="donor_with_num_of_grants_data" style="display: none;">{{ donors }}</div>
-    <div id="win_loss_rates_categories_div" style="display: none;">{{ categories }}</div>
-    <div id="win_loss_rates_series_div" style="display: none;">{{ series }}</div>
     
     <div class="row">
         <div class="col-sm-2">
@@ -78,11 +76,8 @@
 
 
     function draw_win_loss_chart() {
-        var series_raw =  $("#win_loss_rates_series_div").html();
-        var x_categories = $("#win_loss_rates_categories_div").html();
-        var series_data = $.parseJSON(series_raw);
-        var x_categories_data = $.parseJSON(x_categories);
-
+        var series_data = $.parseJSON('{{ series|safe }}');
+        var categories_data = JSON.parse('{{ categories|safe }}');
         var chart_title = 'Win Loss Rates Per Region and Country';
         
         $('#win_loss_rates_series_chart_div').highcharts({
@@ -98,7 +93,7 @@
                 text: chart_title
             },
             xAxis: {
-                categories: x_categories_data
+                categories: categories_data
             },
             yAxis: {
                 min: 0,
@@ -106,14 +101,22 @@
                     text: 'Win/Loss Rate Perecentage'
                 }
             },
+            
             tooltip: {
-                pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>',
+                pointFormat: '<span style="color:{series.color}">{series.name}</span>: {point.percentage:.0f}% <br/>',
                 shared: true
             },
             plotOptions: {
                 column: {
                     stacking: 'percent'
-                }
+                },
+                series: {
+                borderWidth: 0,
+                dataLabels: {
+                    enabled: true,
+                    format: '{point.y:.1f}%'
+                },
+            }
             },
             series: series_data
         });
