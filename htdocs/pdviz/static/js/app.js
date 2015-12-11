@@ -37,12 +37,12 @@ $('body').on('change', 'select#id_sector', function() {
         url = url + '?sector=' + selected_sector;
     }
     $.getJSON(url, function(subsectors) {
-        var options = "<option value=''>--Area of Focus--</option>";
+        var options = "<option value=''></option>";
         for (var i = 0; i < subsectors.length; i++) {
             options += '<option value="' + subsectors[i].subsector_id + '">' + subsectors[i].name + '</option>';
         }
         $('select#id_subsector').html(options);
-        $('select#id_subsector option:first').attr('selected', 'selected');
+        $("select#id_subsector").val('').trigger("change");
     });
 });
 

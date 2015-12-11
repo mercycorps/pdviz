@@ -1,7 +1,9 @@
+import json
+
 from collections import OrderedDict
 
 from django.core import serializers
-from django.db.models import Avg, Max, Min, Count, F
+from django.db.models import DecimalField, IntegerField, CharField, ExpressionWrapper, F, Case, Value, When, Q, Sum, Avg, Max, Min, Count
 
 from django.http import HttpResponse, JsonResponse
 from django.views.generic import TemplateView, ListView, View
@@ -18,38 +20,69 @@ from .forms import *
 from .mixins import *
 from .api import *
 
-"""
-class CountriesByRegion(JSONResponseMixin, ListView):
-    model = Country
-
-    def get_queryset(self, **kwargs):
-        return Country.objects.filter(**self.kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(CountriesByRegion, self).get_context_data(**kwargs)
-        serializer = CountrySerializer(self.get_queryset(), many=True)
-        context['serializer'] = serializer
-        return context
-
-    def render_to_response(self, context, **response_kwargs):
-        return self.render_to_json_response(context, **response_kwargs)
-"""
-
 
 class GlobalDashboard(TemplateView):
     template_name='global_dashboard.html'
 
-    def get(self, request, *args, **kwargs):
-        return super(GlobalDashboard, self).get(request, *args, **kwargs)
+    def get_regions(self):
+        # Get distinct regions along with the number of total grants and tatal_grants_funded
+        regions = Region.objects.filter(countries__grants__submission_date__gt='2012-10-30').distinct(
+        ).annotate(
+            num_funded=Count(
+                Case(
+                    When(
+                        Q(countries__grants__status='Closed')|
+                        Q(countries__grants__status='Funded')|
+                        Q(countries__grants__status='Completed'), then=1
+                    ),
+                    output_field=IntegerField(),
+                )
+            ),
+            num_total=Count(
+                Case(
+                    When(countries__grants__status__isnull=False, then=1),
+                    output_field=IntegerField(),
+                )
+            )
+        ).annotate(
+            win_rate=ExpressionWrapper(F('num_funded')/F('num_total') * 100, DecimalField(decimal_places=2)),
+        ).annotate(
+            loss_rate=(100 - F('win_rate')),
+        ).values('region_id', 'name', 'num_funded', 'num_total', 'win_rate', 'loss_rate')
+
+        return regions
 
     def get_context_data(self, **kwargs):
-        """
-        Provide context data to the template renderer
-        """
         context = super(GlobalDashboard, self).get_context_data(**kwargs)
         form = GrantDonorFilterForm()
         context['form'] = form
+        regions = self.get_regions()
+        categories = []
+        series = []
+        win_rates_data = []
+        loss_rates_data = []
+        for r in regions:
+            categories.append(r['name'])
+            win_rates_data.append(float(r['win_rate']))
+            loss_rates_data.append(float(r['loss_rate']))
+
+        series.append({'name': 'WinRate', 'data': win_rates_data})
+        series.append({'name': 'LossRate', 'data': loss_rates_data})
+        series_json = json.dumps(series)
+        cat_json = json.dumps(categories)
+        context['series'] = series_json
+        context['categories'] = cat_json
         return context
+
+
+class WinLossRateViewByRegionCountry(TemplateView):
+    template_name='global_dashboard.html'
+
+
+
+    def get(self, request, *args, **kwargs):
+
+        return JsonResponse({'status': 'empty'}, safe=False)
 
 
 class DonorCategoriesView(View):

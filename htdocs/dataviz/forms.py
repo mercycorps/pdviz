@@ -63,8 +63,7 @@ class GrantDonorFilterForm(forms.Form):
     )
 
     status = forms.ChoiceField(
-        #queryset = Grant.objects.filter(status__isnull=False).values('status').distinct(),
-        choices = (),
+        choices = [(status['status'], status['status']) for status in Grant.objects.filter(status__isnull=False).values('status').distinct().order_by('status')],
         required = False,
         widget = forms.SelectMultiple(),
     )
@@ -103,12 +102,3 @@ class GrantDonorFilterForm(forms.Form):
         choices.sort()
         choices_hq_admin.extend(choices)
         self.fields['hq_admin'] = forms.ChoiceField(choices=choices_hq_admin, required=False)
-
-        #status_choices = [("", "--Funding Status--"),]
-        status_choices = []
-        choices = None
-        choices = [(status['status'], status['status']) for status in Grant.objects.filter(status__isnull=False).values('status').distinct()]
-        choices.sort()
-        status_choices.extend(choices)
-        self.fields['status'] = forms.ChoiceField(choices=status_choices, required=False, widget = forms.SelectMultiple(),)
-

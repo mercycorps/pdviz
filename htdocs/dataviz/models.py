@@ -179,7 +179,7 @@ class Grant(models.Model):
     subsectors = models.ManyToManyField(SubSector, through='GrantSector')
     themes = models.ManyToManyField(Theme, through='GrantTheme')
     methodologies = models.ManyToManyField(Methodology, through='GrantMethodology')
-    countries = models.ManyToManyField(Country, through="GrantCountry")
+    countries = models.ManyToManyField(Country, through="GrantCountry", related_name='grants')
 
     def __unicode__(self):
         return self.title
