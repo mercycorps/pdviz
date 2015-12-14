@@ -52,26 +52,85 @@ class GlobalDashboard(TemplateView):
 
         return regions
 
+    def get_countries(self):
+        countries = Country.objects.filter(grants__submission_date__gt='2012-10-30').distinct(
+        ).annotate(
+            num_funded=Count(
+                Case(
+                    When(
+                        Q(grants__status='Closed')|
+                        Q(grants__status='Funded')|
+                        Q(grants__status='Completed'), then=1
+                    ),
+                    output_field=IntegerField(),
+                )
+            ),
+            num_total=Count(
+                Case(
+                    When(grants__status__isnull=False, then=1),
+                    output_field=IntegerField(),
+                )
+            )
+        ).annotate(
+            win_rate=ExpressionWrapper(F('num_funded')/F('num_total') * 100, DecimalField(decimal_places=2)),
+        ).annotate(
+            loss_rate=(100 - F('win_rate')),
+        ).values('region', 'region__name', 'country_id', 'name', 'num_funded', 'num_total', 'win_rate', 'loss_rate')
+
+        return countries
+
     def get_context_data(self, **kwargs):
         context = super(GlobalDashboard, self).get_context_data(**kwargs)
         form = GrantDonorFilterForm()
         context['form'] = form
         regions = self.get_regions()
-        categories = []
+        #categories = []
         series = []
         win_rates_data = []
         loss_rates_data = []
         for r in regions:
-            categories.append(r['name'])
-            win_rates_data.append(float(r['win_rate']))
-            loss_rates_data.append(float(r['loss_rate']))
+            #categories.append(r['name'])
+            win_rates_data.append( {'y': float(r['win_rate']), 'name': r['name'], 'drilldown': 'win_rate' + str( r['region_id']) } )
+            loss_rates_data.append( {'y': float(r['loss_rate']), 'name': r['name'], 'drilldown': 'loss_rate' + str(r['region_id']) } )
 
         series.append({'name': 'WinRate', 'data': win_rates_data})
         series.append({'name': 'LossRate', 'data': loss_rates_data})
         series_json = json.dumps(series)
-        cat_json = json.dumps(categories)
         context['series'] = series_json
-        context['categories'] = cat_json
+        #context['categories'] = cat_json
+
+        countries = self.get_countries().order_by('region')
+        country_drilldown_series_win_rate_data = []
+        country_drilldown_series_loss_rate_data = []
+        drilldown_series = []
+        region = None
+        region_name = None
+
+        # get the drilldowns for win_rates per country
+        for c in countries:
+            if region is not None and region != c['region']:
+                drilldown_series.append({'id': 'win_rate' + str(region), 'type': 'column', 'stacking': 'regular', 'name': region_name, 'data': country_drilldown_series_win_rate_data})
+                country_drilldown_series_win_rate_data = []
+            country_drilldown_series_win_rate_data.append( [c['name'], float(c['win_rate']) ])
+            region = c['region']
+            region_name = c['region__name']
+        #print(country_drilldown_series_win_rate_data)
+        drilldown_series.append({'id': 'win_rate' + str(region), 'type': 'column', 'stacking': 'regular', 'name': region_name, 'data': country_drilldown_series_win_rate_data})
+
+        region = None
+        region_name = None
+        # get the drilldowns for loss_rate per country
+        for c in countries:
+            if region is not None and region != c['region']:
+                drilldown_series.append({'id': 'loss_rate' + str(region), 'type': 'column', 'stacking': 'regular', 'name': region_name, 'data': country_drilldown_series_loss_rate_data})
+                country_drilldown_series_loss_rate_data = []
+            country_drilldown_series_loss_rate_data.append( [c['name'], float(c['loss_rate']) ])
+            region = c['region']
+            region_name = c['region__name']
+        drilldown_series.append({'id': 'loss_rate' + str(region), 'type': 'column', 'stacking': 'regular', 'name': region_name, 'data': country_drilldown_series_loss_rate_data})
+
+        drilldown_series_json = json.dumps(drilldown_series)
+        context['drilldown_series'] = drilldown_series_json
         return context
 
 
