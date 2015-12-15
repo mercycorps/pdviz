@@ -3,9 +3,11 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div id="donor_with_num_of_grants_data" style="display: none;">{{ donors }}</div>
+    <div id="donor_categories_data_div" style="display: none;">{{ donor_categories|safe }}</div>
+    <div id="donor_categories_drilldown_data_div" style="display: none;">{{ donors|safe }}</div>
     <div id="win_loss_rates_series_chart_data_div" style="display: none;">{{ regions|safe }}</div>
     <div id="win_loss_rates_series_chart_drilldown_data_div" style="display: none;">{{ regions_drilldown|safe }}</div>
+    <div id = "criteria_raw_div" style="display:none;">{{ criteria|safe }}</div>
 
     <div class="row">
         <div class="col-sm-2">
@@ -71,8 +73,14 @@
             onClose: function( selectedDate ) {
                 $( "#id_submission_date_from" ).datepicker( "option", "maxDate", selectedDate );
             }
-        }); // End Submission Date Range Picker 
+        }); // End Submission Date Range Picker
+        var criteria_raw =  $("#criteria_raw_div").html();
+        var criteria = $.parseJSON(criteria_raw);
+        var formatted_criteria = format_criteria(criteria);
+        $("#criteria").html(formatted_criteria);
+        $("#criteria-panel").show();
 
+        draw_chart();
         draw_win_loss_chart();
     });
 
@@ -153,20 +161,34 @@
             }
         });
 
-        $('#donor_with_num_of_grants_data').empty();
+        $('#donor_categories_data_div').empty();
+        $('#donor_categories_drilldown_data_div').empty();
+        
+        $("#win_loss_rates_series_chart_data_div").empty();
+        $("#win_loss_rates_series_chart_drilldown_data_div").empty();
+
         $.get("/global_dashboard_data/", filters)
             .done(function(data) {
                 if (Object.keys(data['donor_categories']).length > 0) {
-                    $("#donor_with_num_of_grants_data").append(JSON.stringify(data));
+                    $("#donor_categories_data_div").append(JSON.stringify(data['donor_categories']));
+                    $("#donor_categories_drilldown_data_div").append(JSON.stringify(data['donors']));
+
+                    $("#win_loss_rates_series_chart_data_div").append(data['regions']);
+                    $("#win_loss_rates_series_chart_drilldown_data_div").append(data['countries']);
+
                     var criteria = data['criteria'];
                     var formatted_criteria = format_criteria(criteria);
                     
                     //$("#criteria").html(JSON.stringify(formatted_criteria));
                     $("#criteria").html(formatted_criteria);
                     $("#criteria-panel").show();
-                    draw_chart(criteria);
+                    draw_chart();
+                    draw_win_loss_chart();
                 } else {
-                    $("#donor_with_num_of_grants_chart").empty();
+                    $("#donor_categories_data_div").empty();
+                    $("#donor_categories_drilldown_data_div").empty();
+                    $("#win_loss_rates_series_chart_data_div").empty();
+                    $("#win_loss_rates_series_chart_drilldown_data_div").empty();
                     createAlert("warning dynamic-alert", "There is no data available for the specified criteria");
                 }
             });
@@ -255,8 +277,10 @@
     
     //Draw the chart to visualize grants per donor or donor categories.
     function draw_chart(filters) {
-        var data_raw =  $("#donor_with_num_of_grants_data").html();
-        var data = $.parseJSON(data_raw);
+        var donor_categories_raw =  $("#donor_categories_data_div").html();
+        var donors_raw =  $("#donor_categories_drilldown_data_div").html();
+        var donor_categories = $.parseJSON(donor_categories_raw);
+        var donors = $.parseJSON(donors_raw);
         var chart_title = '# Grants Per Donor Category'
         drilldown_levels = [];
         $('#donor_with_num_of_grants_chart').highcharts({
@@ -283,7 +307,7 @@
                 spacingBottom: 0,
                 events: {
                     drilldown: function (e) {
-                        var drilldown_data = $.grep(data['donors'], function(event){ return event.id == e.point.name; });
+                        var drilldown_data = $.grep(donors, function(event){ return event.id == e.point.name; });
                         if (drilldown_data.length == 0) { // must be at the grants level of drilldown
                             //console.log(e.point.name + "  NOT FOUND!");
                             window.open('https://gait.mercycorps.org/editgrant.vm?GrantID=' + e.point.gait_id, '_blank');
@@ -310,7 +334,7 @@
                         name = name.split('<span style="color: red;">');
                         if (name.length > 1) {
                             name = name[1].replace(/<\/span>$/, '');
-                            var drillup_data = $.grep(data['donors'], function(event){ return event.id == name; });
+                            var drillup_data = $.grep(donors, function(event){ return event.id == name; });
                             show_donor_with_num_of_grants_table(drillup_data);
                         } else {
                             $("#donor_with_num_of_grants_table_div").empty();
@@ -390,7 +414,7 @@
             series: [{
                 type: 'pie',
                 name: chart_title,
-                data: data['donor_categories'],
+                data: donor_categories,
             }],
             drilldown: {
                 drillUpButton: {
@@ -400,7 +424,7 @@
                         x: 0
                     },
                 },
-                series: data['donors']
+                series: donors
             },
         });
     }

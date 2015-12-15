@@ -224,10 +224,18 @@ class GlobalDashboard(TemplateView):
         context = super(GlobalDashboard, self).get_context_data(**kwargs)
         form = GrantDonorFilterForm()
         context['form'] = form
-        if self.request.is_ajax():
-            print("ajax requested")
-        else:
-            print("NOT NO NOT NOT NO TNOT")
+
+        donor_categories = get_donor_categories_dataset(self.request.GET)
+        donors = get_donors_dataset(self.request.GET)
+        grants = get_grants_dataset(self.request.GET)
+        series = donors + grants
+
+        context['donor_categories'] = JsonResponse(donor_categories, safe=False).content
+
+        context['donors'] = JsonResponse(series, safe=False).content
+
+        kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
+        context['criteria'] = JsonResponse(kwargs, safe=False).content
 
         # get the win/loss rates by region
         context['regions'] = get_regions(self.request.GET)
@@ -245,7 +253,16 @@ class DonorCategoriesView(View):
         donors = get_donors_dataset(self.request.GET)
         grants = get_grants_dataset(self.request.GET)
         series = donors + grants
+
+        regions = get_regions(self.request.GET)
+        countries = get_countries(self.request.GET)
+
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
 
-        final_dict = {'donor_categories': donor_categories, 'donors': series, 'criteria': kwargs}
+        final_dict = {
+            'donor_categories': donor_categories,
+            'donors': series,
+            'regions': regions,
+            'countries': countries,
+            'criteria': kwargs}
         return JsonResponse(final_dict, safe=False)

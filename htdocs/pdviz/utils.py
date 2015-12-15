@@ -20,7 +20,7 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
             if prefix == 'donors__grants__':
                 kwargs['donors__donor_id__in'] = params[k].split(',')
             else:
-                kwargs['donor_id__in'] = params[k].split(',')
+                kwargs[prefix + 'donor_id__in'] = params[k].split(',')
         elif k == 'sector':
             kwargs[prefix + 'sectors__sector_id'] = params[k]
         elif k == 'subsector':
