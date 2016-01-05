@@ -1,3 +1,28 @@
+var $loading = $('#loading');
+
+/* 
+ * A global ajaxComplete method that shows you any messages that are set in Django's view
+ */
+$( document )
+    .ajaxStart( function() {
+        console.log("showing");
+        $loading.show();
+    })
+    .ajaxStop( function() {
+        console.log("hiding");
+        $loading.hide();
+    })
+    .ajaxComplete(function(e, xhr, settings) {
+        var contentType = xhr.getResponseHeader("Content-Type");
+        if (contentType == "application/javascript" || contentType == "application/json") {
+            var json = $.parseJSON(xhr.responseText);
+            //show_django_ajax_messages(json);
+        }
+    })
+    .ajaxError(function(e, xhr, settings, thrownError) {
+        createAlert("danger", "Error " + xhr.status + ": " +  thrownError, false);
+    });
+
 $(document).ready(function() {
 
     $("#id_region").select2({ placeholder: "Region", allowClear: true });
