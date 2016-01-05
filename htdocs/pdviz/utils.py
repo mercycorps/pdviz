@@ -13,9 +13,15 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
         if k == 'format':
             pass
         elif k == 'region':
-            kwargs[prefix + 'countries__region__in'] = params[k].split(',')
+            if prefix == 'countries__grants__':
+                kwargs['countries__region__in'] = params[k].split(',')
+            else:
+                kwargs[prefix + 'countries__region__in'] = params[k].split(',')
         elif k == 'country':
-            kwargs[prefix + 'countries__country_id__in'] = params[k].split(',')
+            if prefix == 'countries__grants__':
+                kwargs['countries__country_id__in'] = params[k].split(',')
+            else:
+                kwargs[prefix + 'countries__country_id__in'] = params[k].split(',')
         elif k == 'donor':
             if prefix == 'donors__grants__':
                 kwargs['donors__donor_id__in'] = params[k].split(',')

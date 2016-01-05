@@ -57,12 +57,11 @@ def get_regions(kwargs):
     win_rates_data = []
     loss_rates_data = []
     for r in regions:
-        win_rate = r['win_rate']
-        win_rate = float(win_rate) if win_rate else 0
-        loss_rate = r['win_rate']
-        loss_rate = float(loss_rate) if loss_rate else 0
-        win_rates_data.append( {'y': win_rate, 'name': r['name'], 'drilldown': 'win_rate' + str( r['region_id']) } )
-        loss_rates_data.append( {'y': loss_rate, 'name': r['name'], 'drilldown': 'loss_rate' + str(r['region_id']) } )
+        try:
+            win_rates_data.append( {'y': float(r['win_rate']), 'name': r['name'], 'drilldown': 'win_rate' + str( r['region_id']) } )
+            loss_rates_data.append( {'y': float(r['loss_rate']), 'name': r['name'], 'drilldown': 'loss_rate' + str(r['region_id']) } )
+        except Exception as e:
+            pass
 
     series.append({'name': 'WinRate', 'data': win_rates_data})
     series.append({'name': 'LossRate', 'data': loss_rates_data})
