@@ -38,7 +38,12 @@ def get_regions(kwargs):
         ),
         num_total=Count(
             Case(
-                When(countries__grants__status__isnull=False, then=1),
+                When(
+                    Q(countries__grants__status__isnull = False)&
+                    ~Q(countries__grants__status = 'Concept')&
+                    ~Q(countries__grants__status = 'Development')&
+                    ~Q(countries__grants__status = 'Pending'), then=1
+                ),
                 output_field=IntegerField(),
             )
         )
@@ -63,7 +68,7 @@ def get_regions(kwargs):
 
 def get_countries(kwargs):
     kwargs = prepare_related_donor_fields_to_lookup_fields(kwargs, 'grants__')
-    print(kwargs) #grants__submission_date__gt='2012-10-30'
+    #print(kwargs) #grants__submission_date__gt='2012-10-30'
     countries = Country.objects.filter(**kwargs).distinct(
     ).annotate(
         num_funded=Count(
@@ -78,7 +83,12 @@ def get_countries(kwargs):
         ),
         num_total=Count(
             Case(
-                When(grants__status__isnull=False, then=1),
+                When(
+                    Q(grants__status__isnull=False) &
+                    ~Q(grants__status="Concept") &
+                    ~Q(grants__status="Development") &
+                    ~Q(grants__status="Pending"), then=1,
+                ),
                 output_field=IntegerField(),
             )
         )
@@ -103,8 +113,10 @@ def get_countries(kwargs):
             country_drilldown_series_win_rate_data = []
             country_drilldown_series_loss_rate_data = []
 
-        country_drilldown_series_win_rate_data.append( [c['name'], float(c['win_rate']) ])
-        country_drilldown_series_loss_rate_data.append( [c['name'], float(c['loss_rate']) ])
+        win_rate = c['win_rate']
+        loss_rate = c['loss_rate']
+        country_drilldown_series_win_rate_data.append( [c['name'], float(win_rate if win_rate else 0) ])
+        country_drilldown_series_loss_rate_data.append( [c['name'], float(loss_rate if loss_rate else 0) ])
 
         region = c['region']
         region_name = c['region__name']
@@ -226,7 +238,7 @@ class GlobalDashboard(TemplateView):
         context = super(GlobalDashboard, self).get_context_data(**kwargs)
         form = GrantDonorFilterForm()
         context['form'] = form
-
+        print(self.request.GET)
         donor_categories = get_donor_categories_dataset(self.request.GET)
         donors = get_donors_dataset(self.request.GET)
         grants = get_grants_dataset(self.request.GET)
