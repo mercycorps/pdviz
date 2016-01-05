@@ -118,7 +118,9 @@ def get_countries(kwargs):
 def get_donor_categories_dataset(kwargs):
     kwargs = prepare_related_donor_fields_to_lookup_fields(kwargs, 'donors__grants__')
     #print("donor_categories: %s" % kwargs)
-    donor_categories = DonorCategory.objects.filter(**kwargs).annotate(drilldown=F('name'), donors_count=Count('donors', distinct=True)).annotate(y=F('donors_count')).values('name', 'drilldown', 'donors_count', 'y')
+    donor_categories = DonorCategory.objects.filter(**kwargs).\
+        annotate(drilldown=F('name'), grants_count=Count('donors__grants', distinct=True)).\
+        annotate(y=F('grants_count')).values('name', 'drilldown', 'y')
     return list(donor_categories)
 
 
@@ -250,9 +252,9 @@ class DonorCategoriesView(View):
 
     def get(self, request, *args, **kwargs):
         donor_categories = get_donor_categories_dataset(self.request.GET)
-        donors = get_donors_dataset(self.request.GET)
-        grants = get_grants_dataset(self.request.GET)
-        series = donors + grants
+        donors_list = get_donors_dataset(self.request.GET)
+        grants_list = get_grants_dataset(self.request.GET)
+        series = donors_list + grants_list
 
         regions = get_regions(self.request.GET)
         countries = get_countries(self.request.GET)
