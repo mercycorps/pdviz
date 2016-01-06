@@ -90,12 +90,13 @@
         //var drilldown_series = $.parseJSON(`{{ drilldown_series|safe }}`);
         var series_data_raw =  $("#win_loss_rates_series_chart_data_div").html();
         var series_drilldown_data_raw =  $("#win_loss_rates_series_chart_drilldown_data_div").html();
+        //var series_drilldown_grants_data_raw = $("#win_loss_rates_series_chart_grants_data_div").html();
+        
         series_data_raw  = series_data_raw.replace(/&amp;/g, '&');
         series_drilldown_data_raw = series_drilldown_data_raw.replace(/&amp;/g, '&');
-
+        
         var series_data = $.parseJSON(series_data_raw);
         var drilldown_series = $.parseJSON(series_drilldown_data_raw);
-        
 
         var chart_title = 'Win Loss Rates Per Region and Country';
         
@@ -128,7 +129,7 @@
             },
             plotOptions: {
                 column: {
-                    stacking: 'percent'
+                    stacking: 'regular'
                 },
                 series: {
                     borderWidth: 0,

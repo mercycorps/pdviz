@@ -57,16 +57,15 @@ def get_regions(kwargs):
     win_rates_data = []
     loss_rates_data = []
     for r in regions:
-        try:
-            win_rates_data.append( {'y': float(r['win_rate']), 'name': r['name'], 'drilldown': 'win_rate' + str( r['region_id']) } )
-            loss_rates_data.append( {'y': float(r['loss_rate']), 'name': r['name'], 'drilldown': 'loss_rate' + str(r['region_id']) } )
-        except Exception as e:
-            pass
+        win_rate = r['win_rate']
+        loss_rate = r['loss_rate']
+        win_rates_data.append( {'y': float(win_rate if win_rate else 0), 'name': r['name'], 'drilldown': 'win_rate_region_id_' + str( r['region_id']) } )
+        loss_rates_data.append( {'y': float(loss_rate if loss_rate else 0), 'name': r['name'], 'drilldown': 'loss_rate_region_id_' + str(r['region_id']) } )
+
 
     series.append({'name': 'WinRate', 'data': win_rates_data})
     series.append({'name': 'LossRate', 'data': loss_rates_data})
-    series_json = json.dumps(series)
-    return series_json
+    return series
 
 
 def get_countries(kwargs):
@@ -101,33 +100,32 @@ def get_countries(kwargs):
         loss_rate=(100 - F('win_rate')),
     ).values('region', 'region__name', 'country_id', 'name', 'iso2', 'num_funded', 'num_total', 'win_rate', 'loss_rate').order_by('region')
 
-    country_drilldown_series_win_rate_data = []
-    country_drilldown_series_loss_rate_data = []
-    drilldown_series = []
+    countries_per_region_winrate_drilldown = []
+    countries_per_region_lossrate_drilldown = []
+    drilldown_win_series = []
+    drilldown_loss_series = []
     region = None
     region_name = None
 
     # get the drilldowns for win_rates per country
     for c in countries:
         if region is not None and region != c['region']:
-            drilldown_series.append({'id': 'win_rate' + str(region), 'type': 'column', 'stacking': 'regular', 'name': region_name, 'data': country_drilldown_series_win_rate_data})
-            drilldown_series.append({'id': 'loss_rate' + str(region), 'type': 'column', 'stacking': 'regular', 'name': region_name, 'data': country_drilldown_series_loss_rate_data})
+            drilldown_win_series.append({'name': region_name, 'id': 'win_rate_region_id_' + str(region), 'type': 'column', 'stacking': 'regular', 'data': countries_per_region_winrate_drilldown})
+            drilldown_loss_series.append({'name': region_name, 'id': 'loss_rate_region_id_' + str(region), 'type': 'column', 'stacking': 'regular', 'data': countries_per_region_lossrate_drilldown})
 
-            country_drilldown_series_win_rate_data = []
-            country_drilldown_series_loss_rate_data = []
+            countries_per_region_winrate_drilldown = []
+            countries_per_region_lossrate_drilldown = []
 
         win_rate = c['win_rate']
         loss_rate = c['loss_rate']
-        country_drilldown_series_win_rate_data.append( [c['name'], float(win_rate if win_rate else 0) ])
-        country_drilldown_series_loss_rate_data.append( [c['name'], float(loss_rate if loss_rate else 0) ])
+        countries_per_region_winrate_drilldown.append({"name": c["name"], "y": float(win_rate if win_rate else 0), "drilldown": c["name"]})
+        countries_per_region_lossrate_drilldown.append({"name": c["name"], "y": float(loss_rate if loss_rate else 0), "drilldown": c["name"]})
 
         region = c['region']
         region_name = c['region__name']
-    drilldown_series.append({'id': 'win_rate' + str(region), 'type': 'column', 'stacking': 'regular', 'name': region_name, 'data': country_drilldown_series_win_rate_data})
-    drilldown_series.append({'id': 'loss_rate' + str(region), 'type': 'column', 'stacking': 'regular', 'name': region_name, 'data': country_drilldown_series_loss_rate_data})
-
-    #drilldown_series_json = json.dumps(drilldown_series)
-    #return drilldown_series_json
+    drilldown_win_series.append({'name': region_name, 'id': 'win_rate_region_id_' + str(region), 'type': 'column', 'stacking': 'regular', 'data': countries_per_region_winrate_drilldown})
+    drilldown_loss_series.append({'name': region_name, 'id': 'loss_rate_region_id_' + str(region), 'type': 'column', 'stacking': 'regular', 'data': countries_per_region_lossrate_drilldown})
+    drilldown_series = drilldown_win_series + drilldown_loss_series
     return drilldown_series
 
 
@@ -237,8 +235,7 @@ def get_grants_dataset(kwargs):
 
 def get_grants_dataset_grouped_by_country(kwargs):
     kwargs = prepare_related_donor_fields_to_lookup_fields(kwargs, '')
-    #print("grants: %s" % kwargs)
-    grants = Grant.objects.filter(**kwargs).distinct().prefetch_related('donor').order_by('donor')
+    grants = Grant.objects.filter(**kwargs).distinct().prefetch_related('countries').order_by('countries__grantcountry__country')
 
     series = []
     prev_id  = None
@@ -249,11 +246,8 @@ def get_grants_dataset_grouped_by_country(kwargs):
     bar = OrderedDict()
     tooltip = {'valuePrefix': '$', 'valueSuffix': ' USD', 'valueDecimals': 2}
     for g in grants:
-        try:
-            if g.donor == None: continue
-        except Exception as e:
-            continue
-        id = ','.join([c.name for c in g.countries.all()])
+        country = g.countries.all()[0].name
+        id = country #','.join([c.name for c in g.countries.all()])
         if prev_id != id:
             if data:
                 graph['id'] = prev_id
@@ -265,19 +259,20 @@ def get_grants_dataset_grouped_by_country(kwargs):
                 graph = {}
             prev_id = id
         bar['gait_id'] = g.grant_id
-        bar['country'] = ','.join([c.name for c in g.countries.all()])
+        #bar['country'] = ','.join([c.name for c in g.countries.all()])
         bar['name'] = g.title
-        bar['drilldown'] = g.grant_id
+        bar['id'] = country
         bar['y'] = g.amount_usd
         bar['amount_usd'] = g.amount_usd
-        bar['start_date'] = g.start_date
-        bar['end_date'] = g.end_date
+        #bar['start_date'] = g.start_date
+        #bar['end_date'] = g.end_date
         data.append(bar)
         bar = OrderedDict()
     graph = {}
     graph['id'] = id
     graph['name'] = graph_name
     graph['data'] = data
+    graph['type'] = 'column'
     graph['tooltip'] = tooltip
     series.append(graph)
 
@@ -305,13 +300,17 @@ class GlobalDashboard(TemplateView):
         context['criteria'] = JsonResponse(kwargs, safe=False).content
 
         # get the win/loss rates by region
-        context['regions'] = get_regions(self.request.GET)
+        regions = get_regions(self.request.GET)
+        context['regions'] = JsonResponse(regions, safe=False).content
 
         # get all of the win/loss rates by country
         countries = get_countries(self.request.GET)
-        #context['regions_drilldown'] = JsonResponse(countries, safe=False).content
-        countries_grants = countries + get_grants_dataset_grouped_by_country(self.request.GET)
-        context['regions_drilldown'] = JsonResponse(countries_grants, safe=False).content
+        countries_grants = get_grants_dataset_grouped_by_country(self.request.GET)
+        countries_grants_series = countries + countries_grants
+
+        context['regions_drilldown'] = JsonResponse(countries_grants_series, safe=False).content
+
+        #context['countries_grants'] = JsonResponse(countries_grants, safe=False).content
         return context
 
 
