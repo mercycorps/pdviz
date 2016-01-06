@@ -99,7 +99,7 @@ def get_countries(kwargs):
         win_rate=ExpressionWrapper(F('num_funded')/F('num_total') * 100, DecimalField(decimal_places=2)),
     ).annotate(
         loss_rate=(100 - F('win_rate')),
-    ).values('region', 'region__name', 'country_id', 'name', 'num_funded', 'num_total', 'win_rate', 'loss_rate').order_by('region')
+    ).values('region', 'region__name', 'country_id', 'name', 'iso2', 'num_funded', 'num_total', 'win_rate', 'loss_rate').order_by('region')
 
     country_drilldown_series_win_rate_data = []
     country_drilldown_series_loss_rate_data = []
@@ -126,8 +126,9 @@ def get_countries(kwargs):
     drilldown_series.append({'id': 'win_rate' + str(region), 'type': 'column', 'stacking': 'regular', 'name': region_name, 'data': country_drilldown_series_win_rate_data})
     drilldown_series.append({'id': 'loss_rate' + str(region), 'type': 'column', 'stacking': 'regular', 'name': region_name, 'data': country_drilldown_series_loss_rate_data})
 
-    drilldown_series_json = json.dumps(drilldown_series)
-    return drilldown_series_json
+    #drilldown_series_json = json.dumps(drilldown_series)
+    #return drilldown_series_json
+    return drilldown_series
 
 
 def get_donor_categories_dataset(kwargs):
@@ -234,6 +235,55 @@ def get_grants_dataset(kwargs):
     return series
 
 
+def get_grants_dataset_grouped_by_country(kwargs):
+    kwargs = prepare_related_donor_fields_to_lookup_fields(kwargs, '')
+    #print("grants: %s" % kwargs)
+    grants = Grant.objects.filter(**kwargs).distinct().prefetch_related('donor').order_by('donor')
+
+    series = []
+    prev_id  = None
+    id = None
+    graph = {}
+    graph_name = 'Total USD Amount'
+    data = []
+    bar = OrderedDict()
+    tooltip = {'valuePrefix': '$', 'valueSuffix': ' USD', 'valueDecimals': 2}
+    for g in grants:
+        try:
+            if g.donor == None: continue
+        except Exception as e:
+            continue
+        id = ','.join([c.name for c in g.countries.all()])
+        if prev_id != id:
+            if data:
+                graph['id'] = prev_id
+                graph['name'] = graph_name
+                graph['data'] = data
+                graph['tooltip'] = tooltip
+                series.append(graph)
+                data = []
+                graph = {}
+            prev_id = id
+        bar['gait_id'] = g.grant_id
+        bar['country'] = ','.join([c.name for c in g.countries.all()])
+        bar['name'] = g.title
+        bar['drilldown'] = g.grant_id
+        bar['y'] = g.amount_usd
+        bar['amount_usd'] = g.amount_usd
+        bar['start_date'] = g.start_date
+        bar['end_date'] = g.end_date
+        data.append(bar)
+        bar = OrderedDict()
+    graph = {}
+    graph['id'] = id
+    graph['name'] = graph_name
+    graph['data'] = data
+    graph['tooltip'] = tooltip
+    series.append(graph)
+
+    return series
+
+
 class GlobalDashboard(TemplateView):
     template_name='global_dashboard.html'
 
@@ -241,7 +291,7 @@ class GlobalDashboard(TemplateView):
         context = super(GlobalDashboard, self).get_context_data(**kwargs)
         form = GrantDonorFilterForm()
         context['form'] = form
-        print(self.request.GET)
+
         donor_categories = get_donor_categories_dataset(self.request.GET)
         donors = get_donors_dataset(self.request.GET)
         grants = get_grants_dataset(self.request.GET)
@@ -258,12 +308,14 @@ class GlobalDashboard(TemplateView):
         context['regions'] = get_regions(self.request.GET)
 
         # get all of the win/loss rates by country
-        context['regions_drilldown'] = get_countries(self.request.GET)
-
+        countries = get_countries(self.request.GET)
+        #context['regions_drilldown'] = JsonResponse(countries, safe=False).content
+        countries_grants = countries + get_grants_dataset_grouped_by_country(self.request.GET)
+        context['regions_drilldown'] = JsonResponse(countries_grants, safe=False).content
         return context
 
 
-class DonorCategoriesView(View):
+class GlobalDashboardData(View):
 
     def get(self, request, *args, **kwargs):
         donor_categories = get_donor_categories_dataset(self.request.GET)

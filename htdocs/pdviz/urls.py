@@ -44,7 +44,7 @@ urlpatterns = [
     url('^', include('django.contrib.auth.urls')),
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^global_dashboard/$', GlobalDashboard.as_view(), name='global_dashboard'),
-    url(r'^global_dashboard_data/$', DonorCategoriesView.as_view(), name='global_dashboard_data'),
+    url(r'^global_dashboard_data/$', GlobalDashboardData.as_view(), name='global_dashboard_data'),
     #url(r'^dataviz/countries_by_region/(?P<region>[-\w]+)/$', CountriesByRegion.as_view(), name='cbg'),
 ]
 
