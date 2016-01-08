@@ -241,7 +241,7 @@ def get_grants_dataset_grouped_by_country(kwargs):
     prev_id  = None
     id = None
     graph = {}
-    graph_name = 'Total USD Amount'
+    graph_name = 'Grants'
     data = []
     bar = OrderedDict()
     tooltip = {'valuePrefix': '$', 'valueSuffix': ' USD', 'valueDecimals': 2}
@@ -254,6 +254,10 @@ def get_grants_dataset_grouped_by_country(kwargs):
                 graph['name'] = graph_name
                 graph['data'] = data
                 graph['tooltip'] = tooltip
+                graph['type'] = 'column'
+                graph['stacking'] = 'regular'
+                graph['dataLabels'] = {'enabled': True, 'format': '{point.y:,.0f}'}
+                #graph['plotOptions'] = "plotOptions: plotOptions: {column: { stacking: 'regular' }, pointPadding: 0.2,  groupPadding: 0, borderWidth: 1, series: { allowPointSelect: true, dataLabels: { enabled: true,format: '{point.y:.1f}'},}}"
                 series.append(graph)
                 data = []
                 graph = {}
@@ -273,9 +277,12 @@ def get_grants_dataset_grouped_by_country(kwargs):
     graph['name'] = graph_name
     graph['data'] = data
     graph['type'] = 'column'
+    graph['stacking'] = 'regular'
+    graph['dataLabels'] = {'enabled': True, 'format': '{point.y:,.0f}'}
     graph['tooltip'] = tooltip
     series.append(graph)
-
+    series.append({"borderWidth": 1})
+    #series.append({"dataLabels": "{enabled: true, format: '{point.y:.1f}'},"})
     return series
 
 
