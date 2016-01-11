@@ -27,6 +27,7 @@ from dataviz.api import *
 
 router = routers.DefaultRouter()
 router.register('grants', GrantViewSet, base_name='grants')
+router.register('grants_by_country', GrantsByCountryViewSet, base_name='grants_by_country')
 router.register('donors', DonorViewSet, base_name='donors')
 router.register('countries', CountryViewSet, base_name='countries')
 router.register('donorcategories', DonorCategoryViewSet, base_name='donorcategories')

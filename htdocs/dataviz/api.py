@@ -24,9 +24,21 @@ class GrantViewSet(viewsets.ModelViewSet):
         return queryset
 
 
+class GrantsByCountryViewSet(viewsets.ModelViewSet):
+    serializer_class = GrantsByCountrySerializer
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        queryset = Country.objects.all()
+        region_ids = self.request.query_params.get('region', None)
+        if region_ids:
+            region_list = region_ids.split(',')
+            queryset = queryset.filter( reduce(or_, [Q(region=r) for r in region_list]) )
+        return queryset
+
+
 class CountryViewSet(viewsets.ModelViewSet):
     serializer_class = CountrySerializer
-    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         queryset = Country.objects.all()
