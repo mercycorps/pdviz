@@ -101,7 +101,33 @@
         $("#win_loss_rates_series_chart_data_div").empty();
         $("#win_loss_rates_series_chart_drilldown_data_div").empty();
 
-        $.get("/global_dashboard_data/", filters)
+        $.getJSON("/global_dashboard_data/", filters, function(data) {
+            if (Object.keys(data['donor_categories']).length > 0) {
+                $("#donor_categories_data_div").append(JSON.stringify(data['donor_categories']));
+                $("#donor_categories_drilldown_data_div").append(JSON.stringify(data['donors']));
+            } else {
+                $("#donor_categories_data_div").empty();
+                $("#donor_categories_drilldown_data_div").empty();
+            }
+
+            if (Object.keys(data['regions']).length > 0) {
+                $("#win_loss_rates_series_chart_data_div").append(JSON.stringify(data['regions']));
+                $("#win_loss_rates_series_chart_drilldown_data_div").append(JSON.stringify(data['countries']));
+            } else {
+                $("#win_loss_rates_series_chart_data_div").empty();
+                $("#win_loss_rates_series_chart_drilldown_data_div").empty();
+            }
+
+            var criteria = data['criteria'];
+            var formatted_criteria = format_criteria(criteria);
+            $("#criteria").html(formatted_criteria);
+            $("#criteria-panel").show();
+
+            draw_chart();
+            draw_win_loss_chart();
+        });
+
+        /*
             .done(function(data) {
                 if (Object.keys(data['donor_categories']).length > 0) {
                     $("#donor_categories_data_div").append(JSON.stringify(data['donor_categories']));
@@ -126,6 +152,7 @@
                     createAlert("warning dynamic-alert", "There is no data available for the specified criteria");
                 }
             });
+        */
     });
 
     // Format the criteria from the search form in a more readable fashion.
@@ -208,18 +235,22 @@
         $("#donor_with_num_of_grants_table").DataTable();
     }
 
-    function draw_win_loss_chart() {
-        //var series_data = $.parseJSON("{{ series|safe }}");
-        //var drilldown_series = $.parseJSON(`{{ drilldown_series|safe }}`);
-        var series_data_raw =  $("#win_loss_rates_series_chart_data_div").html();
-        var series_drilldown_data_raw =  $("#win_loss_rates_series_chart_drilldown_data_div").html();
-        //var series_drilldown_grants_data_raw = $("#win_loss_rates_series_chart_grants_data_div").html();
-        
-        series_data_raw  = series_data_raw.replace(/&amp;/g, '&');
-        series_drilldown_data_raw = series_drilldown_data_raw.replace(/&amp;/g, '&');
-        
-        var series_data = $.parseJSON(series_data_raw);
-        var drilldown_series = $.parseJSON(series_drilldown_data_raw);
+    function draw_win_loss_chart(regions, countries) {
+        var series_data
+        var drilldown_series
+
+        if (regions && countries) {
+            series_data = $.parseJSON(`{{ regions|safe }}`);
+            drilldown_series = $.parseJSON(`{{ countries|safe }}`);
+        } else {
+            var series_data_raw =  $("#win_loss_rates_series_chart_data_div").html();
+            var series_drilldown_data_raw =  $("#win_loss_rates_series_chart_drilldown_data_div").html();
+            //var series_drilldown_grants_data_raw = $("#win_loss_rates_series_chart_grants_data_div").html();
+            series_data_raw  = series_data_raw.replace(/&amp;/g, '&');
+            series_drilldown_data_raw = series_drilldown_data_raw.replace(/&amp;/g, '&');
+            series_data = $.parseJSON(series_data_raw);
+            drilldown_series = $.parseJSON(series_drilldown_data_raw);
+        }
 
         var chart_title = 'Win Loss Rates Per Region and Country';
         

@@ -175,20 +175,14 @@ def get_countries(criteria):
 def get_donor_categories_dataset(kwargs):
     kwargs = prepare_related_donor_fields_to_lookup_fields(kwargs, 'donors__grants__')
     #print("donor_categories: %s" % kwargs)
-    donor_categories = DonorCategory.objects.filter(**kwargs).\
-        annotate(drilldown=F('name'), grants_count=Count('donors__grants', distinct=True)).\
-        annotate(y=F('grants_count')).values('name', 'drilldown', 'y')
+    donor_categories = DonorCategory.objects.filter(**kwargs).annotate(drilldown=F('name'), grants_count=Count('donors__grants', distinct=True)).annotate(y=F('grants_count')).values('name', 'drilldown', 'y')
     return list(donor_categories)
 
 
 def get_donors_dataset(kwargs):
     kwargs = prepare_related_donor_fields_to_lookup_fields(kwargs, 'grants__')
     #print("donors: %s: " % kwargs)
-    donors = Donor.objects.filter(**kwargs).\
-        annotate(id=F('category__name'), grants_count=Count('grants', distinct=True)).\
-        annotate(y=F('grants_count')).\
-        values('id', 'name', 'donor_id', 'grants_count', 'y').\
-        order_by('id')
+    donors = Donor.objects.filter(**kwargs).annotate(id=F('category__name'), grants_count=Count('grants', distinct=True)).annotate(y=F('grants_count')).values('id', 'name', 'donor_id', 'grants_count', 'y').order_by('id')
 
     series = []
     graph = {}
@@ -266,8 +260,8 @@ def get_grants_dataset(kwargs):
         bar['drilldown'] = g.grant_id
         bar['y'] = g.amount_usd
         bar['amount_usd'] = g.amount_usd
-        bar['start_date'] = g.start_date
-        bar['end_date'] = g.end_date
+        bar['start_date'] = g.start_date.strftime("%Y-%m-%d") if g.start_date else ""
+        bar['end_date'] = g.end_date.strftime("%Y-%m-%d") if g.end_date else ""
         data.append(bar)
         bar = OrderedDict()
     graph = {}
@@ -294,7 +288,7 @@ class GlobalDashboard(TemplateView):
         series = donors + grants
 
         context['donor_categories'] = json.dumps(donor_categories)
-        context['donors'] = JsonResponse(series, safe=False).content
+        context['donors'] = json.dumps(series)
 
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
         context['criteria'] = json.dumps(kwargs)
@@ -312,6 +306,7 @@ class GlobalDashboard(TemplateView):
 class GlobalDashboardData(View):
 
     def get(self, request, *args, **kwargs):
+        #print(self.request.GET)
         donor_categories = get_donor_categories_dataset(self.request.GET)
         donors_list = get_donors_dataset(self.request.GET)
         grants_list = get_grants_dataset(self.request.GET)
@@ -319,7 +314,6 @@ class GlobalDashboardData(View):
 
         regions = get_regions(self.request.GET)
         countries = get_countries(self.request.GET)
-
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
 
         final_dict = {
