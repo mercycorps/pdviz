@@ -3,9 +3,25 @@ from .models import *
 
 
 class GrantSerializer(serializers.ModelSerializer):
+    gait_id = serializers.SerializerMethodField('get_grant_id')
+    y = serializers.SerializerMethodField('get_amount_usd')
+    id = serializers.SerializerMethodField('get_country_name')
+    name = serializers.SerializerMethodField('get_grant_title')
     class Meta:
         model = Grant
-        depth = 1
+        fields = ("gait_id", "name", "id", "y")
+
+    def get_grant_id(self, obj):
+        return obj.grant_id
+
+    def get_amount_usd(self, obj):
+        return obj.amount_usd
+
+    def get_grant_title(self, obj):
+        return obj.title
+
+    def get_country_name(self, obj):
+        return obj.countries.all()[0].name
 
 
 class DonorSerializer(serializers.ModelSerializer):

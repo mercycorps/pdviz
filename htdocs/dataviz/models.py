@@ -154,6 +154,22 @@ class Methodology(models.Model):
     def __unicode__(self):
         return self.name
 
+class GrantsLostManager(models.Manager):
+    def get_queryset(self):
+        return super(GrantsLostManager, self).get_queryset().filter(
+                    Q(status='Closed')|
+                    Q(status='Funded')|
+                    Q(status='Completed'))
+
+
+class GrantsWonManager(models.Manager):
+    def get_queryset(self):
+        return super(GrantsWonManager, self).get_queryset().filter(
+                Q(status__isnull=False) &
+                ~Q(status="Concept") &
+                ~Q(status="Development") &
+                ~Q(status="Pending"))
+
 
 class Grant(models.Model):
     grant_id = models.PositiveIntegerField(primary_key=True, db_column="GrantID", validators=[validate_positive,])
@@ -180,6 +196,9 @@ class Grant(models.Model):
     themes = models.ManyToManyField(Theme, through='GrantTheme')
     methodologies = models.ManyToManyField(Methodology, through='GrantMethodology')
     countries = models.ManyToManyField(Country, through="GrantCountry", related_name='grants')
+    objects = models.Manager() # The default manager.
+    won_grants = GrantsWonManager()
+    lost_grants = GrantsLostManager()
 
     def __unicode__(self):
         return self.title
