@@ -22,6 +22,9 @@ from .mixins import *
 from .api import *
 
 def get_regions(kwargs):
+    """
+    Win/Loss rate of grants by region.
+    """
     kwargs = prepare_related_donor_fields_to_lookup_fields(kwargs, 'countries__grants__')
     # Get distinct regions along with the number of total grants and tatal_grants_funded
     #countries__grants__submission_date__gt='2012-10-30'
@@ -70,8 +73,10 @@ def get_regions(kwargs):
 
 
 def get_countries(criteria):
+    """
+    Get a list of countries along with grants grouped by won and lost
+    """
     kwargs = prepare_related_donor_fields_to_lookup_fields(criteria, 'grants__')
-    #print(kwargs) #grants__submission_date__gt='2012-10-30'
     countries = Country.objects.filter(**kwargs).distinct(
     ).annotate(
         num_funded=Count(
@@ -120,8 +125,8 @@ def get_countries(criteria):
         grants_lost = None
 
         if region is not None and region != c['region']:
-            drilldown_win_series.append({'name': region_name, 'id': 'wr' + str(region), 'type': 'column', 'stacking': 'regular', 'data': countries_per_region_winrate_drilldown})
-            drilldown_loss_series.append({'name': region_name, 'id': 'lr' + str(region), 'type': 'column', 'stacking': 'regular', 'data': countries_per_region_lossrate_drilldown})
+            drilldown_win_series.append({'name': region_name, 'id': 'wr' + str(region), 'stacking': 'regular', 'data': countries_per_region_winrate_drilldown})
+            drilldown_loss_series.append({'name': region_name, 'id': 'lr' + str(region), 'stacking': 'regular', 'data': countries_per_region_lossrate_drilldown})
 
             countries_per_region_winrate_drilldown = []
             countries_per_region_lossrate_drilldown = []
@@ -138,7 +143,8 @@ def get_countries(criteria):
         grants_win_series.append({
             "name": "GRANTS",
             "id": "w" + str(c["country_id"]),
-            "type": "column",
+            #"type": "column",
+            "colorByPoint": True,
             "stacking": "regular",
             "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2},
             "dataLabels": {'enabled': True, 'format': '{point.y:,.0f}'},
@@ -150,7 +156,8 @@ def get_countries(criteria):
         grants_loss_series.append({
             "name": "GRANTS",
             "id": "l" + str(c["country_id"]),
-            "type": "column",
+            #"type": "column",
+            "colorByPoint": True,
             "stacking": "regular",
             "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2},
             "dataLabels": {'enabled': True, 'format': '{point.y:,.0f}'},
