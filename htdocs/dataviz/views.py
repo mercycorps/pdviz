@@ -177,7 +177,11 @@ def get_donor_categories_dataset(kwargs):
 def get_donors_dataset(kwargs):
     kwargs = prepare_related_donor_fields_to_lookup_fields(kwargs, 'grants__')
     #print("donors: %s: " % kwargs)
-    donors = Donor.objects.filter(**kwargs).annotate(id=F('category__name'), grants_count=Count('grants', distinct=True)).annotate(y=F('grants_count')).values('id', 'name', 'grants_count', 'y').order_by('id')
+    donors = Donor.objects.filter(**kwargs).\
+        annotate(id=F('category__name'), grants_count=Count('grants', distinct=True)).\
+        annotate(y=F('grants_count')).\
+        values('id', 'name', 'donor_id', 'grants_count', 'y').\
+        order_by('id')
 
     series = []
     graph = {}
@@ -208,7 +212,7 @@ def get_donors_dataset(kwargs):
         bar['name'] = bar_name # set the name of the bar on the X-axis
         bar['y'] = d['y'] # set the bar's value for the Y-axis
         bar['grants_count'] = d['grants_count'] # set the bar's value for the Y-axis
-        bar['drilldown'] = d['name'] # set the name of the drilldown graph for this bar
+        bar['drilldown'] = "d-" + str(d['donor_id']) # set the name of the drilldown graph for this bar
         data.append(bar) # append the bar to the graph's data list
         bar = {} # Initialize a new bar
 
@@ -238,7 +242,7 @@ def get_grants_dataset(kwargs):
             if g.donor == None: continue
         except Exception as e:
             continue
-        id = g.donor.name
+        id = "d-" + str(g.donor.donor_id)
         if prev_id != id:
             if data:
                 graph['id'] = prev_id

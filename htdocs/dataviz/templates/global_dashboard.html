@@ -356,7 +356,7 @@
                 spacingBottom: 0,
                 events: {
                     drilldown: function (e) {
-                        var drilldown_data = $.grep(donors, function(event){ return event.id == e.point.name; });
+                        var drilldown_data = $.grep(donors, function(event){ return event.id == e.point.drilldown; });
                         if (drilldown_data.length == 0) { // must be at the grants level of drilldown
                             //console.log(e.point.name + "  NOT FOUND!");
                             window.open('https://gait.mercycorps.org/editgrant.vm?GrantID=' + e.point.gait_id, '_blank');
