@@ -1,13 +1,18 @@
 from operator import and_, or_
 from django.db.models import Q
 
-from rest_framework import viewsets
+from rest_framework import viewsets, pagination
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet
 
 from .models import *
 from .serializers import *
 from pdviz.utils import *
+
+class StandardResultsSetPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 
 class GrantViewSet(viewsets.ModelViewSet):
@@ -21,6 +26,7 @@ class GrantViewSet(viewsets.ModelViewSet):
 
 class CountryViewSet(viewsets.ModelViewSet):
     serializer_class = CountrySerializer
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         queryset = Country.objects.all()

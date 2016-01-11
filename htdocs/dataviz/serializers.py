@@ -24,6 +24,38 @@ class GrantSerializer(serializers.ModelSerializer):
         return obj.countries.all()[0].name
 
 
+class CountrySerializer(serializers.ModelSerializer):
+    data = GrantSerializer(many=True, read_only=True, source="grants")
+    type = serializers.SerializerMethodField()
+    dataLabels = serializers.SerializerMethodField()
+    id = serializers.SerializerMethodField('get_country_name')
+    tooltip = serializers.SerializerMethodField()
+    stacking = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Country
+        fields = ("id", "iso2","name", "region", "type", "stacking", "dataLabels", "tooltip", "data")
+
+    def get_type(self, obj):
+        return "column"
+
+    def get_dataLabels(self, obj):
+        return {'enabled': True, 'format': '{point.y:,.0f}'}
+
+    def get_country_name(self, obj):
+        return obj.name
+
+    def get_tooltip(self, obj):
+        return {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2}
+
+    def get_stacking(self, obj):
+        return "regular"
+
+    def get_name(self,obj):
+        return "GRANTS"
+
+
 class DonorSerializer(serializers.ModelSerializer):
     grants_count = serializers.IntegerField()
     class Meta:
@@ -39,11 +71,6 @@ class DonorCategorySerializer(serializers.ModelSerializer):
 class DonorDepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = DonorDepartment
-
-
-class CountrySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Country
 
 
 class SectorSerializer(serializers.ModelSerializer):
