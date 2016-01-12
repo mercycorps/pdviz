@@ -23,9 +23,21 @@
                 <div class="panel-heading"> Filter Criteria </div>
                 <div class="panel-body" id="criteria" style="padding:5px;"> No criteria specified </div>
             </div>
-            <div id="donor_with_num_of_grants_chart"></div>
-            <div id="donor_with_num_of_grants_table_div" class="table-responsive"> </div>
-            <div id="win_loss_rates_series_chart_div"></div>
+            <div id='criteria-panel' class="panel panel-primary">
+                <div class="panel-heading"> Grants Per Donor Category and Donor </div>
+                <div class="panel-body" style="padding:5px;">
+                    <div id="donor_with_num_of_grants_chart"></div>
+                    <div id="donor_with_num_of_grants_table_div" class="table-responsive"> </div>
+                </div>
+            </div>
+            
+            <div id='criteria-panel' class="panel panel-primary">
+                <div class="panel-heading"> Grants Win / Loss Rate by Region and Country </div>
+                <div class="panel-body" style="padding:5px;">
+                    <div id="win_loss_rates_series_chart_div"></div>
+                </div>
+            </div>
+            
         </div>
     </div>
 {% endblock content %}
@@ -35,6 +47,56 @@
 <script type="text/javascript">
     "use strict";
     var drilldown_levels = [];
+
+    /// Base configuration for hicharts
+    var baseConfig = {
+        credits: {
+            text: 'mercycorps.org',
+            href: 'http://www.mercycorps.org',
+            enabled: false,
+        },
+        tooltip: {
+            backgroundColor: '#FCFFC5',
+            //borderColor: 'black',
+            borderRadius: 10,
+            borderWidth: 1,
+            shared: true,
+            shadow: false,
+            useHTML: true,
+            style: {
+                padding: 5
+            },
+            headerFormat: '<small>{point.key}</small><table>',
+            pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
+                '<td style="text-align: right"><b>{point.y} </b></td></tr>',
+            footerFormat: '</table>',
+            /*
+            formatter: function() {
+                return '<b>' + this.point.name + '</b>, has <b>' + this.y + '</b> grants. <br /> '+ this.series.name;
+                //return this.y;
+            },
+            */
+        },/*
+        tooltip: {
+            pointFormat: '<span style="color:{series.color}">{series.name}</span>: {point.percentage:.0f}% <br/>',
+            shared: true
+        },
+        */
+        
+        subtitle: {
+            text: 'Source: <a href="https://gait.mercycorps.org" target="_blank">GAIT</a>'
+        },
+        xAxis: {
+            type: 'category',
+            labels: {
+                //rotation: -45,
+                style: {
+                    fontSize: '10px',
+                }
+            }
+        },
+
+    }
 
     // On the search form reset event, clear all of the select2 dorpdowns.
     $("body").on("reset", "#grants_donor_filter_form", function(e) {
@@ -235,6 +297,7 @@
         $("#donor_with_num_of_grants_table").DataTable();
     }
 
+    // A drilldown stacked column chart that shows win / loss rate by region and country
     function draw_win_loss_chart(regions, countries) {
         var series_data
         var drilldown_series
@@ -251,60 +314,24 @@
             series_data = $.parseJSON(series_data_raw);
             drilldown_series = $.parseJSON(series_drilldown_data_raw);
         }
-
-        var chart_title = 'Win Loss Rates Per Region and Country';
-        
-        $('#win_loss_rates_series_chart_div').highcharts({
-            credits: {
-                text: 'mercycorps.org',
-                href: 'http://www.mercycorps.org',
-                enabled: false,
-            },
+        var winLossConfig = {
             chart: {
                 type: 'column',
                 margin: [80, 0, 90, 70],
                 renderTo: 'win_loss_rates_series_chart_div',
                 spacingBottom: 0,
             },
-            title: {
-                text: chart_title
-            },
-            xAxis: {
-                type: 'category',
-                labels: {
-                    //rotation: -45,
-                    style: {
-                        fontSize: '10px',
-                    }
-                }
-            },
+            title: {text: 'Win Loss Rates Per Region and Country'},
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Win/Loss Rate Perecentage'
+                    text: 'Perecentage'
                 }
-            },
-            
-            tooltip: {
-                pointFormat: '<span style="color:{series.color}">{series.name}</span>: {point.percentage:.0f}% <br/>',
-                shared: true
             },
             plotOptions: {
                 column: {
                     stacking: 'percent',
-                    /*
-                    dataLabels: {
-                        enabled: true,
-                        formatter: function () {
-                            return Highcharts.numberFormat(this.y,2);
-                        },
-                    },
-                    */
                 },
-                pointPadding: 0.2,
-                groupPadding: 0,
-                borderWidth: 1,
-                
                 series: {
                     allowPointSelect: true,
                     dataLabels: {
@@ -312,30 +339,9 @@
                         format: '{point.y:.1f}%'
                     },
                 },
-                
-                
             },
-            tooltip: {
-                backgroundColor: '#FCFFC5',
-                //borderColor: 'black',
-                borderRadius: 10,
-                borderWidth: 1,
-                shared: true,
-                shadow: false,
-                useHTML: true,
-                style: {
-                    padding: 5
-                },
-                headerFormat: '<small>{point.key}</small><table>',
-                pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
-                    '<td style="text-align: right"><b>{point.y} </b></td></tr>',
-                footerFormat: '</table>',
-                /*
-                formatter: function() {
-                    return '<b>' + this.point.name + '</b>, has <b>' + this.y + '</b> grants. <br /> '+ this.series.name;
-                    //return this.y;
-                },
-                */
+            legend: {
+                enabled: true
             },
             series: series_data,
             drilldown: {
@@ -352,23 +358,19 @@
                 },
                 series: drilldown_series,
             }
-        });
+        };
+        $('#win_loss_rates_series_chart_div').highcharts($.extend(baseConfig, winLossConfig));
     }
     
-    //Draw the chart to visualize grants per donor or donor categories.
+    //A drilldown pie/column chart that shows number of grants per donor_category and donor
     function draw_chart(filters) {
         var donor_categories_raw =  $("#donor_categories_data_div").html();
         var donors_raw =  $("#donor_categories_drilldown_data_div").html();
         var donor_categories = $.parseJSON(donor_categories_raw);
         var donors = $.parseJSON(donors_raw);
-        var chart_title = 'Grants Per Donor Category'
+
         drilldown_levels = [];
-        $('#donor_with_num_of_grants_chart').highcharts({
-            credits: {
-                text: 'mercycorps.org',
-                href: 'http://www.mercycorps.org',
-                enabled: false,
-            },
+        var numGrantsChartConfig = {
             chart: {
                 zoomType: 'x',
                 panning: true,
@@ -407,7 +409,7 @@
                         drilldown_levels.pop();
                         var name = drilldown_levels[drilldown_levels.length - 1 ];
                         if (name == undefined ) {
-                            name = '# Grants per Donor Category';
+                            name = 'Grants per Donor Category';
                         }
                         this.setTitle({ text: name});
 
@@ -423,19 +425,7 @@
                 },
             },
             title: {
-                text: chart_title
-            },
-            subtitle: {
-                text: 'Source: <a href="https://gait.mercycorps.org" target="_blank">GAIT</a>'
-            },
-            xAxis: {
-                type: 'category',
-                labels: {
-                    //rotation: -45,
-                    style: {
-                        fontSize: '10px',
-                    }
-                }
+                text: "Grants Per Donor Category",
             },
             yAxis: {
                 min: 0,
@@ -448,9 +438,6 @@
                 column: {
                     colorByPoint: true,
                 },
-                pointPadding: 0.2,
-                groupPadding: 0,
-                borderWidth: 1,
                 series: {
                     allowPointSelect: true,
                     animation: {
@@ -459,41 +446,15 @@
                     dataLabels: {
                         enabled: true,
                         align: 'top',
-                        // rotation: -90,
-                        //color: '#FFFFFF',
-                        //y: -10
                     },
                 },
-            },
-            
-            tooltip: {
-                backgroundColor: '#FCFFC5',
-                //borderColor: 'black',
-                borderRadius: 10,
-                borderWidth: 1,
-                shared: true,
-                shadow: false,
-                useHTML: true,
-                style: {
-                    padding: 5
-                },
-                headerFormat: '<small>{point.key}</small><table>',
-                pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
-                    '<td style="text-align: right"><b>{point.y} </b></td></tr>',
-                footerFormat: '</table>',
-                /*
-                formatter: function() {
-                    //return '<b>' + this.point.name + '</b>, has <b>' + this.y + '</b> grants. <br /> '+ this.series.name;
-                    return this.y;
-                },
-                */
             },
             legend: {
                 enabled: false
             },
             series: [{
                 type: 'pie',
-                name: chart_title,
+                name: "Grants per Donor Category",
                 data: donor_categories,
             }],
             drilldown: {
@@ -506,7 +467,8 @@
                 },
                 series: donors
             },
-        });
+        };
+        $('#donor_with_num_of_grants_chart').highcharts($.extend(baseConfig, numGrantsChartConfig));
     }
 
 </script>
