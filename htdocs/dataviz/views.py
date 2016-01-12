@@ -141,7 +141,7 @@ def get_countries(criteria):
         grants_won = Grant.won_grants.filter(countries__country_id=c['country_id'], **kwargs)
         serializer_won_grants = GrantSerializer(grants_won, many=True)
         grants_win_series.append({
-            "name": "GRANTS",
+            "name": c['name'],
             "id": "w" + str(c["country_id"]),
             #"type": "column",
             "colorByPoint": True,
@@ -154,7 +154,7 @@ def get_countries(criteria):
         grants_lost = Grant.lost_grants.filter(countries__country_id=c['country_id'], **kwargs)
         serializer_lost_grants = GrantSerializer(grants_lost, many=True)
         grants_loss_series.append({
-            "name": "GRANTS",
+            "name": c['name'],
             "id": "l" + str(c["country_id"]),
             #"type": "column",
             "colorByPoint": True,

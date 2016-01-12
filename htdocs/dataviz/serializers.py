@@ -62,7 +62,7 @@ class GrantsByCountrySerializer(serializers.ModelSerializer):
         return "regular"
 
     def get_name(self,obj):
-        return "GRANTS"
+        return obj.name
 
 
 class GrantsByDonorSerializer(serializers.ModelSerializer):

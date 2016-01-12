@@ -317,9 +317,9 @@
         var winLossConfig = {
             chart: {
                 type: 'column',
-                margin: [80, 0, 90, 70],
+                margin: [80, 0, 120, 70],
                 renderTo: 'win_loss_rates_series_chart_div',
-                spacingBottom: 0,
+                spacingBottom: 90,
             },
             title: {text: 'Win Loss Rates Per Region and Country'},
             yAxis: {
@@ -341,7 +341,8 @@
                 },
             },
             legend: {
-                enabled: true
+                enabled: true,
+                y: 95
             },
             series: series_data,
             drilldown: {
