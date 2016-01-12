@@ -5,11 +5,11 @@ var $loading = $('#loading');
  */
 $( document )
     .ajaxStart( function() {
-        console.log("showing");
+        //console.log("showing");
         $loading.show();
     })
     .ajaxStop( function() {
-        console.log("hiding");
+        //console.log("hiding");
         $loading.hide();
     })
     .ajaxComplete(function(e, xhr, settings) {
