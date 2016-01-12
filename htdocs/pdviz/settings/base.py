@@ -58,6 +58,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'pdviz.middleware.AjaxMessaging',
+    'pdviz.middleware.TimingMiddleware',
 )
 
 ROOT_URLCONF = 'pdviz.urls'
