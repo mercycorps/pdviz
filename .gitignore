@@ -8,6 +8,7 @@ local.py
 conf/
 extras/
 djangocosign/
+feedback/
 scripts/
 
 # C extensions

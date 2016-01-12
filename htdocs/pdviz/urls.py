@@ -47,6 +47,7 @@ urlpatterns = [
     url(r'^global_dashboard/$', GlobalDashboard.as_view(), name='global_dashboard'),
     url(r'^global_dashboard_data/$', GlobalDashboardData.as_view(), name='global_dashboard_data'),
     #url(r'^dataviz/countries_by_region/(?P<region>[-\w]+)/$', CountriesByRegion.as_view(), name='cbg'),
+    url(r'^feedback/', include('feedback.urls')),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
