@@ -170,6 +170,7 @@
             } else {
                 $("#donor_categories_data_div").empty();
                 $("#donor_categories_drilldown_data_div").empty();
+                createAlert("warning dynamic-alert", "There is no data available for the 'Grant per Donor Category and Donor Chart'");
             }
 
             if (Object.keys(data['regions']).length > 0) {
@@ -178,6 +179,7 @@
             } else {
                 $("#win_loss_rates_series_chart_data_div").empty();
                 $("#win_loss_rates_series_chart_drilldown_data_div").empty();
+                createAlert("warning dynamic-alert", "There is no data available for the Win/Loss Rate Chart");
             }
 
             var criteria = data['criteria'];
@@ -188,33 +190,6 @@
             draw_chart();
             draw_win_loss_chart();
         });
-
-        /*
-            .done(function(data) {
-                if (Object.keys(data['donor_categories']).length > 0) {
-                    $("#donor_categories_data_div").append(JSON.stringify(data['donor_categories']));
-                    $("#donor_categories_drilldown_data_div").append(JSON.stringify(data['donors']));
-
-                    $("#win_loss_rates_series_chart_data_div").append(data['regions']);
-                    $("#win_loss_rates_series_chart_drilldown_data_div").append(data['countries']);
-
-                    var criteria = data['criteria'];
-                    var formatted_criteria = format_criteria(criteria);
-                    
-                    //$("#criteria").html(JSON.stringify(formatted_criteria));
-                    $("#criteria").html(formatted_criteria);
-                    $("#criteria-panel").show();
-                    draw_chart();
-                    draw_win_loss_chart();
-                } else {
-                    $("#donor_categories_data_div").empty();
-                    $("#donor_categories_drilldown_data_div").empty();
-                    $("#win_loss_rates_series_chart_data_div").empty();
-                    $("#win_loss_rates_series_chart_drilldown_data_div").empty();
-                    createAlert("warning dynamic-alert", "There is no data available for the specified criteria");
-                }
-            });
-        */
     });
 
     // Format the criteria from the search form in a more readable fashion.
