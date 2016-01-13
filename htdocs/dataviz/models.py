@@ -154,17 +154,17 @@ class Methodology(models.Model):
     def __unicode__(self):
         return self.name
 
-class GrantsLostManager(models.Manager):
+class GrantsWonManager(models.Manager):
     def get_queryset(self):
-        return super(GrantsLostManager, self).get_queryset().filter(
+        return super(GrantsWonManager, self).get_queryset().filter(
                     Q(status='Closed')|
                     Q(status='Funded')|
                     Q(status='Completed'))
 
 
-class GrantsWonManager(models.Manager):
+class GrantsLostManager(models.Manager):
     def get_queryset(self):
-        return super(GrantsWonManager, self).get_queryset().filter(
+        return super(GrantsLostManager, self).get_queryset().filter(
                 Q(status="Rejected") |
                 Q(status="No-Response"))
 
