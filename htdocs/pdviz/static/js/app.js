@@ -94,7 +94,7 @@ function createAlert (type, message, fade) {
 }
 
        
-var tableObject = function (json) {
+var tableObject = function (json, id) {
     var headerCount = new Object();
 
     var createTHEAD = function () {
@@ -168,7 +168,7 @@ var tableObject = function (json) {
             tbody.appendChild(row);
         }
         pTable.appendChild(tbody);
-        pTable.setAttribute("id", "donor_with_num_of_grants_table");
+        pTable.setAttribute("id", id);
         pTable.setAttribute("class", "table table-striped table-bordered table-hover table-condensed");
     }
     return pTable;

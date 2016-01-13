@@ -35,6 +35,7 @@
                 <div class="panel-heading"> Grants Win / Loss Rate by Region and Country </div>
                 <div class="panel-body" style="padding:15px;">
                     <div id="win_loss_rates_series_chart_div"></div>
+                    <div id="win_loss_rate_table_div" class="table-responsive"> </div>
                 </div>
             </div>
             
@@ -266,10 +267,18 @@
 
     //Show the corresponding table for the donor_with_num_grants chart
     function show_donor_with_num_of_grants_table(drillupdown_data) {
-        var donor_with_num_of_grants_table = new tableObject(drillupdown_data[0].data);
+        var donor_with_num_of_grants_table = new tableObject(drillupdown_data[0].data, "donor_with_num_of_grants_table");
         $("#donor_with_num_of_grants_table_div").empty();
         $("#donor_with_num_of_grants_table_div").append(donor_with_num_of_grants_table);
         $("#donor_with_num_of_grants_table").DataTable();
+    }
+
+    //Show the corresponding table for the donor_with_num_grants chart
+    function show_win_loss_rate_table(drillupdown_data) {
+        var win_loss_rate_table = new tableObject(drillupdown_data[0].data, "win_loss_rate_table");
+        $("#win_loss_rate_table_div").empty();
+        $("#win_loss_rate_table_div").append(win_loss_rate_table);
+        $("#win_loss_rate_table").DataTable();
     }
 
     // A drilldown stacked column chart that shows win / loss rate by region and country
@@ -289,12 +298,40 @@
             series_data = $.parseJSON(series_data_raw);
             drilldown_series = $.parseJSON(series_drilldown_data_raw);
         }
+        drilldown_levels = [];
         var winLossConfig = {
             chart: {
                 type: 'column',
                 margin: [80, 0, 120, 70],
                 renderTo: 'win_loss_rates_series_chart_div',
                 spacingBottom: 90,
+                events: {
+                    drilldown: function (e) {
+                        var drilldown_data = $.grep(drilldown_series, function(event){ return event.id == e.point.drilldown; });
+                        if ($.isNumeric(e.point.drilldown)) {
+                            // if drilldown point is numeric then grants bar is clicked.
+                            window.open('https://gait.mercycorps.org/editgrant.vm?GrantID=' + e.point.gait_id, '_blank');
+                        } else {
+                            show_win_loss_rate_table(drilldown_data);
+                            console.log(this.series[0].name);
+                            drilldown_levels.push(this.series[0].name);
+                        }
+                    },
+                    drillup: function(e) {
+                        var level = drilldown_levels.pop();
+                        //console.log(this.options.series[1].data[0].name);
+                        if (level.length > 1) {
+                            var drillup_data = $.grep(drilldown_series, function(event){return event.name == level; });
+                            if (drillup_data.length == 0) {
+                                $("#win_loss_rate_table_div").empty();
+                            } else {
+                                show_win_loss_rate_table(drillup_data);
+                            }
+                        } else {
+                            $("#win_loss_rate_table_div").empty();
+                        }
+                    },
+                },
             },
             title: {text: 'Win Loss Rates Per Region and Country'},
             yAxis: {
