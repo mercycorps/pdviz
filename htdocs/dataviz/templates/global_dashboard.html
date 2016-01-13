@@ -259,7 +259,7 @@
                 default:
                     break;
             }
-            if (key == 'submission_date<' || "Submission Date < ") {
+            if (key == 'submission_date<') {
                 formatted_criteria += '<span id="submission_date_span" class="label label-default" style="margin-left:2px; white-space:normal; line-height:2;"><abbr title="Submission date defaults to a rolling three years back from today date">' + key + value + '</abbr></span>';
             } else {
                 formatted_criteria += '<span class="label label-default" style="margin-left:2px; white-space:normal; line-height:2;">' + key + value + '</span>';
@@ -317,7 +317,7 @@
                             window.open('https://gait.mercycorps.org/editgrant.vm?GrantID=' + e.point.gait_id, '_blank');
                         } else {
                             show_win_loss_rate_table(drilldown_data);
-                            console.log(this.series[0].name);
+                            //console.log(this.series[0].name);
                             drilldown_levels.push(this.series[0].name);
                         }
                     },
