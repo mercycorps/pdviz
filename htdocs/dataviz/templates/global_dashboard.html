@@ -47,6 +47,13 @@
 {% block extra_js %}
 <script type="text/javascript">
     "use strict";
+
+$('body').tooltip({
+  selector: '[id=submission_date_span]'
+});
+$('[id=submission_date_span]').tooltip({
+  container: 'body'
+});
     var drilldown_levels = [];
 
     /// Base configuration for hicharts
@@ -259,8 +266,9 @@
                 default:
                     break;
             }
-            if (key == 'submission_date<') {
-                formatted_criteria += '<span id="submission_date_span" class="label label-default" style="margin-left:2px; white-space:normal; line-height:2;"><abbr title="Submission date defaults to a rolling three years back from today date">' + key + value + '</abbr></span>';
+            console.log(key);
+            if (key == 'Submission Date > ') {
+                formatted_criteria += '<span id="submission_date_span" class="label label-default" style="margin-left:2px; white-space:normal; line-height:2;" data-toggle="tooltip" data-placement="bottom" title="Submission date defaults to a rolling three years back from today date">' + key + value + '</span>';
             } else {
                 formatted_criteria += '<span class="label label-default" style="margin-left:2px; white-space:normal; line-height:2;">' + key + value + '</span>';
             }
