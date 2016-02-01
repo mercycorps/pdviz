@@ -261,7 +261,7 @@ $('[id=submission_date_span]').tooltip({
             }
             //console.log(key);
             if (key == 'Submission Date > ') {
-                formatted_criteria += '<span id="submission_date_span" class="label label-default" style="margin-left:2px; white-space:normal; line-height:2;" data-toggle="tooltip" data-placement="bottom" title="Submission date defaults to a rolling three years back from today date">' + key + value + '</span>';
+                formatted_criteria += '<span id="submission_date_span" class="label label-default" style="margin-left:2px; white-space:normal; line-height:2;" data-toggle="tooltip" data-placement="bottom" title="Submission date defaults to 3 years prior to today\'s date to reduce initial page load time.">' + key + value + '</span>';
             } else {
                 formatted_criteria += '<span class="label label-default" style="margin-left:2px; white-space:normal; line-height:2;">' + key + value + '</span>';
             }
