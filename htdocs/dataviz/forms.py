@@ -95,7 +95,7 @@ class GrantDonorFilterForm(forms.Form):
         self.helper.form_method = 'get'
         self.helper.form_action = '/global/'
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm'))
-        self.helper.add_input(Reset('reset', 'Reset', css_id='id_search_form_reset_btn', css_class='btn-warning btn-sm'))
+        self.helper.add_input(Reset('reset', 'Clear', css_id='id_search_form_reset_btn', css_class='btn-warning btn-sm'))
         super(GrantDonorFilterForm, self).__init__(*args, **kwargs)
         choices_hq_admin = [("", "--HQadmin--"),]
         choices =  [(hq['hq_admin'], hq['hq_admin']) for hq in Grant.objects.filter(hq_admin__isnull=False).exclude(hq_admin__exact = '').exclude(hq_admin__exact='Hong Kong').values('hq_admin').distinct()]
