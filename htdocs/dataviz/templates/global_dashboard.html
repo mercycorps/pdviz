@@ -152,9 +152,11 @@ $('[id=submission_date_span]').tooltip({
 
         $('#donor_categories_data_div').empty();
         $('#donor_categories_drilldown_data_div').empty();
+        $("#donor_with_num_of_grants_table_div").empty();
         
         $("#win_loss_rates_series_chart_data_div").empty();
         $("#win_loss_rates_series_chart_drilldown_data_div").empty();
+        $("#win_loss_rate_table_div").empty();
 
         $.getJSON("/global_dashboard_data/", filters, function(data) {
             if (Object.keys(data['donor_categories']).length > 0) {
@@ -292,8 +294,17 @@ $('[id=submission_date_span]').tooltip({
             //var series_drilldown_grants_data_raw = $("#win_loss_rates_series_chart_grants_data_div").html();
             series_data_raw  = series_data_raw.replace(/&amp;/g, '&');
             series_drilldown_data_raw = series_drilldown_data_raw.replace(/&amp;/g, '&');
-            series_data = $.parseJSON(series_data_raw);
-            drilldown_series = $.parseJSON(series_drilldown_data_raw);
+
+            try {
+                series_data = $.parseJSON(series_data_raw);
+            } catch (err) {
+                console.log("series_data_raw empty");
+            }
+            try {
+                drilldown_series = $.parseJSON(series_drilldown_data_raw);
+            } catch (err) {
+                console.log("series_drilldown_data_raw");
+            }
         }
         drilldown_levels = [];
         var winLossConfig = {
@@ -387,9 +398,23 @@ $('[id=submission_date_span]').tooltip({
     function draw_chart(filters) {
         var donor_categories_raw =  $("#donor_categories_data_div").html();
         var donors_raw =  $("#donor_categories_drilldown_data_div").html();
-        var donor_categories = $.parseJSON(donor_categories_raw);
-        var donors = $.parseJSON(donors_raw);
 
+        var donor_categories = null;
+        try {
+            donor_categories = $.parseJSON(donor_categories_raw);
+        } catch (err) {
+            console.log("donor categories raw: " + donor_categories_raw);
+            donor_categories = null;
+        }
+
+        var donors = null;
+        try {
+            donors = $.parseJSON(donors_raw);
+        } catch(err) {
+            console.log("donors: " + donors);
+            donors_raw = null;
+        }
+        
         drilldown_levels = [];
         var numGrantsChartConfig = {
             chart: {
