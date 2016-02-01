@@ -165,8 +165,7 @@ class GrantsWonManager(models.Manager):
 class GrantsLostManager(models.Manager):
     def get_queryset(self):
         return super(GrantsLostManager, self).get_queryset().filter(
-                Q(status="Rejected") |
-                Q(status="No-Response"))
+                Q(status="Rejected"))
 
 
 class Grant(models.Model):

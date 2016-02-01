@@ -127,8 +127,8 @@ def get_countries(criteria):
         grants_lost = None
 
         if region is not None and region != c['region']:
-            drilldown_win_series.append({'name': region_name, 'id': 'wr' + str(region), 'stacking': 'regular', 'data': countries_per_region_winrate_drilldown})
-            drilldown_loss_series.append({'name': region_name, 'id': 'lr' + str(region), 'stacking': 'regular', 'data': countries_per_region_lossrate_drilldown})
+            drilldown_win_series.append({'name': "WIN-RATE - " + region_name, 'id': 'wr' + str(region), 'stacking': 'regular', 'data': countries_per_region_winrate_drilldown})
+            drilldown_loss_series.append({'name': "LOSS-RATE - " + region_name, 'id': 'lr' + str(region), 'stacking': 'regular', 'data': countries_per_region_lossrate_drilldown})
 
             countries_per_region_winrate_drilldown = []
             countries_per_region_lossrate_drilldown = []
@@ -143,10 +143,10 @@ def get_countries(criteria):
         grants_won = Grant.won_grants.filter(countries__country_id=c['country_id'], **kwargs)
         serializer_won_grants = GrantSerializer(grants_won, many=True)
         grants_win_series.append({
-            "name": c['name'],
+            "name": "WON ", #+ c['name'],
             "id": "w" + str(c["country_id"]),
             #"type": "column",
-            "colorByPoint": True,
+            #"colorByPoint": True,
             "stacking": "regular",
             "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2},
             "dataLabels": {'enabled': True, 'format': '{point.y:,.0f}'},
@@ -156,14 +156,14 @@ def get_countries(criteria):
         grants_lost = Grant.lost_grants.filter(countries__country_id=c['country_id'], **kwargs)
         serializer_lost_grants = GrantSerializer(grants_lost, many=True)
         grants_loss_series.append({
-            "name": c['name'],
+            "name": "LOST ",  #+ c['name'],
             "id": "l" + str(c["country_id"]),
             #"type": "column",
-            "colorByPoint": True,
+            #"colorByPoint": True,
             "stacking": "regular",
             "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2},
             "dataLabels": {'enabled': True, 'format': '{point.y:,.0f}'},
-            "data": serializer_lost_grants.data,
+            "data": serializer_lost_grants.data + serializer_won_grants.data,
         })
 
         region = c['region']
