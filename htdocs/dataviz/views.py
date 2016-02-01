@@ -46,6 +46,7 @@ def get_regions(kwargs):
                     Q(countries__grants__status__isnull = False)&
                     ~Q(countries__grants__status = 'Concept')&
                     ~Q(countries__grants__status = 'Development')&
+                    ~Q(countries__grants__status = 'No-Response')&
                     ~Q(countries__grants__status = 'Pending'), then=1
                 ),
                 output_field=IntegerField(),
@@ -95,6 +96,7 @@ def get_countries(criteria):
                     Q(grants__status__isnull=False) &
                     ~Q(grants__status="Concept") &
                     ~Q(grants__status="Development") &
+                    ~Q(grants__status="No-Response") &
                     ~Q(grants__status="Pending"), then=1,
                 ),
                 output_field=IntegerField(),
