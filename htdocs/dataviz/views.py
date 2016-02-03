@@ -163,7 +163,7 @@ def get_countries(criteria):
             "stacking": "regular",
             "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2},
             "dataLabels": {'enabled': True, 'format': '{point.y:,.0f}'},
-            "data": serializer_lost_grants.data + serializer_won_grants.data,
+            "data": serializer_lost_grants.data,
         })
 
         region = c['region']

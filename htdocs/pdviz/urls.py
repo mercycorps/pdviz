@@ -16,8 +16,9 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
-
+from django.views.decorators.cache import never_cache
 from django.contrib import admin
+from django.contrib.auth.views import login
 
 from rest_framework import routers, serializers, viewsets
 
@@ -41,7 +42,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/v1/', include(router.urls)),
     url(r'^api/docs/', include('rest_framework_swagger.urls')),
-    #url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
+    url(r'^login/$', never_cache(login), name='login'),
     url('^', include('django.contrib.auth.urls')),
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^global_dashboard/$', GlobalDashboard.as_view(), name='global_dashboard'),
