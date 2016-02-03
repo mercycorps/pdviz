@@ -141,6 +141,10 @@
             </div>
         </footer>
 
+        {% if GOOGLE_ANALYTICS_PROPERTY_ID %}
+            {% include "google_analytics.html" %}
+        {% endif %}
+
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script type="text/javascript" src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
 
