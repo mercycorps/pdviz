@@ -486,6 +486,7 @@ $('[id=submission_date_span]').tooltip({
                     align: 'high'
                 }
             },
+            
             plotOptions: {
                 column: {
                     colorByPoint: true,
@@ -519,8 +520,31 @@ $('[id=submission_date_span]').tooltip({
                 },
                 series: donors
             },
+            
+            credits: {
+                text: 'mercycorps.org',
+                href: 'http://www.mercycorps.org',
+                enabled: false,
+            },
+            tooltip: {
+                backgroundColor: '#FCFFC5',
+                style: { padding: 5 },
+                pointFormat: '<span style="color:{point.color}">\u25CF</span> {series.name}: <b>{point.y}</b><br/>',
+            },
+            subtitle: {
+                text: 'Source: <a href="https://gait.mercycorps.org" target="_blank">GAIT</a>'
+            },
+            xAxis: {
+                type: 'category',
+                labels: {
+                    //rotation: -45,
+                    style: {
+                        fontSize: '10px',
+                    }
+                }
+            },
         };
-        $('#donor_with_num_of_grants_chart').highcharts($.extend(baseConfig, numGrantsChartConfig));
+        $('#donor_with_num_of_grants_chart').highcharts(numGrantsChartConfig);
     }
 
 </script>
