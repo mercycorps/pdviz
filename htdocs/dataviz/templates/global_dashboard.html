@@ -89,9 +89,11 @@ $('[id=submission_date_span]').tooltip({
             type: 'category',
             labels: {
                 //rotation: -45,
+                //enabled: false,
                 style: {
                     fontSize: '10px',
                 }
+                
             }
         },
 
@@ -280,7 +282,8 @@ $('[id=submission_date_span]').tooltip({
 
     //Show the corresponding table for the donor_with_num_grants chart
     function show_win_loss_rate_table(drillupdown_data) {
-        var win_loss_rate_table = new tableObject(drillupdown_data[0].data, "win_loss_rate_table");
+        //var win_loss_rate_table = new tableObject(drillupdown_data[0].data, "win_loss_rate_table");
+        var win_loss_rate_table = new tableObject(drillupdown_data, "win_loss_rate_table");
         $("#win_loss_rate_table_div").empty();
         $("#win_loss_rate_table_div").append(win_loss_rate_table);
         $("#win_loss_rate_table").DataTable();
@@ -312,7 +315,6 @@ $('[id=submission_date_span]').tooltip({
                 console.log("series_drilldown_data_raw");
             }
         }
-        drilldown_levels = [];
         var winLossConfig = {
             chart: {
                 zoomType: 'x',
@@ -327,34 +329,50 @@ $('[id=submission_date_span]').tooltip({
                     }
                 },
                 type: 'column',
-                margin: [80, 0, 120, 70],
+                margin: [80, 0, 80, 80],
                 renderTo: 'win_loss_rates_series_chart_div',
                 spacingBottom: 90,
                 events: {
                     drilldown: function (e) {
-                        var drilldown_data = $.grep(drilldown_series, function(event){ return event.id == e.point.drilldown; });
+                        var drilldown_data;
+                        var all_data;
+                        var point_id_part_2 = e.point.drilldown.split("-")[1];
+
                         if ($.isNumeric(e.point.drilldown)) {
                             // if drilldown point is numeric then grants bar is clicked.
                             window.open('https://gait.mercycorps.org/editgrant.vm?GrantID=' + e.point.gait_id, '_blank');
                         } else {
-                            show_win_loss_rate_table(drilldown_data);
-                            //console.log(this.series[0].name);
-                            drilldown_levels.push(this.series[0].name);
+                            // if the xAxis label is clicked
+                            if (e.category != undefined) {
+                                drilldown_data = $.grep(drilldown_series, function(event){ 
+                                    var event_id_part2 = event.id.split("-")[1];
+                                    //console.log(event.id+"="+event_id_part2 + " VS " + e.point.drilldown+"=" + point_id_part_2);
+                                    if (event_id_part2 == point_id_part_2) {
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                                // combine data from the loss and won series.
+                                all_data = drilldown_data[0].data.concat(drilldown_data[1].data);
+                                if (point_id_part_2.substring(0,2) == "ac") {
+                                    this.xAxis[0].update({visible: false});
+                                    this.yAxis[0].update({title: {text: "Amount"}});
+                                }
+                            } else {
+                                drilldown_data = $.grep(drilldown_series, function(event){ 
+                                    return event.id == e.point.drilldown; 
+                                });
+                                all_data = drilldown_data[0].data;
+                            }
+                            if (point_id_part_2.substring(0,2) != "ar"){
+                                show_win_loss_rate_table(all_data);
+                            }
                         }
                     },
                     drillup: function(e) {
-                        var level = drilldown_levels.pop();
-                        //console.log(this.options.series[1].data[0].name);
-                        if (level.length > 1) {
-                            var drillup_data = $.grep(drilldown_series, function(event){return event.name == level; });
-                            if (drillup_data.length == 0) {
-                                $("#win_loss_rate_table_div").empty();
-                            } else {
-                                show_win_loss_rate_table(drillup_data);
-                            }
-                        } else {
-                            $("#win_loss_rate_table_div").empty();
-                        }
+                        this.xAxis[0].update({visible: true});
+                        this.yAxis[0].update({title: {text: "Percentage"}});
+                        $("#win_loss_rate_table_div").empty();
                     },
                 },
             },

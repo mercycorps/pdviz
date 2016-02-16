@@ -64,8 +64,8 @@ def get_regions(kwargs):
     for r in regions:
         win_rate = r['win_rate']
         loss_rate = r['loss_rate']
-        win_rates_data.append( {'y': float(win_rate if win_rate else 0), 'name': r['name'], 'drilldown': 'wr' + str( r['region_id']) } )
-        loss_rates_data.append( {'y': float(loss_rate if loss_rate else 0), 'name': r['name'], 'drilldown': 'lr' + str(r['region_id']) } )
+        win_rates_data.append( {'y': float(win_rate if win_rate else 0), 'name': r['name'], 'drilldown': 'wr' + str( r['region_id'])+"-ar"+str( r['region_id']) } )
+        loss_rates_data.append( {'y': float(loss_rate if loss_rate else 0), 'name': r['name'], 'drilldown': 'lr' + str(r['region_id'])+"-ar"+str( r['region_id']) } )
 
 
     series.append({'name': 'WinRate', 'data': win_rates_data})
@@ -127,49 +127,48 @@ def get_countries(criteria):
         grants_lost = None
 
         if region is not None and region != c['region']:
-            drilldown_win_series.append({'name': "WIN-RATE - " + region_name, 'id': 'wr' + str(region), 'stacking': 'regular', 'data': countries_per_region_winrate_drilldown})
-            drilldown_loss_series.append({'name': "LOSS-RATE - " + region_name, 'id': 'lr' + str(region), 'stacking': 'regular', 'data': countries_per_region_lossrate_drilldown})
+            drilldown_win_series.append({'name': "WIN-RATE - " + region_name, 'id': 'wr' + str(region) +"-ar"+str(region), 'stacking': 'regular', 'data': countries_per_region_winrate_drilldown})
+            drilldown_loss_series.append({'name': "LOSS-RATE - " + region_name, 'id': 'lr' + str(region)+"-ar"+str(region), 'stacking': 'regular', 'data': countries_per_region_lossrate_drilldown})
 
             countries_per_region_winrate_drilldown = []
             countries_per_region_lossrate_drilldown = []
 
         win_rate = c['win_rate']
         loss_rate = c['loss_rate']
-        countries_per_region_winrate_drilldown.append({"name": c["name"], "y": float(win_rate if win_rate else 0), "drilldown": "w"+str(c["country_id"])})
-        countries_per_region_lossrate_drilldown.append({"name": c["name"], "y": float(loss_rate if loss_rate else 0), "drilldown": "l"+str(c["country_id"])})
+        countries_per_region_winrate_drilldown.append({"name": c["name"], "y": float(win_rate if win_rate else 0), "drilldown": "wc"+str(c["country_id"])+"-ac"+ str(c["country_id"])})
+        countries_per_region_lossrate_drilldown.append({"name": c["name"], "y": float(loss_rate if loss_rate else 0), "drilldown": "lc"+str(c["country_id"])+"-ac"+ str(c["country_id"]) })
 
         kwargs = prepare_related_donor_fields_to_lookup_fields(criteria, '')
 
         grants_won = Grant.won_grants.filter(countries__country_id=c['country_id'], **kwargs)
         serializer_won_grants = GrantSerializer(grants_won, many=True)
         grants_win_series.append({
-            "name": "WON ", #+ c['name'],
-            "id": "w" + str(c["country_id"]),
-            #"type": "column",
+            "name": c['name'] + " WON Grants",
+            "id": "wc" + str(c["country_id"])+"-ac"+ str(c["country_id"]),
+            "type": "column",
             #"colorByPoint": True,
-            "stacking": "regular",
-            "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2},
-            "dataLabels": {'enabled': True, 'format': '{point.y:,.0f}'},
+            "stacking": "",
+            "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2, "pointFormat": '{series.name}: <b>{point.y}</b><br/>',},
+            "dataLabels": {'enabled': False, 'format': '{point.y:,.0f}'},
             "data": serializer_won_grants.data,
         })
-
         grants_lost = Grant.lost_grants.filter(countries__country_id=c['country_id'], **kwargs)
         serializer_lost_grants = GrantSerializer(grants_lost, many=True)
         grants_loss_series.append({
-            "name": "LOST ",  #+ c['name'],
-            "id": "l" + str(c["country_id"]),
-            #"type": "column",
+            "name": c['name'] + " LOST Grants",
+            "id": "lc" + str(c["country_id"])+"-ac"+ str(c["country_id"]),
+            "type": "column",
             #"colorByPoint": True,
-            "stacking": "regular",
-            "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2},
-            "dataLabels": {'enabled': True, 'format': '{point.y:,.0f}'},
+            "stacking": "",
+            "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2, "pointFormat": '{series.name}: <b>{point.y}</b><br/>'},
+            "dataLabels": {'enabled': False, 'format': '{point.y:,.0f}'},
             "data": serializer_lost_grants.data,
         })
 
         region = c['region']
         region_name = c['region__name']
-    drilldown_win_series.append({'name': region_name, 'id': 'wr' + str(region), 'type': 'column', 'stacking': 'regular', 'data': countries_per_region_winrate_drilldown})
-    drilldown_loss_series.append({'name': region_name, 'id': 'lr' + str(region), 'type': 'column', 'stacking': 'regular', 'data': countries_per_region_lossrate_drilldown})
+    drilldown_win_series.append({'name': region_name, 'id': 'wr' + str(region)+"-ar"+str(region), 'type': 'column', 'stacking': 'regular', 'data': countries_per_region_winrate_drilldown})
+    drilldown_loss_series.append({'name': region_name, 'id': 'lr' + str(region)+"-ar"+str(region), 'type': 'column', 'stacking': 'regular', 'data': countries_per_region_lossrate_drilldown})
     drilldown_series = drilldown_win_series + drilldown_loss_series + grants_win_series + grants_loss_series
     return drilldown_series
 

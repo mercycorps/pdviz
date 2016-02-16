@@ -168,6 +168,14 @@ class GrantsLostManager(models.Manager):
                 Q(status="Rejected"))
 
 
+class BothWonLostGrants(models.Manager):
+    def get_queryset(self):
+        return super(BothWonLostGrants, self).get_queryset().filter(
+                    Q(status='Closed')|
+                    Q(status='Funded')|
+                    Q(status='Completed')|
+                    Q(status="Rejected"))
+
 class Grant(models.Model):
     grant_id = models.PositiveIntegerField(primary_key=True, db_column="GrantID", validators=[validate_positive,])
     title = models.CharField(db_column="GrantTitle", max_length=250, null=True)
@@ -196,6 +204,7 @@ class Grant(models.Model):
     objects = models.Manager() # The default manager.
     won_grants = GrantsWonManager()
     lost_grants = GrantsLostManager()
+    both_won_n_loss_grants = BothWonLostGrants()
 
     def __unicode__(self):
         return self.title
