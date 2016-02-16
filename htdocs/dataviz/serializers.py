@@ -4,13 +4,14 @@ from .models import *
 
 class GrantSerializer(serializers.ModelSerializer):
     gait_id = serializers.SerializerMethodField('get_grant_id')
+    win_loss = serializers.SerializerMethodField()
     y = serializers.SerializerMethodField('get_amount_usd')
     id = serializers.SerializerMethodField('get_country_name')
     drilldown = serializers.SerializerMethodField('get_grant_id')
     name = serializers.SerializerMethodField('get_grant_title')
     class Meta:
         model = Grant
-        fields = ("gait_id", "name", "id", "drilldown", "y", "start_date", "end_date")
+        fields = ("gait_id", "name", "id", "win_loss", "drilldown", "y", "start_date", "end_date")
 
     def get_grant_id(self, obj):
         return obj.grant_id
@@ -26,6 +27,9 @@ class GrantSerializer(serializers.ModelSerializer):
             return obj.countries.all()[0].name #','.join([c.name for c in g.countries.all()])
         else:
             return None
+
+    def get_win_loss(self, obj):
+        return obj.win_loss
 
 
 class CountrySerializer(serializers.ModelSerializer):

@@ -5,6 +5,7 @@ from collections import OrderedDict
 
 from django.core import serializers
 from django.db.models import DecimalField, IntegerField, CharField, ExpressionWrapper, F, Case, Value, When, Q, Sum, Avg, Max, Min, Count
+from django.db.models.expressions import RawSQL
 
 from django.http import HttpResponse, JsonResponse
 from django.views.generic import TemplateView, ListView, View
@@ -140,25 +141,27 @@ def get_countries(criteria):
 
         kwargs = prepare_related_donor_fields_to_lookup_fields(criteria, '')
 
-        grants_won = Grant.won_grants.filter(countries__country_id=c['country_id'], **kwargs)
+        grants_won = Grant.won_grants.filter(countries__country_id=c['country_id'], **kwargs).annotate(win_loss=RawSQL('SELECT "won"', ()))
         serializer_won_grants = GrantSerializer(grants_won, many=True)
         grants_win_series.append({
             "name": c['name'] + " WON Grants",
             "id": "wc" + str(c["country_id"])+"-ac"+ str(c["country_id"]),
             "type": "column",
             #"colorByPoint": True,
+            "WIN/LOSS": "WON",
             "stacking": "",
             "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2, "pointFormat": '{series.name}: <b>{point.y}</b><br/>',},
             "dataLabels": {'enabled': False, 'format': '{point.y:,.0f}'},
             "data": serializer_won_grants.data,
         })
-        grants_lost = Grant.lost_grants.filter(countries__country_id=c['country_id'], **kwargs)
+        grants_lost = Grant.lost_grants.filter(countries__country_id=c['country_id'], **kwargs).annotate(win_loss=RawSQL('SELECT "loss"', ()))
         serializer_lost_grants = GrantSerializer(grants_lost, many=True)
         grants_loss_series.append({
             "name": c['name'] + " LOST Grants",
             "id": "lc" + str(c["country_id"])+"-ac"+ str(c["country_id"]),
             "type": "column",
             #"colorByPoint": True,
+            "WIN/LOSS": "LOSS",
             "stacking": "",
             "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2, "pointFormat": '{series.name}: <b>{point.y}</b><br/>'},
             "dataLabels": {'enabled': False, 'format': '{point.y:,.0f}'},
