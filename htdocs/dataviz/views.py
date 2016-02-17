@@ -119,9 +119,17 @@ def get_countries(criteria):
 
     region = None
     region_name = None
+    cids = None
 
     # get the drilldowns for win_rates per country
     for c in countries:
+        for k in kwargs:
+            if k == "grants__countries__country_id__in":
+                cids = [int(x) for x in kwargs[k]]
+
+        if cids is not None and int(c['country_id']) not in cids:
+            continue
+
         serializer_lost_grants = None
         serializer_won_grants = None
         grants_won = None
@@ -148,7 +156,6 @@ def get_countries(criteria):
             "id": "wc" + str(c["country_id"])+"-ac"+ str(c["country_id"]),
             "type": "column",
             #"colorByPoint": True,
-            "WIN/LOSS": "WON",
             "stacking": "",
             "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2, "pointFormat": '{series.name}: <b>{point.y}</b><br/>',},
             "dataLabels": {'enabled': False, 'format': '{point.y:,.0f}'},
@@ -161,7 +168,6 @@ def get_countries(criteria):
             "id": "lc" + str(c["country_id"])+"-ac"+ str(c["country_id"]),
             "type": "column",
             #"colorByPoint": True,
-            "WIN/LOSS": "LOSS",
             "stacking": "",
             "tooltip": {"valueSuffix": " USD", "valuePrefix": "$", "valueDecimals": 2, "pointFormat": '{series.name}: <b>{point.y}</b><br/>'},
             "dataLabels": {'enabled': False, 'format': '{point.y:,.0f}'},
