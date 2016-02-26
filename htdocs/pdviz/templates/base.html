@@ -65,13 +65,15 @@
 
                         <!-- USER MENU -->
                         {% if user.is_authenticated  %}
-                        <ul class="nav navbar-nav navbar-right">
-                            <li>
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <span class="glyphicon glyphicon-user"></span> {{ user.userprofile.name }}
-                                </a>
-                            </li>
-                        </ul>
+                            {% comment %}
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li>
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                            <span class="glyphicon glyphicon-user"></span> {{ user.userprofile.name }}
+                                        </a>
+                                    </li>
+                                </ul>
+                            {% endcomment %}
                         {% else %}
                         <form class="navbar-form navbar-right" role="form" method="post" action="{% url 'django.contrib.auth.views.login' %}">
                             {% csrf_token %}
