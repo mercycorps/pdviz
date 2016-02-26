@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_page
 from django.contrib import admin
 from django.contrib.auth.views import login
 
@@ -42,11 +42,11 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/v1/', include(router.urls)),
     url(r'^api/docs/', include('rest_framework_swagger.urls')),
-    url(r'^login/$', never_cache(login), name='login'),
+    url(r'^login/$', login, name='login'),
     url('^', include('django.contrib.auth.urls')),
     url(r'^$', HomeView.as_view(), name='home'),
-    url(r'^global_dashboard/$', GlobalDashboard.as_view(), name='global_dashboard'),
-    url(r'^global_dashboard_data/$', GlobalDashboardData.as_view(), name='global_dashboard_data'),
+    url(r'^global_dashboard/$', cache_page(60*60*12)(GlobalDashboard.as_view()), name='global_dashboard'),
+    url(r'^global_dashboard_data/$', cache_page(60*60*12)(GlobalDashboardData.as_view()), name='global_dashboard_data'),
     #url(r'^dataviz/countries_by_region/(?P<region>[-\w]+)/$', CountriesByRegion.as_view(), name='cbg'),
     url(r'^feedback/', include('feedback.urls')),
 ]
