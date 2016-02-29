@@ -49,7 +49,7 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
     # Grants submission_date is not specified then, by default, restrict it to the last three years
     if not prefix + 'submission_date__gt' in kwargs and not prefix + 'submission_date__lt' in kwargs:
         today_date  = datetime.datetime.now()
-        date_3_years_ago = str(datetime.date(today_date.year -3 , today_date.month, today_date.day))
+        date_3_years_ago = str(datetime.date(today_date.year -3 , today_date.month, 1))
         kwargs[prefix + 'submission_date__gt'] = date_3_years_ago
 
     # Do not show donors that have no Grants
