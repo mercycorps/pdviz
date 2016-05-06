@@ -74,7 +74,7 @@ class Country(models.Model):
     country_id = models.PositiveIntegerField(primary_key=True, db_column="CountryID", validators=[validate_positive,])
     name = models.CharField(db_column="Country", max_length=100)
     region = models.ForeignKey(Region, db_column="RegionID", related_name="countries")
-    iso2 = models.CharField(db_column="CountryCode", max_length="2")
+    iso2 = models.CharField(db_column="CountryCode", max_length=2)
 
     class Meta:
         managed = False
@@ -100,7 +100,7 @@ class Sector(models.Model):
 
 class SubSector(models.Model):
     subsector_id = models.PositiveIntegerField(primary_key=True, db_column="SubSectorID", validators=[validate_positive,])
-    name = models.CharField(db_column="SubSector", max_length='50')
+    name = models.CharField(db_column="SubSector", max_length=50)
     sectors = models.ManyToManyField(Sector, through="SectorSubSector")
 
     class Meta:
@@ -121,7 +121,7 @@ class SectorSubSector(models.Model):
 
 class SectorType(models.Model):
     sector_id = models.PositiveIntegerField(primary_key=True, db_column="SectorTypeID", validators=[validate_positive,])
-    sector_type = models.CharField(db_column="SectorType", max_length="50")
+    sector_type = models.CharField(db_column="SectorType", max_length=50)
 
     class Meta:
         managed = False
@@ -133,7 +133,7 @@ class SectorType(models.Model):
 
 class Theme(models.Model):
     theme_id = models.PositiveIntegerField(primary_key=True, db_column='ThemeID')
-    name = models.CharField(db_column="Theme", max_length="50")
+    name = models.CharField(db_column="Theme", max_length=50)
 
     class Meta:
         managed = False
@@ -145,7 +145,7 @@ class Theme(models.Model):
 
 class Methodology(models.Model):
     methodology_id = models.PositiveIntegerField(primary_key=True, db_column='MethodologyID')
-    name = models.CharField(db_column='Methodology', max_length="50")
+    name = models.CharField(db_column='Methodology', max_length=50)
 
     class Meta:
         managed = False
