@@ -1,5 +1,31 @@
+import math
+import locale
 from rest_framework import serializers
 from .models import *
+
+locale.setlocale(locale.LC_ALL, 'en_US')
+
+class GrantSerializerPlain(serializers.ModelSerializer):
+    gait_id = serializers.SerializerMethodField("get_grant_id")
+    donor = serializers.SerializerMethodField("get_donor_name")
+    amount_usd = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Grant
+        fields = ("gait_id", "donor", "title", "amount_usd", "start_date", "end_date", "submission_date")
+
+    def get_grant_id(self, obj):
+        return obj.grant_id
+
+    def get_amount_usd(self, obj):
+        #return math.trunc(obj.amount_usd)
+        return locale.format("%d", obj.amount_usd, grouping=True)
+
+    def get_donor_name(self, obj):
+        donor = ""
+        if obj.donor:
+            donor = obj.donor.name
+        return donor
 
 
 class GrantSerializer(serializers.ModelSerializer):

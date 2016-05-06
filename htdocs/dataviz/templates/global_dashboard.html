@@ -5,6 +5,7 @@
 {% block content %}
     <div id="donor_categories_data_div" style="display: none;">{{ donor_categories|safe }}</div>
     <div id="donor_categories_drilldown_data_div" style="display: none;">{{ donors|safe }}</div>
+    <div id="grants_data_div" style="display: none;">{{ grants|safe }}</div>
     <div id="win_loss_rates_series_chart_data_div" style="display: none;">{{ regions|safe }}</div>
     <div id="win_loss_rates_series_chart_drilldown_data_div" style="display: none;">{{ regions_drilldown|safe }}</div>
     <div id = "criteria_raw_div" style="display:none;">{{ criteria|safe }}</div>
@@ -23,7 +24,8 @@
                 <div class="panel-heading"> Filter Criteria </div>
                 <div class="panel-body" id="criteria" style="padding:5px;"> No criteria specified </div>
             </div>
-            <div id='criteria-panel' class="panel panel-primary">
+
+            <div class="panel panel-primary">
                 <div class="panel-heading"> Grants Per Donor Category and Donor </div>
                 <div class="panel-body" style="padding:15px;">
                     <div id="donor_with_num_of_grants_chart"></div>
@@ -31,7 +33,7 @@
                 </div>
             </div>
             
-            <div id='criteria-panel' class="panel panel-primary">
+            <div class="panel panel-primary">
                 <div class="panel-heading"> Grants Win / Loss Rate by Region and Country </div>
                 <div class="panel-body" style="padding:15px;">
                     <div id="win_loss_rates_series_chart_div"></div>
@@ -45,6 +47,14 @@
                 </div>
             </div>
             
+
+            <div class="panel panel-primary">
+                <div class="panel-heading"> Grants Tabular View </div>
+                <div class="panel-body" style="padding:15px;">
+                    <div id="grants_table_div" class="table-responsive"> </div>
+                </div>
+            </div>
+
         </div>
     </div>
 {% endblock content %}
@@ -60,6 +70,7 @@ $('body').tooltip({
 $('[id=submission_date_span]').tooltip({
   container: 'body'
 });
+
     var drilldown_levels = [];
 
     /// Base configuration for hicharts
@@ -143,6 +154,7 @@ $('[id=submission_date_span]').tooltip({
         $("#criteria").html(formatted_criteria);
         $("#criteria-panel").show();
 
+        show_grants_table();
         draw_chart();
         draw_win_loss_chart();
     });
@@ -173,7 +185,7 @@ $('[id=submission_date_span]').tooltip({
             } else {
                 $("#donor_categories_data_div").empty();
                 $("#donor_categories_drilldown_data_div").empty();
-                createAlert("warning dynamic-alert", "There is no data available for the 'Grant per Donor Category and Donor Chart'");
+                //createAlert("warning dynamic-alert", "There is no data available for the 'Grant per Donor Category and Donor Chart'");
             }
 
             if (Object.keys(data['regions']).length > 0) {
@@ -184,6 +196,15 @@ $('[id=submission_date_span]').tooltip({
                 $("#win_loss_rates_series_chart_drilldown_data_div").empty();
                 createAlert("warning dynamic-alert", "There is no data available for the Win/Loss Rate Chart");
             }
+            
+            if (Object.keys(data['grants']).length > 0 ) {
+                $("#grants_data_div").empty();
+                $("#grants_data_div").append(JSON.stringify(data['grants']));
+            } else {
+                $("#grants_data_div").empty();
+                $("#grants_table_div").empty();
+                createAlert("warning dynamic-alert", "There is no data to display");
+            }
 
             var criteria = data['criteria'];
             var formatted_criteria = format_criteria(criteria);
@@ -191,6 +212,7 @@ $('[id=submission_date_span]').tooltip({
             $("#criteria").html(formatted_criteria);
             $("#criteria-panel").show();
 
+            show_grants_table();
             draw_chart();
             draw_win_loss_chart();
         });
@@ -435,7 +457,7 @@ $('[id=submission_date_span]').tooltip({
         try {
             donors = $.parseJSON(donors_raw);
         } catch(err) {
-            console.log("donors: " + donors);
+            //console.log("donors: " + donors);
             donors_raw = null;
         }
         
@@ -563,6 +585,25 @@ $('[id=submission_date_span]').tooltip({
             },
         };
         $('#donor_with_num_of_grants_chart').highcharts(numGrantsChartConfig);
+    }
+
+    function show_grants_table(){
+        var grants_raw =  $("#grants_data_div").html();
+        var grants = null;
+        try {
+            grants = $.parseJSON(grants_raw);
+            var grants_table = new tableObject(grants, "grants_table");
+            $("#grants_table_div").empty();
+            $("#grants_table_div").append(grants_table);
+            $("#grants_table").DataTable({
+                dom: "<'row'<'col-sm-2'B><'col-sm-5'l><'col-sm-5'f>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                buttons: [
+                    { extend: 'csv', text: 'Export to CSV' }
+                ]
+            });
+        } catch(e) {
+            console.log(e);
+        }
     }
 
 </script>

@@ -281,7 +281,7 @@ def get_grants_dataset(kwargs):
     graph['tooltip'] = tooltip
     series.append(graph)
 
-    return series
+    return {"series": series, "grants": grants}
 
 
 class GlobalDashboard(TemplateView):
@@ -295,10 +295,12 @@ class GlobalDashboard(TemplateView):
         donor_categories = get_donor_categories_dataset(self.request.GET)
         donors = get_donors_dataset(self.request.GET)
         grants = get_grants_dataset(self.request.GET)
-        series = donors + grants
+        grants_table_serializer = GrantSerializerPlain(grants.pop("grants"), many=True)
+        series = donors + grants.pop("series")
 
         context['donor_categories'] = json.dumps(donor_categories)
         context['donors'] = json.dumps(series)
+        context['grants'] = json.dumps(grants_table_serializer.data)
 
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
         context['criteria'] = json.dumps(kwargs)
@@ -320,7 +322,8 @@ class GlobalDashboardData(View):
         donor_categories = get_donor_categories_dataset(self.request.GET)
         donors_list = get_donors_dataset(self.request.GET)
         grants_list = get_grants_dataset(self.request.GET)
-        series = donors_list + grants_list
+        grants_table_serializer = GrantSerializerPlain(grants_list.pop("grants"), many=True)
+        series = donors_list + grants_list.pop("series")
 
         regions = get_regions(self.request.GET)
         countries = get_countries(self.request.GET)
@@ -331,5 +334,6 @@ class GlobalDashboardData(View):
             'donors': series,
             'regions': regions,
             'countries': countries,
+            'grants': grants_table_serializer.data,
             'criteria': kwargs}
         return JsonResponse(final_dict, safe=False)
