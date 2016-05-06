@@ -270,6 +270,7 @@ def get_grants_dataset(kwargs):
         bar['drilldown'] = g.grant_id
         bar['y'] = g.amount_usd
         bar['amount_usd'] = g.amount_usd
+        bar['submitted'] = g.submission_date.strftime("%Y-%m-%d") if g.submission_date else ""
         bar['start_date'] = g.start_date.strftime("%Y-%m-%d") if g.start_date else ""
         bar['end_date'] = g.end_date.strftime("%Y-%m-%d") if g.end_date else ""
         data.append(bar)
