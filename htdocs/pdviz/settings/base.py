@@ -86,6 +86,7 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
                 'pdviz.context_processors.google_analytics',
+                'feedback.context_processors.base_context_processor',
             ],
         },
     },
@@ -146,4 +147,14 @@ AUTHENTICATION_BACKENDS = (
         'djangocosign.cosign.CosignBackend',
         'django.contrib.auth.backends.ModelBackend',
     )
+
+
+# Turn on pagination, and make API accessible only to admin users.
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+        #'rest_framework.permissions.IsAdminUser',
+    ),
+    'PAGE_SIZE': 10
+}
 
