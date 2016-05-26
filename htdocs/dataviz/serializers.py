@@ -9,10 +9,11 @@ class GrantSerializerPlain(serializers.ModelSerializer):
     gait_id = serializers.SerializerMethodField("get_grant_id")
     donor = serializers.SerializerMethodField("get_donor_name")
     amount_usd = serializers.SerializerMethodField()
+    country = serializers.SerializerMethodField('get_country_name')
 
     class Meta:
         model = Grant
-        fields = ("gait_id", "donor", "title", "amount_usd", "start_date", "end_date", "submission_date")
+        fields = ("gait_id", "donor", "country", "title", "amount_usd", "status",  "submission_date")
 
     def get_grant_id(self, obj):
         return obj.grant_id
@@ -26,6 +27,12 @@ class GrantSerializerPlain(serializers.ModelSerializer):
         if obj.donor:
             donor = obj.donor.name
         return donor
+
+    def get_country_name(self, obj):
+        if obj.countries.count() > 0:
+            return obj.countries.all()[0].name #','.join([c.name for c in g.countries.all()])
+        else:
+            return None
 
 
 class GrantSerializer(serializers.ModelSerializer):
