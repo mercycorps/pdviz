@@ -53,8 +53,9 @@ $('body').on('change', 'select#id_region', function() {
     }
     $.getJSON(url, function(countries) {
         var options = "";
-        for (var i = 0; i < countries.length; i++) {
-            options += '<option value="' + countries[i].country_id + '">' + countries[i].name + '</option>';
+        var country_options = countries['results'];
+        for (var i = 0; i < country_options.length; i++) {
+            options += '<option value="' + country_options[i].country_id + '">' + country_options[i].name + '</option>';
         }
 
         $("select#id_country").html(options);
@@ -70,8 +71,9 @@ $('body').on('change', 'select#id_sector', function() {
     }
     $.getJSON(url, function(subsectors) {
         var options = "<option value=''></option>";
-        for (var i = 0; i < subsectors.length; i++) {
-            options += '<option value="' + subsectors[i].subsector_id + '">' + subsectors[i].name + '</option>';
+        var subsector_options = subsectors['results'];
+        for (var i = 0; i < subsector_options.length; i++) {
+            options += '<option value="' + subsector_options[i].subsector_id + '">' + subsector_options[i].name + '</option>';
         }
         $('select#id_subsector').html(options);
         $("select#id_subsector").val('').trigger("change");
