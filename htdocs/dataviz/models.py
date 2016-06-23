@@ -40,7 +40,7 @@ class Donor(models.Model):
         return self.grants.aggregate(num_grants=Count('grant_id'))['num_grants']
 
     def __unicode__(self):
-        return self.name
+        return self.name or ''
 
 
 class DonorDepartment(models.Model):
@@ -54,7 +54,7 @@ class DonorDepartment(models.Model):
         ordering = ['name',]
 
     def __unicode__(self):
-        return self.name
+        return self.name or ''
 
 
 class Region(models.Model):
@@ -67,7 +67,7 @@ class Region(models.Model):
         ordering = ['name',]
 
     def __unicode__(self):
-        return self.name
+        return self.name or ''
 
 
 class Country(models.Model):
@@ -82,7 +82,7 @@ class Country(models.Model):
         ordering = ['name',]
 
     def __unicode__(self):
-        return self.name
+        return self.name or ''
 
 
 class Sector(models.Model):
@@ -95,7 +95,7 @@ class Sector(models.Model):
         ordering = ['name',]
 
     def __unicode__(self):
-        return self.name
+        return self.name or ''
 
 
 class SubSector(models.Model):
@@ -108,7 +108,7 @@ class SubSector(models.Model):
         db_table = 'n_subsectortbl'
 
     def __unicode__(self):
-        return self.name
+        return self.name or ''
 
 class SectorSubSector(models.Model):
     sector = models.ForeignKey(Sector, db_column="SectorID")
@@ -128,7 +128,7 @@ class SectorType(models.Model):
         db_table = "n_sectortypetbl"
 
     def __unicode__(self):
-        return self.sector_type
+        return self.sector_type or ''
 
 
 class Theme(models.Model):
@@ -140,7 +140,7 @@ class Theme(models.Model):
         db_table = 'n_themetbl'
 
     def __unicode__(self):
-        return self.name
+        return self.name or ''
 
 
 class Methodology(models.Model):
@@ -152,7 +152,7 @@ class Methodology(models.Model):
         db_table = 'n_methodologytbl'
 
     def __unicode__(self):
-        return self.name
+        return self.name or ''
 
 class GrantsWonManager(models.Manager):
     def get_queryset(self):
@@ -207,7 +207,7 @@ class Grant(models.Model):
     both_won_n_loss_grants = BothWonLostGrants()
 
     def __unicode__(self):
-        return self.title
+        return self.title or ''
 
     class Meta:
         managed = False
