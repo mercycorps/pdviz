@@ -39,6 +39,7 @@ class GrantsByCountryViewSet(viewsets.ModelViewSet):
 
 class CountryViewSet(viewsets.ModelViewSet):
     serializer_class = CountrySerializer
+    page_size = 100
 
     def get_queryset(self):
         queryset = Country.objects.all()
