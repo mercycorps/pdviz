@@ -62,16 +62,25 @@ def get_regions(kwargs):
     series = []
     win_rates_data = []
     loss_rates_data = []
+    overallWins = 0
+    overallApplications = 0
     for r in regions:
+        overallWins += r['num_funded']
+        overallApplications += r['num_total']
         win_rate = r['win_rate']
         loss_rate = r['loss_rate']
         win_rates_data.append( {'y': float(win_rate if win_rate else 0), 'name': r['name'], 'drilldown': 'wr' + str( r['region_id'])+"-ar"+str( r['region_id']) } )
         loss_rates_data.append( {'y': float(loss_rate if loss_rate else 0), 'name': r['name'], 'drilldown': 'lr' + str(r['region_id'])+"-ar"+str( r['region_id']) } )
 
+    try:
+        overallWinRate = float(overallWins)/float(overallApplications)
+    except ZeroDivisionError:
+        overallWinRate = 0
 
     series.append({'name': 'WinRate', 'data': win_rates_data})
     series.append({'name': 'LossRate', 'data': loss_rates_data})
-    return series
+
+    return series, overallWinRate
 
 
 def get_countries(criteria):
@@ -239,7 +248,6 @@ def get_grants_dataset(kwargs):
     kwargs = prepare_related_donor_fields_to_lookup_fields(kwargs, '')
     #print("grants: %s" % kwargs)
     grants = Grant.objects.filter(**kwargs).distinct().prefetch_related('donor').order_by('donor')
-
     series = []
     prev_id  = None
     id = None
@@ -307,8 +315,9 @@ class GlobalDashboard(TemplateView):
         context['criteria'] = json.dumps(kwargs)
 
         # get the win/loss rates by region
-        regions = get_regions(self.request.GET)
+        regions, overallWinRate = get_regions(self.request.GET)
         context['regions'] = json.dumps(regions)
+        context['overallWinRate'] = overallWinRate
 
         # get all of the win/loss rates by country
         countries = get_countries(self.request.GET)
@@ -326,7 +335,8 @@ class GlobalDashboardData(View):
         grants_table_serializer = GrantSerializerPlain(grants_list.pop("grants"), many=True)
         series = donors_list + grants_list.pop("series")
 
-        regions = get_regions(self.request.GET)
+        regions, overallWinRate = get_regions(self.request.GET)
+        print 'gtregions', regions
         countries = get_countries(self.request.GET)
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
 
@@ -334,6 +344,7 @@ class GlobalDashboardData(View):
             'donor_categories': donor_categories,
             'donors': series,
             'regions': regions,
+            'overallWinRate': overallWinRate,
             'countries': countries,
             'grants': grants_table_serializer.data,
             'criteria': kwargs}

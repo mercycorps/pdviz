@@ -39,8 +39,10 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
             kwargs[prefix + 'submission_date__gt'] = params[k]
         elif k == 'submission_date_to':
             kwargs[prefix + 'submission_date__lt'] = params[k]
-        elif k == 'grants_amount':
+        elif k == 'grants_amount_min':
             kwargs[prefix + 'amount_usd__gte'] = params[k]
+        elif k == 'grants_amount_max':
+            kwargs[prefix + 'amount_usd__lte'] = params[k]
         elif k == 'status':
             kwargs[prefix + 'status__in'] = params[k].split(',')
         else:

@@ -26,15 +26,9 @@
             </div>
 
             <div class="panel panel-primary">
-                <div class="panel-heading"> Grants Per Donor Category and Donor </div>
-                <div class="panel-body" style="padding:15px;">
-                    <div id="donor_with_num_of_grants_chart"></div>
-                    <div id="donor_with_num_of_grants_table_div" class="table-responsive"> </div>
+                <div class="panel-heading"> Grants Win / Loss Rate by Region and Country
+                  (Overall Win Rate: <span id="overallWinRate"></span>)
                 </div>
-            </div>
-            
-            <div class="panel panel-primary">
-                <div class="panel-heading"> Grants Win / Loss Rate by Region and Country </div>
                 <div class="panel-body" style="padding:15px;">
                     <div id="win_loss_rates_series_chart_div"></div>
                     <div id="win_loss_rate_table_div" class="table-responsive"> </div>
@@ -46,7 +40,14 @@
                     <span class="label label-default">LossRate =  WinRate - 100</span>
                 </div>
             </div>
-            
+
+            <div class="panel panel-primary">
+                <div class="panel-heading"> Grants Per Donor Category and Donor </div>
+                <div class="panel-body" style="padding:15px;">
+                    <div id="donor_with_num_of_grants_chart"></div>
+                    <div id="donor_with_num_of_grants_table_div" class="table-responsive"> </div>
+                </div>
+            </div>
 
             <div class="panel panel-primary">
                 <div class="panel-heading"> Grants Tabular View </div>
@@ -64,12 +65,12 @@
 <script type="text/javascript">
     "use strict";
 
-$('body').tooltip({
-  selector: '[id=submission_date_span]'
-});
-$('[id=submission_date_span]').tooltip({
-  container: 'body'
-});
+    $('body').tooltip({
+      selector: '[id=submission_date_span]'
+    });
+    $('[id=submission_date_span]').tooltip({
+      container: 'body'
+    });
 
     var drilldown_levels = [];
 
@@ -92,7 +93,7 @@ $('[id=submission_date_span]').tooltip({
             },
             pointFormat: '<span style="color:{point.color}">\u25CF</span> {series.name}: <b>{point.percentage:.0f}%</b><br/>',
         },
-        
+
         subtitle: {
             text: 'Source: <a href="https://gait.mercycorps.org" target="_blank">GAIT</a>'
         },
@@ -104,7 +105,7 @@ $('[id=submission_date_span]').tooltip({
                 style: {
                     fontSize: '10px',
                 }
-                
+
             }
         },
 
@@ -128,12 +129,12 @@ $('[id=submission_date_span]').tooltip({
     });
 
     $(document).ready(function() {
-    
+
         // Remove the hasDatePicker class so that the date-range works properly
         $( "#id_submission_date_from" ).removeClass("hasDatepicker");
         $( "#id_submission_date_to" ).removeClass("hasDatepicker");
-    
-        // Submission Date Range Picker 
+
+        // Submission Date Range Picker
         $( "#id_submission_date_from" ).datepicker({
             numberOfMonths: 1,
             dateFormat: 'yy-mm-dd',
@@ -157,6 +158,7 @@ $('[id=submission_date_span]').tooltip({
         show_grants_table();
         draw_chart();
         draw_win_loss_chart();
+        show_overall_winrate({{overallWinRate}});
     });
 
     // Upon search form submission, format filter values so Django understands it.
@@ -173,12 +175,13 @@ $('[id=submission_date_span]').tooltip({
         $('#donor_categories_data_div').empty();
         $('#donor_categories_drilldown_data_div').empty();
         $("#donor_with_num_of_grants_table_div").empty();
-        
+
         $("#win_loss_rates_series_chart_data_div").empty();
         $("#win_loss_rates_series_chart_drilldown_data_div").empty();
         $("#win_loss_rate_table_div").empty();
 
         $.getJSON("/global_dashboard_data/", filters, function(data) {
+            // console.log('data', data)
             if (Object.keys(data['donor_categories']).length > 0) {
                 $("#donor_categories_data_div").append(JSON.stringify(data['donor_categories']));
                 $("#donor_categories_drilldown_data_div").append(JSON.stringify(data['donors']));
@@ -196,7 +199,7 @@ $('[id=submission_date_span]').tooltip({
                 $("#win_loss_rates_series_chart_drilldown_data_div").empty();
                 createAlert("warning dynamic-alert", "There is no data available for the Win/Loss Rate Chart");
             }
-            
+
             if (Object.keys(data['grants']).length > 0 ) {
                 $("#grants_data_div").empty();
                 $("#grants_data_div").append(JSON.stringify(data['grants']));
@@ -215,6 +218,8 @@ $('[id=submission_date_span]').tooltip({
             show_grants_table();
             draw_chart();
             draw_win_loss_chart();
+            show_overall_winrate(data['overallWinRate']);
+
         });
     });
 
@@ -291,7 +296,7 @@ $('[id=submission_date_span]').tooltip({
             }
         });
         return formatted_criteria;
-        
+
     }
 
     //Show the corresponding table for the donor_with_num_grants chart
@@ -325,7 +330,7 @@ $('[id=submission_date_span]').tooltip({
             //var series_drilldown_grants_data_raw = $("#win_loss_rates_series_chart_grants_data_div").html();
             series_data_raw  = series_data_raw.replace(/&amp;/g, '&');
             series_drilldown_data_raw = series_drilldown_data_raw.replace(/&amp;/g, '&');
-
+            console.log('seriesdataraw', series_data_raw)
             try {
                 series_data = $.parseJSON(series_data_raw);
             } catch (err) {
@@ -337,6 +342,7 @@ $('[id=submission_date_span]').tooltip({
                 console.log("series_drilldown_data_raw");
             }
         }
+        // console.log('series data', series_data)
         var winLossConfig = {
             chart: {
                 zoomType: 'x',
@@ -366,7 +372,7 @@ $('[id=submission_date_span]').tooltip({
                         } else {
                             // if the xAxis label is clicked
                             if (e.category != undefined) {
-                                drilldown_data = $.grep(drilldown_series, function(event){ 
+                                drilldown_data = $.grep(drilldown_series, function(event){
                                     var event_id_part2 = event.id.split("-")[1];
                                     //console.log(event.id+"="+event_id_part2 + " VS " + e.point.drilldown+"=" + point_id_part_2);
                                     if (event_id_part2 == point_id_part_2) {
@@ -381,8 +387,8 @@ $('[id=submission_date_span]').tooltip({
                                     this.yAxis[0].update({title: {text: "Amount"}});
                                 }
                             } else {
-                                drilldown_data = $.grep(drilldown_series, function(event){ 
-                                    return event.id == e.point.drilldown; 
+                                drilldown_data = $.grep(drilldown_series, function(event){
+                                    return event.id == e.point.drilldown;
                                 });
                                 all_data = drilldown_data[0].data;
                             }
@@ -439,7 +445,7 @@ $('[id=submission_date_span]').tooltip({
         };
         $('#win_loss_rates_series_chart_div').highcharts($.extend(baseConfig, winLossConfig));
     }
-    
+
     //A drilldown pie/column chart that shows number of grants per donor_category and donor
     function draw_chart(filters) {
         var donor_categories_raw =  $("#donor_categories_data_div").html();
@@ -460,7 +466,7 @@ $('[id=submission_date_span]').tooltip({
             //console.log("donors: " + donors);
             donors_raw = null;
         }
-        
+
         drilldown_levels = [];
         var numGrantsChartConfig = {
             chart: {
@@ -526,7 +532,7 @@ $('[id=submission_date_span]').tooltip({
                     align: 'high'
                 }
             },
-            
+
             plotOptions: {
                 column: {
                     colorByPoint: true,
@@ -560,7 +566,7 @@ $('[id=submission_date_span]').tooltip({
                 },
                 series: donors
             },
-            
+
             credits: {
                 text: 'mercycorps.org',
                 href: 'http://www.mercycorps.org',
@@ -605,6 +611,14 @@ $('[id=submission_date_span]').tooltip({
             console.log(e);
         }
     }
+
+    function show_overall_winrate(rate){
+      // console.log('showing overall winrate ' + rate );
+      $("#overallWinRate").text(rate);
+
+    }
+
+
 
 </script>
 {% endblock %}
