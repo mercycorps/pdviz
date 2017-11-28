@@ -27,17 +27,21 @@
 
             <div class="panel panel-primary">
                 <div class="panel-heading"> Grants Win / Loss Rate by Region and Country
-                  (Overall Win Rate: <span id="overallWinRate"></span>)
+                  (<span id="overallWinLabel">Overall Win Rate</span>: <span id="overallWinRate"></span>)
+                  <div id="chart-type-selectors" class="btn-group">
+                    <button type="button" class="btn btn-primary active" aria-pressed="true" id="showPercent">Percent</button>
+                    <button type="button" class="btn btn-primary" id="showNominal">Nominal</button>
+                  </div>
                 </div>
                 <div class="panel-body" style="padding:15px;">
                     <div id="win_loss_rates_series_chart_div"></div>
                     <div id="win_loss_rate_table_div" class="table-responsive"> </div>
                 </div>
                 <div class="panel-footer">
-                    <span class="label label-primary">Win/Loss Rate calculation method: </span>&nbsp;
-                    <span class="label label-default">WinRate = <abbr title="Grants that have status of Closed, Completed, or Funded">Funded Grants</abbr>
+                    <span id="rateCalcMethod" class="label label-primary">Win/Loss Rate calculation method: </span>&nbsp;
+                    <span id="winLabel" class="label label-default">WinRate = <abbr title="Grants that have status of Closed, Completed, or Funded">Funded Grants</abbr>
                     divided by <abbr title="All grants excluding those with status of Concept, Development, No-Response, or Pending">Total Grants:</abbr></span>
-                    <span class="label label-default">LossRate =  WinRate - 100</span>
+                    <span id="lossLabel" class="label label-default">LossRate =  WinRate - 100</span>
                 </div>
             </div>
 
@@ -71,6 +75,29 @@
     $('[id=submission_date_span]').tooltip({
       container: 'body'
     });
+
+    var percentConfig = {
+      title: "Win / Loss Rates Per Region and Country",
+      yAxisTitle: "Percentage",
+      stacking: "percent",
+      dataLabelFormat: "{point.y:.1f}%",
+      overallWinLabel: "Overall Win Rate",
+      rateCalcMethod: "Win/Loss Rate calculation method: ",
+      winLabel: 'WinRate = <abbr title="Grants that have status of Closed, Completed, or Funded">Funded Grants</abbr> \
+        divided by <abbr title="All grants excluding those with status of Concept, Development, No-Response, or Pending">Total Grants:</abbr>',
+      lossLabel: "LossRate =  WinRate - 100"
+    };
+
+    var nominalConfig = {
+      title: "Wins and Losses Per Region and Country",
+      yAxisTitle: "Grant Count",
+      stacking: "normal",
+      dataLabelFormat: "{point.y}",
+      overallWinLabel: "Overall Wins/Total",
+      rateCalcMethod: "",
+      winLabel: 'Wins = <abbr title="Grants that have status of Closed, Completed, or Funded">Funded Grants</abbr>',
+      lossLabel: 'Total = <abbr title="All grants excluding those with status of Concept, Development, No-Response, or Pending">Total Grants:</abbr>'
+    };
 
     var drilldown_levels = [];
 
@@ -128,6 +155,23 @@
         //e.stopPropagation();
     });
 
+    $('#showPercent').on("click", function(e) {
+        e.preventDefault();
+        $('#showNominal').removeClass("active").removeAttr("aria-pressed", "true");
+        $('#showPercent').addClass("active").attr("aria-pressed", "true");
+        set_win_loss_labels(percentConfig);
+        draw_win_loss_chart(percentConfig);
+    });
+
+    $('#showNominal').on('click', function(e) {
+        e.preventDefault();
+        $('#showPercent').removeClass("active").removeAttr("aria-pressed", "true");
+        $('#showNominal').addClass("active").attr("aria-pressed", "true");
+        set_win_loss_labels(nominalConfig);
+        draw_win_loss_chart(nominalConfig);
+    });
+
+
     $(document).ready(function() {
 
         // Remove the hasDatePicker class so that the date-range works properly
@@ -157,7 +201,7 @@
 
         show_grants_table();
         draw_chart();
-        draw_win_loss_chart();
+        draw_win_loss_chart(nominalConfig);
         show_overall_winrate({{overallWinRate}});
     });
 
@@ -217,7 +261,7 @@
 
             show_grants_table();
             draw_chart();
-            draw_win_loss_chart();
+            draw_win_loss_chart(nominalConfig);
             show_overall_winrate(data['overallWinRate']);
 
         });
@@ -317,14 +361,15 @@
     }
 
     // A drilldown stacked column chart that shows win / loss rate by region and country
-    function draw_win_loss_chart(regions, countries) {
+    function draw_win_loss_chart(typeConfig) {
         var series_data
         var drilldown_series
 
-        if (regions && countries) {
-            series_data = $.parseJSON(`{{ regions|safe }}`);
-            drilldown_series = $.parseJSON(`{{ countries|safe }}`);
-        } else {
+        set_win_loss_labels(typeConfig);
+        // if (regions && countries) {
+        //     series_data = $.parseJSON(`{{ regions|safe }}`);
+        //     drilldown_series = $.parseJSON(`{{ countries|safe }}`);
+        // } else {
             var series_data_raw =  $("#win_loss_rates_series_chart_data_div").html();
             var series_drilldown_data_raw =  $("#win_loss_rates_series_chart_drilldown_data_div").html();
             //var series_drilldown_grants_data_raw = $("#win_loss_rates_series_chart_grants_data_div").html();
@@ -341,7 +386,7 @@
             } catch (err) {
                 console.log("series_drilldown_data_raw");
             }
-        }
+        // }
         // console.log('series data', series_data)
         var winLossConfig = {
             chart: {
@@ -404,22 +449,22 @@
                     },
                 },
             },
-            title: {text: 'Win Loss Rates Per Region and Country'},
+            title: {text: typeConfig.title},
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Perecentage'
+                    text: typeConfig.yAxisTitle
                 }
             },
             plotOptions: {
                 column: {
-                    stacking: 'percent',
+                    stacking: typeConfig.stacking,
                 },
                 series: {
                     allowPointSelect: true,
                     dataLabels: {
                         enabled: true,
-                        format: '{point.y:.1f}%'
+                        format: typeConfig.dataLabelFormat
                     },
                 },
             },
@@ -616,6 +661,14 @@
       // console.log('showing overall winrate ' + rate );
       $("#overallWinRate").text(rate);
 
+    }
+
+    // Set Grant Win / Loss chart labels based on type of chart selected
+    function set_win_loss_labels(type){
+      $('#overallWinLabel').text(type.overallWinLabel);
+      $('#rateCalcMethod').text(type.rateCalcMethod);
+      $('#winLabel').html(type.winLabel);
+      $('#lossLabel').html(type.lossLabel);
     }
 
 

@@ -27,8 +27,9 @@ def get_regions(kwargs):
     Win/Loss rate of grants by region.
     """
     kwargs = prepare_related_donor_fields_to_lookup_fields(kwargs, 'countries__grants__')
-    # Get distinct regions along with the number of total grants and tatal_grants_funded
+    # Get distinct regions along with the number of total grants and total_grants_funded
     #countries__grants__submission_date__gt='2012-10-30'
+    print 'kwargs list', kwargs
     regions = Region.objects.filter(**kwargs).distinct(
     ).annotate(
         num_funded=Count(
@@ -69,8 +70,12 @@ def get_regions(kwargs):
         overallApplications += r['num_total']
         win_rate = r['win_rate']
         loss_rate = r['loss_rate']
-        win_rates_data.append( {'y': float(win_rate if win_rate else 0), 'name': r['name'], 'drilldown': 'wr' + str( r['region_id'])+"-ar"+str( r['region_id']) } )
-        loss_rates_data.append( {'y': float(loss_rate if loss_rate else 0), 'name': r['name'], 'drilldown': 'lr' + str(r['region_id'])+"-ar"+str( r['region_id']) } )
+        wins = r['num_funded']
+        losses = r['num_total'] - wins
+        # win_rates_data.append( {'y': float(win_rate if win_rate else 0), 'name': r['name'], 'drilldown': 'wr' + str( r['region_id'])+"-ar"+str( r['region_id']) } )
+        # loss_rates_data.append( {'y': float(loss_rate if loss_rate else 0), 'name': r['name'], 'drilldown': 'lr' + str(r['region_id'])+"-ar"+str( r['region_id']) } )
+        win_rates_data.append( {'y': wins, 'name': r['name'], 'drilldown': 'wr' + str( r['region_id'])+"-ar"+str( r['region_id']) } )
+        loss_rates_data.append( {'y': losses, 'name': r['name'], 'drilldown': 'lr' + str(r['region_id'])+"-ar"+str( r['region_id']) } )
 
     try:
         overallWinRate = float(overallWins)/float(overallApplications)
