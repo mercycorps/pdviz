@@ -38,11 +38,11 @@ class GrantDonorFilterForm(forms.Form):
         required = False,
     )
     grants_amount_min = forms.IntegerField(
-        label = u'Dollar value >=',
+        label = u'Dollar value minimum',
         required = False,
     )
     grants_amount_max = forms.IntegerField(
-        label = u'Dollar value <=',
+        label = u'Dollar value maximum',
         required = False,
     )
     sector = forms.ModelChoiceField(
@@ -88,8 +88,8 @@ class GrantDonorFilterForm(forms.Form):
             #Field(AppendedText('submission_date_from', '<span class="glyphicon glyphicon-calendar"></span>'), placeholder="From Submission date", css_class="input-sm"),
             Field('submission_date_from', placeholder="From Submission date", css_class="input-sm"),
             Field('submission_date_to', placeholder="To Submission date", css_class="input-sm"),
-            Field('grants_amount_min', placeholder = 'Dollar value >=', css_class='input-sm'),
-            Field('grants_amount_max', placeholder = 'Dollar value <=', css_class='input-sm'),
+            Field('grants_amount_min', placeholder = 'Dollar value minimum', css_class='input-sm'),
+            Field('grants_amount_max', placeholder = 'Dollar value maximum', css_class='input-sm'),
             Field('sector', css_class='input-sm'),
             Field('subsector', css_class='input-sm'),
             Field('theme', css_class='input-sm'),

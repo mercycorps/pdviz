@@ -29,7 +29,6 @@ def get_regions(kwargs):
     kwargs = prepare_related_donor_fields_to_lookup_fields(kwargs, 'countries__grants__')
     # Get distinct regions along with the number of total grants and total_grants_funded
     #countries__grants__submission_date__gt='2012-10-30'
-    print 'kwargs list', kwargs
     regions = Region.objects.filter(**kwargs).distinct(
     ).annotate(
         num_funded=Count(
@@ -85,7 +84,7 @@ def get_regions(kwargs):
     series.append({'name': 'WinRate', 'data': win_rates_data})
     series.append({'name': 'LossRate', 'data': loss_rates_data})
 
-    return series, overallWinRate
+    return series, overallWins, overallApplications
 
 
 def get_countries(criteria):
@@ -150,16 +149,20 @@ def get_countries(criteria):
         grants_lost = None
 
         if region is not None and region != c['region']:
-            drilldown_win_series.append({'name': "WIN-RATE - " + region_name, 'id': 'wr' + str(region) +"-ar"+str(region), 'stacking': 'regular', 'data': countries_per_region_winrate_drilldown})
-            drilldown_loss_series.append({'name': "LOSS-RATE - " + region_name, 'id': 'lr' + str(region)+"-ar"+str(region), 'stacking': 'regular', 'data': countries_per_region_lossrate_drilldown})
+            drilldown_win_series.append({'name': "WIN-RATE - " + region_name, 'id': 'wr' + str(region) +"-ar"+str(region), 'stacking': '', 'data': countries_per_region_winrate_drilldown})
+            drilldown_loss_series.append({'name': "LOSS-RATE - " + region_name, 'id': 'lr' + str(region)+"-ar"+str(region), 'stacking': '', 'data': countries_per_region_lossrate_drilldown})
 
             countries_per_region_winrate_drilldown = []
             countries_per_region_lossrate_drilldown = []
 
         win_rate = c['win_rate']
         loss_rate = c['loss_rate']
-        countries_per_region_winrate_drilldown.append({"name": c["name"], "y": float(win_rate if win_rate else 0), "drilldown": "wc"+str(c["country_id"])+"-ac"+ str(c["country_id"])})
-        countries_per_region_lossrate_drilldown.append({"name": c["name"], "y": float(loss_rate if loss_rate else 0), "drilldown": "lc"+str(c["country_id"])+"-ac"+ str(c["country_id"]) })
+        wins = c['num_funded']
+        losses = c['num_total'] - wins
+        # countries_per_region_winrate_drilldown.append({"name": c["name"], "y": float(win_rate if win_rate else 0), "drilldown": "wc"+str(c["country_id"])+"-ac"+ str(c["country_id"])})
+        # countries_per_region_lossrate_drilldown.append({"name": c["name"], "y": float(loss_rate if loss_rate else 0), "drilldown": "lc"+str(c["country_id"])+"-ac"+ str(c["country_id"]) })
+        countries_per_region_winrate_drilldown.append({"name": c["name"], "y": wins, "drilldown": "wc"+str(c["country_id"])+"-ac"+ str(c["country_id"])})
+        countries_per_region_lossrate_drilldown.append({"name": c["name"], "y": losses, "drilldown": "lc"+str(c["country_id"])+"-ac"+ str(c["country_id"]) })
 
         kwargs = prepare_related_donor_fields_to_lookup_fields(criteria, '')
 
@@ -190,8 +193,9 @@ def get_countries(criteria):
 
         region = c['region']
         region_name = c['region__name']
-    drilldown_win_series.append({'name': region_name, 'id': 'wr' + str(region)+"-ar"+str(region), 'type': 'column', 'stacking': 'regular', 'data': countries_per_region_winrate_drilldown})
-    drilldown_loss_series.append({'name': region_name, 'id': 'lr' + str(region)+"-ar"+str(region), 'type': 'column', 'stacking': 'regular', 'data': countries_per_region_lossrate_drilldown})
+
+    drilldown_win_series.append({'name': region_name, 'id': 'wr' + str(region)+"-ar"+str(region), 'type': 'column', 'stacking': '', 'data': countries_per_region_winrate_drilldown})
+    drilldown_loss_series.append({'name': region_name, 'id': 'lr' + str(region)+"-ar"+str(region), 'type': 'column', 'stacking': '', 'data': countries_per_region_lossrate_drilldown})
     drilldown_series = drilldown_win_series + drilldown_loss_series + grants_win_series + grants_loss_series
     return drilldown_series
 
@@ -320,9 +324,10 @@ class GlobalDashboard(TemplateView):
         context['criteria'] = json.dumps(kwargs)
 
         # get the win/loss rates by region
-        regions, overallWinRate = get_regions(self.request.GET)
+        regions, overallWins, overallApplications = get_regions(self.request.GET)
         context['regions'] = json.dumps(regions)
-        context['overallWinRate'] = overallWinRate
+        context['overallWins'] = overallWins
+        context['overallApplications'] = overallApplications
 
         # get all of the win/loss rates by country
         countries = get_countries(self.request.GET)
@@ -340,8 +345,7 @@ class GlobalDashboardData(View):
         grants_table_serializer = GrantSerializerPlain(grants_list.pop("grants"), many=True)
         series = donors_list + grants_list.pop("series")
 
-        regions, overallWinRate = get_regions(self.request.GET)
-        print 'gtregions', regions
+        regions, overallWins, overallApplications = get_regions(self.request.GET)
         countries = get_countries(self.request.GET)
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
 
@@ -349,7 +353,8 @@ class GlobalDashboardData(View):
             'donor_categories': donor_categories,
             'donors': series,
             'regions': regions,
-            'overallWinRate': overallWinRate,
+            'overallWins': overallWins,
+            'overallApplications': overallApplications,
             'countries': countries,
             'grants': grants_table_serializer.data,
             'criteria': kwargs}

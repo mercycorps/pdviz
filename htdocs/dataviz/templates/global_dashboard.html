@@ -26,8 +26,11 @@
             </div>
 
             <div class="panel panel-primary">
-                <div class="panel-heading"> Grants Win / Loss Rate by Region and Country
-                  (<span id="overallWinLabel">Overall Win Rate</span>: <span id="overallWinRate"></span>)
+                <div class="panel-heading" style="display: flex; justify-content: space-between">
+                  <div >
+                    Grants Win / Loss Rate by Region and Country <br/>
+                    <span id="overallWinLabel">Overall Win Rate</span>: <span id="overallWinRate"></span>
+                  </div>
                   <div id="chart-type-selectors" class="btn-group">
                     <button type="button" class="btn btn-primary active" aria-pressed="true" id="showPercent">Percent</button>
                     <button type="button" class="btn btn-primary" id="showNominal">Nominal</button>
@@ -80,7 +83,8 @@
       title: "Win / Loss Rates Per Region and Country",
       yAxisTitle: "Percentage",
       stacking: "percent",
-      dataLabelFormat: "{point.y:.1f}%",
+      // dataLabelFormat: "{point.y:.1f}%",
+      dataLabelFormat: "{point.y}",
       overallWinLabel: "Overall Win Rate",
       rateCalcMethod: "Win/Loss Rate calculation method: ",
       winLabel: 'WinRate = <abbr title="Grants that have status of Closed, Completed, or Funded">Funded Grants</abbr> \
@@ -98,7 +102,7 @@
       winLabel: 'Wins = <abbr title="Grants that have status of Closed, Completed, or Funded">Funded Grants</abbr>',
       lossLabel: 'Total = <abbr title="All grants excluding those with status of Concept, Development, No-Response, or Pending">Total Grants:</abbr>'
     };
-
+    var selectedConfigType = percentConfig
     var drilldown_levels = [];
 
     /// Base configuration for hicharts
@@ -159,16 +163,18 @@
         e.preventDefault();
         $('#showNominal').removeClass("active").removeAttr("aria-pressed", "true");
         $('#showPercent').addClass("active").attr("aria-pressed", "true");
+        selectedConfigType = percentConfig
         set_win_loss_labels(percentConfig);
-        draw_win_loss_chart(percentConfig);
+        draw_win_loss_chart();
     });
 
     $('#showNominal').on('click', function(e) {
         e.preventDefault();
         $('#showPercent').removeClass("active").removeAttr("aria-pressed", "true");
         $('#showNominal').addClass("active").attr("aria-pressed", "true");
+        selectedConfigType = nominalConfig
         set_win_loss_labels(nominalConfig);
-        draw_win_loss_chart(nominalConfig);
+        draw_win_loss_chart();
     });
 
 
@@ -201,8 +207,8 @@
 
         show_grants_table();
         draw_chart();
-        draw_win_loss_chart(nominalConfig);
-        show_overall_winrate({{overallWinRate}});
+        draw_win_loss_chart();
+        show_overall_winrate({{overallWins}}, {{overallApplications}});
     });
 
     // Upon search form submission, format filter values so Django understands it.
@@ -261,8 +267,8 @@
 
             show_grants_table();
             draw_chart();
-            draw_win_loss_chart(nominalConfig);
-            show_overall_winrate(data['overallWinRate']);
+            draw_win_loss_chart();
+            show_overall_winrate(data['overallWins'], data['overallApplications']);
 
         });
     });
@@ -361,21 +367,20 @@
     }
 
     // A drilldown stacked column chart that shows win / loss rate by region and country
-    function draw_win_loss_chart(typeConfig) {
+    function draw_win_loss_chart(regions, countries) {
         var series_data
         var drilldown_series
 
-        set_win_loss_labels(typeConfig);
-        // if (regions && countries) {
-        //     series_data = $.parseJSON(`{{ regions|safe }}`);
-        //     drilldown_series = $.parseJSON(`{{ countries|safe }}`);
-        // } else {
+        set_win_loss_labels(selectedConfigType);
+        if (regions && countries) {
+            series_data = $.parseJSON(`{{ regions|safe }}`);
+            drilldown_series = $.parseJSON(`{{ countries|safe }}`);
+        } else {
             var series_data_raw =  $("#win_loss_rates_series_chart_data_div").html();
             var series_drilldown_data_raw =  $("#win_loss_rates_series_chart_drilldown_data_div").html();
             //var series_drilldown_grants_data_raw = $("#win_loss_rates_series_chart_grants_data_div").html();
             series_data_raw  = series_data_raw.replace(/&amp;/g, '&');
             series_drilldown_data_raw = series_drilldown_data_raw.replace(/&amp;/g, '&');
-            console.log('seriesdataraw', series_data_raw)
             try {
                 series_data = $.parseJSON(series_data_raw);
             } catch (err) {
@@ -383,10 +388,14 @@
             }
             try {
                 drilldown_series = $.parseJSON(series_drilldown_data_raw);
+                drilldown_series = $.map(drilldown_series, function(country){
+                    country.stacking = selectedConfigType.stacking;
+                    return country
+                });
             } catch (err) {
-                console.log("series_drilldown_data_raw");
+                console.log("drilldown series empty");
             }
-        // }
+        }
         // console.log('series data', series_data)
         var winLossConfig = {
             chart: {
@@ -449,22 +458,22 @@
                     },
                 },
             },
-            title: {text: typeConfig.title},
+            title: {text: selectedConfigType.title},
             yAxis: {
                 min: 0,
                 title: {
-                    text: typeConfig.yAxisTitle
+                    text: selectedConfigType.yAxisTitle
                 }
             },
             plotOptions: {
                 column: {
-                    stacking: typeConfig.stacking,
+                    stacking: selectedConfigType.stacking,
                 },
                 series: {
                     allowPointSelect: true,
                     dataLabels: {
                         enabled: true,
-                        format: typeConfig.dataLabelFormat
+                        format: selectedConfigType.dataLabelFormat
                     },
                 },
             },
@@ -500,7 +509,6 @@
         try {
             donor_categories = $.parseJSON(donor_categories_raw);
         } catch (err) {
-            console.log("donor categories raw: " + donor_categories_raw);
             donor_categories = null;
         }
 
@@ -657,9 +665,14 @@
         }
     }
 
-    function show_overall_winrate(rate){
+    function show_overall_winrate(wins, total){
       // console.log('showing overall winrate ' + rate );
-      $("#overallWinRate").text(rate);
+      // TODO Make sure total is 0 (i.e. not None or somesuch)
+      var winRate = "0.0%"
+      if (total > 0) {
+        winRate = ((wins/total)*100).toFixed(1) + '%';
+      }
+      $("#overallWinRate").text(wins + " / " + total + " (" + winRate + ")" );
 
     }
 
