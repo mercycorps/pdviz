@@ -360,6 +360,7 @@ def get_grants_dataset(kwargs):
                 graph = {}
             prev_id = id
         bar['gait_id'] = g.grant_id
+        bar['admin'] = g.hq_admin
         bar['country'] = ','.join([c.name for c in g.countries.all()])
         bar['name'] = g.title
         bar['drilldown'] = g.grant_id
