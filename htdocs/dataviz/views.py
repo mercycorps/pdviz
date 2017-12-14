@@ -5,6 +5,7 @@ from collections import OrderedDict
 
 from django.core import serializers
 from django.db.models import DecimalField, IntegerField, CharField, ExpressionWrapper, F, Case, Value, When, Q, Sum, Avg, Max, Min, Count
+from django.db.models.functions import Coalesce
 from django.db.models.expressions import RawSQL
 
 from django.http import HttpResponse, JsonResponse
@@ -52,39 +53,74 @@ def get_regions(kwargs):
                 ),
                 output_field=IntegerField(),
             )
-        )
+        ),
+        amt_funded=Sum(
+            Case(
+                When(
+                    Q(countries__grants__status='Closed')|
+                    Q(countries__grants__status='Funded')|
+                    Q(countries__grants__status='Completed'), then='countries__grants__amount_usd'
+                ),
+                output_field=IntegerField(),
+            )
+        ),
+        amt_total=Sum(
+            Case(
+                When(
+                    Q(countries__grants__status__isnull = False)&
+                    ~Q(countries__grants__status = 'Concept')&
+                    ~Q(countries__grants__status = 'Development')&
+                    ~Q(countries__grants__status = 'No-Response')&
+                    ~Q(countries__grants__status = 'Pending'), then='countries__grants__amount_usd'
+                ),
+                output_field=IntegerField(),
+            )
+        ),
     ).annotate(
         win_rate=ExpressionWrapper(F('num_funded')/F('num_total') * 100, DecimalField(decimal_places=2)),
     ).annotate(
         loss_rate=(100 - F('win_rate')),
-    ).values('region_id', 'name', 'num_funded', 'num_total', 'win_rate', 'loss_rate')
+    ).values('region_id', 'name', 'num_funded', 'num_total', 'amt_funded', 'amt_total', 'win_rate', 'loss_rate')
 
-    series = []
     win_rates_data = []
     loss_rates_data = []
+    win_amts_data = []
+    loss_amts_data = []
     overallWins = 0
     overallApplications = 0
+    overallAmountWon = 0
+    overallAmountTried = 0
     for r in regions:
         overallWins += r['num_funded']
         overallApplications += r['num_total']
+        overallAmountWon += r['amt_funded'] or 0
+        overallAmountTried += r['amt_total'] or 0
         win_rate = r['win_rate']
         loss_rate = r['loss_rate']
         wins = r['num_funded']
         losses = r['num_total'] - wins
+        winAmts = r['amt_funded'] or 0
+        lossAmts = (r['amt_total'] or 0) - winAmts
         # win_rates_data.append( {'y': float(win_rate if win_rate else 0), 'name': r['name'], 'drilldown': 'wr' + str( r['region_id'])+"-ar"+str( r['region_id']) } )
         # loss_rates_data.append( {'y': float(loss_rate if loss_rate else 0), 'name': r['name'], 'drilldown': 'lr' + str(r['region_id'])+"-ar"+str( r['region_id']) } )
         win_rates_data.append( {'y': wins, 'name': r['name'], 'drilldown': 'wr' + str( r['region_id'])+"-ar"+str( r['region_id']) } )
         loss_rates_data.append( {'y': losses, 'name': r['name'], 'drilldown': 'lr' + str(r['region_id'])+"-ar"+str( r['region_id']) } )
+        win_amts_data.append( {'y': winAmts, 'name': r['name'], 'drilldown': 'wr' + str( r['region_id'])+"-ar"+str( r['region_id']) } )
+        loss_amts_data.append( {'y': lossAmts, 'name': r['name'], 'drilldown': 'lr' + str(r['region_id'])+"-ar"+str( r['region_id']) } )
 
     try:
         overallWinRate = float(overallWins)/float(overallApplications)
     except ZeroDivisionError:
         overallWinRate = 0
 
-    series.append({'name': 'WinRate', 'data': win_rates_data})
+    series = [{'name': 'WinRate', 'data': win_rates_data}]
     series.append({'name': 'LossRate', 'data': loss_rates_data})
 
-    return series, overallWins, overallApplications
+    seriesAmts = [{'name': 'WinAmts', 'data': win_amts_data}]
+    seriesAmts.append({'name': 'LossAmts', 'data': loss_amts_data})
+
+
+    return series, seriesAmts, overallWins, overallApplications, overallAmountWon, overallAmountTried
 
 
 def get_countries(criteria):
@@ -115,20 +151,52 @@ def get_countries(criteria):
                 ),
                 output_field=IntegerField(),
             )
+        ),
+        amt_funded=Sum(
+            Case(
+                When(
+                    Q(grants__status='Closed')|
+                    Q(grants__status='Funded')|
+                    Q(grants__status='Completed'), then='grants__amount_usd'
+                ),
+                output_field=IntegerField(),
+            )
+        ),
+        amt_total=Sum(
+            Case(
+                When(
+                    Q(grants__status__isnull=False) &
+                    ~Q(grants__status="Concept") &
+                    ~Q(grants__status="Development") &
+                    ~Q(grants__status="No-Response") &
+                    ~Q(grants__status="Pending"), then='grants__amount_usd'
+                ),
+                output_field=IntegerField(),
+            )
         )
     ).annotate(
         win_rate=ExpressionWrapper(F('num_funded')/F('num_total') * 100, DecimalField(decimal_places=2)),
     ).annotate(
         loss_rate=(100 - F('win_rate')),
-    ).values('region', 'region__name', 'country_id', 'name', 'iso2', 'num_funded', 'num_total', 'win_rate', 'loss_rate').order_by('region')
+    ).annotate(
+        win_amt_rate=ExpressionWrapper(F('amt_funded')/F('amt_total') * 100, DecimalField(decimal_places=2)),
+    ).annotate(
+        loss_amt_rate=(100 - F('win_rate')),).values('region', 'region__name', 'country_id', 'name', 'iso2', 'num_funded', 'num_total', 'amt_funded', 'amt_total', 'win_rate', 'loss_rate', 'win_amt_rate', 'loss_amt_rate').order_by('region')
 
     countries_per_region_winrate_drilldown = []
     countries_per_region_lossrate_drilldown = []
+    countries_per_region_winamt_drilldown = []
+    countries_per_region_lossamt_drilldown = []
+
     drilldown_win_series = []
     drilldown_loss_series = []
+    drilldown_winamt_series = []
+    drilldown_lossamt_series = []
 
     grants_win_series = []
     grants_loss_series = []
+    grants_winamt_series = []
+    grants_lossamt_series = []
 
     region = None
     region_name = None
@@ -151,18 +219,27 @@ def get_countries(criteria):
         if region is not None and region != c['region']:
             drilldown_win_series.append({'name': "WIN-RATE - " + region_name, 'id': 'wr' + str(region) +"-ar"+str(region), 'stacking': '', 'data': countries_per_region_winrate_drilldown})
             drilldown_loss_series.append({'name': "LOSS-RATE - " + region_name, 'id': 'lr' + str(region)+"-ar"+str(region), 'stacking': '', 'data': countries_per_region_lossrate_drilldown})
+            drilldown_winamt_series.append({'name': "WIN-RATE - " + region_name, 'id': 'wr' + str(region) +"-ar"+str(region), 'stacking': '', 'data': countries_per_region_winamt_drilldown})
+            drilldown_lossamt_series.append({'name': "LOSS-RATE - " + region_name, 'id': 'lr' + str(region)+"-ar"+str(region), 'stacking': '', 'data': countries_per_region_lossamt_drilldown})
 
             countries_per_region_winrate_drilldown = []
             countries_per_region_lossrate_drilldown = []
+            countries_per_region_winamt_drilldown = []
+            countries_per_region_lossamt_drilldown = []
 
-        win_rate = c['win_rate']
-        loss_rate = c['loss_rate']
-        wins = c['num_funded']
-        losses = c['num_total'] - wins
+        wins = c['num_funded'] or 0
+        losses = (c['num_total'] or 0) - wins
+        print 'funded, total', c['amt_funded'], c['amt_total']
+        win_amts = c['amt_funded'] or 0
+        loss_amts = (c['amt_total'] or 0) - win_amts
+        print 'loss_amts', loss_amts
+
         # countries_per_region_winrate_drilldown.append({"name": c["name"], "y": float(win_rate if win_rate else 0), "drilldown": "wc"+str(c["country_id"])+"-ac"+ str(c["country_id"])})
         # countries_per_region_lossrate_drilldown.append({"name": c["name"], "y": float(loss_rate if loss_rate else 0), "drilldown": "lc"+str(c["country_id"])+"-ac"+ str(c["country_id"]) })
         countries_per_region_winrate_drilldown.append({"name": c["name"], "y": wins, "drilldown": "wc"+str(c["country_id"])+"-ac"+ str(c["country_id"])})
         countries_per_region_lossrate_drilldown.append({"name": c["name"], "y": losses, "drilldown": "lc"+str(c["country_id"])+"-ac"+ str(c["country_id"]) })
+        countries_per_region_winamt_drilldown.append({"name": c["name"], "y": win_amts, "drilldown": "wc"+str(c["country_id"])+"-ac"+ str(c["country_id"])})
+        countries_per_region_lossamt_drilldown.append({"name": c["name"], "y": loss_amts, "drilldown": "lc"+str(c["country_id"])+"-ac"+ str(c["country_id"]) })
 
         kwargs = prepare_related_donor_fields_to_lookup_fields(criteria, '')
 
@@ -196,8 +273,16 @@ def get_countries(criteria):
 
     drilldown_win_series.append({'name': region_name, 'id': 'wr' + str(region)+"-ar"+str(region), 'type': 'column', 'stacking': '', 'data': countries_per_region_winrate_drilldown})
     drilldown_loss_series.append({'name': region_name, 'id': 'lr' + str(region)+"-ar"+str(region), 'type': 'column', 'stacking': '', 'data': countries_per_region_lossrate_drilldown})
-    drilldown_series = drilldown_win_series + drilldown_loss_series + grants_win_series + grants_loss_series
-    return drilldown_series
+    drilldown_winamt_series.append({'name': region_name, 'id': 'wr' + str(region)+"-ar"+str(region), 'type': 'column', 'stacking': '', 'data': countries_per_region_winamt_drilldown})
+    drilldown_lossamt_series.append({'name': region_name, 'id': 'lr' + str(region)+"-ar"+str(region), 'type': 'column', 'stacking': '', 'data': countries_per_region_lossamt_drilldown})
+
+    print 'drill wins', json.dumps(drilldown_win_series)[:200]
+    print 'drill losses', json.dumps(drilldown_loss_series)[:200]
+    print 'drill win amts', json.dumps(drilldown_winamt_series)[:200]
+    print 'drill loss amts', json.dumps(drilldown_lossamt_series)[:200]
+    drilldown_rate_series = drilldown_win_series + drilldown_loss_series + grants_win_series + grants_loss_series
+    drilldown_amt_series = drilldown_winamt_series + drilldown_lossamt_series + grants_win_series + grants_loss_series
+    return drilldown_rate_series, drilldown_amt_series
 
 
 def get_donor_categories_dataset(kwargs):
@@ -324,14 +409,20 @@ class GlobalDashboard(TemplateView):
         context['criteria'] = json.dumps(kwargs)
 
         # get the win/loss rates by region
-        regions, overallWins, overallApplications = get_regions(self.request.GET)
+        regions, regionAmts, overallWins, overallApplications, overallAmountWon, overallAmountTried = get_regions(self.request.GET)
         context['regions'] = json.dumps(regions)
+        context['regionAmts'] = json.dumps(regionAmts)
         context['overallWins'] = overallWins
         context['overallApplications'] = overallApplications
+        context['overallAmountWon'] = overallAmountWon
+        context['overallAmountTried'] = overallAmountTried
 
         # get all of the win/loss rates by country
-        countries = get_countries(self.request.GET)
-        context['regions_drilldown'] = json.dumps(countries)
+        countries_rates, countries_amts = get_countries(self.request.GET)
+        context['regions_drilldown'] = json.dumps(countries_rates)
+        context['regions_amt_drilldown'] = json.dumps(countries_amts)
+        print 'contextregionprinter', context['regions_drilldown'][:100]
+        print 'contextregionprinter', context['regions_amt_drilldown'][:100]
         return context
 
 
@@ -346,7 +437,7 @@ class GlobalDashboardData(View):
         series = donors_list + grants_list.pop("series")
 
         regions, overallWins, overallApplications = get_regions(self.request.GET)
-        countries = get_countries(self.request.GET)
+        countries_rate, countries_amts = get_countries(self.request.GET)
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
 
         final_dict = {
@@ -355,7 +446,8 @@ class GlobalDashboardData(View):
             'regions': regions,
             'overallWins': overallWins,
             'overallApplications': overallApplications,
-            'countries': countries,
+            'countries': countries_rate,
+            'countries_amt': countries_amts,
             'grants': grants_table_serializer.data,
             'criteria': kwargs}
         return JsonResponse(final_dict, safe=False)
