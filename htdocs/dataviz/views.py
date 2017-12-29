@@ -4,7 +4,7 @@ import time
 from collections import OrderedDict
 
 from django.core import serializers
-from django.db.models import DecimalField, IntegerField, CharField, ExpressionWrapper, F, Case, Value, When, Q, Sum, Avg, Max, Min, Count
+from django.db.models import DecimalField, FloatField, IntegerField, CharField, ExpressionWrapper, F, Case, Value, When, Q, Sum, Avg, Max, Min, Count
 from django.db.models.functions import Coalesce
 from django.db.models.expressions import RawSQL
 
@@ -61,9 +61,9 @@ def get_regions(kwargs):
                     Q(countries__grants__status='Funded')|
                     Q(countries__grants__status='Completed'), then='countries__grants__amount_usd'
                 ),
-                output_field=IntegerField(),
+                output_field=FloatField(),
             )
-        ),
+        ) / 1000000,
         amt_total=Sum(
             Case(
                 When(
@@ -73,9 +73,9 @@ def get_regions(kwargs):
                     ~Q(countries__grants__status = 'No-Response')&
                     ~Q(countries__grants__status = 'Pending'), then='countries__grants__amount_usd'
                 ),
-                output_field=IntegerField(),
+                output_field=FloatField(),
             )
-        ),
+        ) / 1000000,
     ).annotate(
         win_rate=ExpressionWrapper(F('num_funded')/F('num_total') * 100, DecimalField(decimal_places=2)),
     ).annotate(
@@ -108,7 +108,6 @@ def get_regions(kwargs):
         win_amts_data.append( {'y': winAmts, 'name': r['name'], 'drilldown': 'wr' + str( r['region_id'])+"-ar"+str( r['region_id']) } )
         loss_amts_data.append( {'y': lossAmts, 'name': r['name'], 'drilldown': 'lr' + str(r['region_id'])+"-ar"+str( r['region_id']) } )
 
-    print 'pre-overamtwon', overallAmountWon, 'pre-amttotal', overallAmountTried
     try:
         overallWinRate = float(overallWins)/float(overallApplications)
     except ZeroDivisionError:
@@ -162,7 +161,7 @@ def get_countries(criteria):
                 ),
                 output_field=IntegerField(),
             )
-        ),
+        ) / 1000000,
         amt_total=Sum(
             Case(
                 When(
@@ -174,7 +173,7 @@ def get_countries(criteria):
                 ),
                 output_field=IntegerField(),
             )
-        )
+        ) / 1000000
     ).annotate(
         win_rate=ExpressionWrapper(F('num_funded')/F('num_total') * 100, DecimalField(decimal_places=2)),
     ).annotate(
@@ -410,50 +409,18 @@ class GlobalDashboard(TemplateView):
         context['criteria'] = json.dumps(kwargs)
 
         # get the win/loss rates by region
-        captureData = BarChartData()
-        countData = BarChartData()
         regions, regionAmts, overallWins, overallApplications, overallAmountWon, overallAmountTried = get_regions(self.request.GET)
-
-        print 'slakfj won', overallAmountWon, 'tried', overallAmountTried
-
-        countData.regions = json.dumps(regions)
-        countData.overallWins = overallWins
-        countData.overallTotal = overallApplications
-        countData.overallLosses = overallApplications - overallWins
-
-        captureData.regions = json.dumps(regionAmts)
-        captureData.overallWins = overallAmountWon
-        captureData.overallTotal = overallAmountTried
-        captureData.overallLosses = overallAmountTried - overallAmountWon
-        print 'captured', captureData
-        print 'counted', countData
-
         context['regions'] = json.dumps(regions)
         context['regionAmts'] = json.dumps(regionAmts)
         context['overallWins'] = overallWins
         context['overallApplications'] = overallApplications
         context['overallAmountWon'] = overallAmountWon
         context['overallAmountTried'] = overallAmountTried
-        print 'overallwins', overallWins
-        print 'overallaapplications', overallApplications
-        print 'overallaamountWon', overallAmountWon
-        print 'overallAmountttried', overallAmountTried
 
         # get all of the win/loss rates by country
         countries_rates, countries_amts = get_countries(self.request.GET)
-        captureData.drilldown = countries_amts
-        countData.drilldown = countries_rates
         context['regions_drilldown'] = json.dumps(countries_rates)
         context['regions_amt_drilldown'] = json.dumps(countries_amts)
-        print 'contextregionprinter', context['regions_drilldown'][:100]
-        print 'contextregionprinter', context['regions_amt_drilldown'][:100]
-
-        print 'captured', captureData
-        print 'counted', countData
-        # TODO why is the region count different for counted vs captured
-
-        context['captureData'] = captureData
-        context['countData'] = countData
         return context
 
 
@@ -467,7 +434,8 @@ class GlobalDashboardData(View):
         grants_table_serializer = GrantSerializerPlain(grants_list.pop("grants"), many=True)
         series = donors_list + grants_list.pop("series")
 
-        regions, overallWins, overallApplications = get_regions(self.request.GET)
+        regions, regionAmts, overallWins, overallApplications, overallAmountWon, overallAmountTried = get_regions(self.request.GET)
+        # regions, overallWins, overallApplications = get_regions(self.request.GET)
         countries_rate, countries_amts = get_countries(self.request.GET)
         kwargs = prepare_related_donor_fields_to_lookup_fields(self.request.GET, '')
 
@@ -475,28 +443,13 @@ class GlobalDashboardData(View):
             'donor_categories': donor_categories,
             'donors': series,
             'regions': regions,
+            'regionAmts': regionAmts,
             'overallWins': overallWins,
             'overallApplications': overallApplications,
+            'overallAmountWon': overallAmountWon,
+            'overallAmountTried': overallAmountTried,
             'countries': countries_rate,
-            'countries_amt': countries_amts,
+            'countries_amts': countries_amts,
             'grants': grants_table_serializer.data,
             'criteria': kwargs}
         return JsonResponse(final_dict, safe=False)
-
-class BarChartData:
-    def __init__(self):
-        self.overallWins = 0
-        self.overallLosses = 0
-        self.overallTotal = 0
-        self.regions = {}
-        self.drilldown = []
-
-    def __str__(self):
-        return 'wins=%s, losses=%s, total=%s, regions=%s, drill=%s' % \
-            (self.overallWins,
-            self.overallLosses,
-            self.overallTotal,
-            len(self.regions),
-            len(self.drilldown),
-            )
-    __repr__ = __str__

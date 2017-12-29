@@ -27,15 +27,15 @@
                 <div class="panel-body" id="criteria" style="padding:5px;"> No criteria specified </div>
             </div>
 
-            <div class="panel panel-primary">
+            <div id="countChart" class="panel panel-primary">
                 <div class="panel-heading" style="display: flex; justify-content: space-between">
                   <div >
                     Win / Loss Rate by Region and Country <br/>
-                    <span id="overallWinLabel">Overall Win Rate</span>: <span id="overallWinRate"></span>
+                    <span class="overallWinLabel">Overall Win Rate</span>: <span id="overallWinRate"></span>
                   </div>
-                  <div id="chart-type-selectors" class="btn-group">
-                    <button type="button" class="btn btn-primary active" aria-pressed="true" id="showPercent">Percent</button>
-                    <button type="button" class="btn btn-primary" id="showNominal">Nominal</button>
+                  <div class="chart-type-selectors" class="btn-group">
+                    <button id="showCountPercent" type="button" class="btn btn-primary active" aria-pressed="true">Percent</button>
+                    <button id="showCountNominal" type="button" class="btn btn-primary">Nominal</button>
                   </div>
                 </div>
                 <div class="panel-body" style="padding:15px;">
@@ -43,31 +43,33 @@
                     <div id="win_loss_rate_table_div" class="table-responsive"> </div>
                 </div>
                 <div class="panel-footer">
-                    <span id="rateCalcMethod" class="label label-primary">Win/Loss Rate calculation method: </span>&nbsp;
-                    <span id="winLabel" class="label label-default">WinRate = <abbr title="Grants that have status of Closed, Completed, or Funded">Funded Grants</abbr>
+                    <span class="label label-primary rateCalcMethod">Win/Loss Rate calculation method: </span>&nbsp;
+                    <span class="winLabel label label-default">WinRate = <abbr title="Grants that have status of Closed, Completed, or Funded">Funded Grants</abbr>
                     divided by <abbr title="All grants excluding those with status of Concept, Development, No-Response, or Pending">Total Grants:</abbr></span>
-                    <span id="lossLabel" class="label label-default">LossRate =  WinRate - 100</span>
+                    <span class="lossLabel label label-default">LossRate =  WinRate - 100</span>
                 </div>
             </div>
 
-            <div class="panel panel-primary">
-                <div class="panel-heading" style="display: flex; justify-content: space-between">
-                    Grants Capture Rate by Region and Country <br/>
-                    <span id="overallWinLabel">Overall Capture Rate</span>: <span id="overallWinRate"></span>
+            <div id="captureChart" class="panel panel-primary">
+              <div class="panel-heading" style="display: flex; justify-content: space-between">
+                <div >
+                  Win / Loss Rate by Region and Country <br/>
+                  <span class="overallWinLabel">Overall Win Rate</span>: <span id="overallCaptureRate"></span>
                 </div>
-                <div id="chart-type-selectors" class="btn-group">
-                  <button type="button" class="btn btn-primary active" aria-pressed="true" id="showPercent">Percent</button>
-                  <button type="button" class="btn btn-primary" id="showNominal">Nominal</button>
+                <div class="chart-type-selectors" class="btn-group">
+                  <button id="showCapturePercent" type="button" class="btn btn-primary active" aria-pressed="true">Percent</button>
+                  <button id="showCaptureNominal" type="button" class="btn btn-primary">Nominal</button>
                 </div>
+              </div>
                 <div class="panel-body" style="padding:15px;">
                     <div id="capture_rates_series_chart_div"></div>
                     <div id="capture_rate_table_div" class="table-responsive"> </div>
                 </div>
                 <div class="panel-footer">
-                    <span id="rateCalcMethod" class="label label-primary">Win/Loss Rate calculation method: </span>&nbsp;
-                    <span id="winLabel" class="label label-default">WinRate = <abbr title="Grants that have status of Closed, Completed, or Funded">Funded Grants</abbr>
+                    <span class="rateCalcMethod label label-primary">Win/Loss Rate calculation method: </span>&nbsp;
+                    <span class="winLabel label label-default">WinRate = <abbr title="Grants that have status of Closed, Completed, or Funded">Funded Grants</abbr>
                     divided by <abbr title="All grants excluding those with status of Concept, Development, No-Response, or Pending">Total Grants:</abbr></span>
-                    <span id="lossLabel" class="label label-default">LossRate =  WinRate - 100</span>
+                    <span class="lossLabel label label-default">LossRate =  WinRate - 100</span>
                 </div>
             </div>
 
@@ -103,11 +105,11 @@
       container: 'body'
     });
 
-    var percentConfig = {
+    var countPercentConfig = {
       title: "Win / Loss Rates Per Region and Country",
       yAxisTitle: "Percentage",
       stacking: "percent",
-      // dataLabelFormat: "{point.y:.1f}%",
+      dataLabelFormat: "{point.y}",
       dataLabelFormat: "{point.y}",
       overallWinLabel: "Overall Win Rate",
       rateCalcMethod: "Win/Loss Rate calculation method: ",
@@ -117,10 +119,11 @@
       regionDataDiv: "win_loss_rates_series_chart_data_div",
       drillDataDiv: "win_loss_rates_series_chart_drilldown_data_div",
       renderDiv: "win_loss_rates_series_chart_div",
-      rateTableDiv: "win_loss_rate_table_div"
+      rateTable: "win_loss_rate_table",
+      divID: "countChart"
     };
 
-    var nominalConfig = {
+    var countNominalConfig = {
       title: "Wins and Losses Per Region and Country",
       yAxisTitle: "Grant Count",
       stacking: "normal",
@@ -132,14 +135,15 @@
       regionDataDiv: "win_loss_rates_series_chart_data_div",
       drillDataDiv: "win_loss_rates_series_chart_drilldown_data_div",
       renderDiv: "win_loss_rates_series_chart_div",
-      rateTableDiv: "win_loss_rate_table_div"
+      rateTable: "win_loss_rate_table",
+      divID: "countChart"
     };
 
-    var captureConfig = {
+    var capturePercentConfig = {
       title: "Capture Rate Per Region and Country",
-      yAxisTitle: "Grants USD Value",
-      stacking: "normal",
-      dataLabelFormat: "{point.y}",
+      yAxisTitle: "Percentage",
+      stacking: "percent",
+      dataLabelFormat: "${point.y:,.1f}",
       overallWinLabel: "Overall Capture Rate",
       rateCalcMethod: "",
       winLabel: 'Amounts Won = <abbr title="Grants that have status of Closed, Completed, or Funded">Funded Grants</abbr>',
@@ -147,11 +151,30 @@
       regionDataDiv: "capture_rates_series_chart_data_div",
       drillDataDiv: "capture_rates_series_chart_drilldown_data_div",
       renderDiv: "capture_rates_series_chart_div",
-      rateTableDiv: "capture_rate_table_div"
+      rateTable: "capture_rate_table",
+      divID: "captureChart"
     };
 
-    var selectedConfigType = percentConfig
-    var drilldown_levels = [];
+    var captureNominalConfig = {
+      title: "Value of Grants Won/Lost Per Region and Country",
+      yAxisTitle: "Cumulative Grant Values",
+      stacking: "normal",
+      dataLabelFormat: "${point.y:,.1f}",
+      overallWinLabel: "Overall Value of Grants Won/Lost",
+      rateCalcMethod: "",
+      winLabel: 'Wins = <abbr title="Value of grants that have status of Closed, Completed, or Funded">Funded Grants</abbr>',
+      lossLabel: 'Total = <abbr title="Value of all grants excluding those with status of Concept, Development, No-Response, or Pending">Total Grants:</abbr>',
+      regionDataDiv: "capture_rates_series_chart_data_div",
+      drillDataDiv: "capture_rates_series_chart_drilldown_data_div",
+      renderDiv: "capture_rates_series_chart_div",
+      rateTable: "capture_rate_table",
+      divID: "captureChart"
+    };
+
+    var activeCountConfig = countPercentConfig
+    var activeCaptureConfig = capturePercentConfig
+
+    // var drilldown_levels = [];
 
     /// Base configuration for hicharts
     var baseConfig = {
@@ -174,7 +197,7 @@
         },
 
         subtitle: {
-            text: 'Source: <a href="https://gait.mercycorps.org" target="_blank">GAIT</a>'
+            text: '$Millions, Source: <a href="https://gait.mercycorps.org" target="_blank">GAIT</a>'
         },
         xAxis: {
             type: 'category',
@@ -207,24 +230,41 @@
         //e.stopPropagation();
     });
 
-    $('#showPercent').on("click", function(e) {
+    $('#showCountPercent').on("click", function(e) {
         e.preventDefault();
-        $('#showNominal').removeClass("active").removeAttr("aria-pressed", "true");
-        $('#showPercent').addClass("active").attr("aria-pressed", "true");
-        selectedConfigType = percentConfig
-        set_win_loss_labels(percentConfig);
-        draw_bar_chart(false, false, percentConfig);
+        $('#showCountNominal').removeClass("active").removeAttr("aria-pressed", "true");
+        $('#showCountPercent').addClass("active").attr("aria-pressed", "true");
+        activeCountConfig = countPercentConfig
+        set_win_loss_labels(countPercentConfig);
+        draw_bar_chart(false, false, countPercentConfig);
     });
 
-    $('#showNominal').on('click', function(e) {
+    $('#showCountNominal').on('click', function(e) {
         e.preventDefault();
-        $('#showPercent').removeClass("active").removeAttr("aria-pressed", "true");
-        $('#showNominal').addClass("active").attr("aria-pressed", "true");
-        selectedConfigType = nominalConfig
-        set_win_loss_labels(nominalConfig);
-        draw_bar_chart(false, false, nominalConfig);
+        $('#showCountPercent').removeClass("active").removeAttr("aria-pressed", "true");
+        $('#showCountNominal').addClass("active").attr("aria-pressed", "true");
+        activeCountConfig = countNominalConfig
+        set_win_loss_labels(countNominalConfig);
+        draw_bar_chart(false, false, countNominalConfig);
     });
 
+    $('#showCapturePercent').on("click", function(e) {
+        e.preventDefault();
+        $('#showCaptureNominal').removeClass("active").removeAttr("aria-pressed", "true");
+        $('#showCapturePercent').addClass("active").attr("aria-pressed", "true");
+        activeCountConfig = capturePercentConfig
+        set_win_loss_labels(capturePercentConfig);
+        draw_bar_chart(false, false, capturePercentConfig);
+    });
+
+    $('#showCaptureNominal').on('click', function(e) {
+        e.preventDefault();
+        $('#showCapturePercent').removeClass("active").removeAttr("aria-pressed", "true");
+        $('#showCaptureNominal').addClass("active").attr("aria-pressed", "true");
+        activeCountConfig = captureNominalConfig
+        set_win_loss_labels(captureNominalConfig);
+        draw_bar_chart(false, false, captureNominalConfig);
+    });
 
     $(document).ready(function() {
 
@@ -255,8 +295,8 @@
 
         show_grants_table();
         draw_chart();
-        draw_bar_chart(false, false, selectedConfigType);
-        draw_bar_chart(false, false, captureConfig);
+        draw_bar_chart(false, false, activeCountConfig);
+        draw_bar_chart(false, false, activeCaptureConfig);
         show_overall_winrate({{overallWins}}, {{overallApplications}});
     });
 
@@ -328,8 +368,8 @@
 
             show_grants_table();
             draw_chart();
-            draw_bar_chart(false, false, selectedConfigType);
-            draw_bar_chart(false, false, captureConfig);
+            draw_bar_chart(false, false, activeCountConfig);
+            draw_bar_chart(false, false, activeCaptureConfig);
             show_overall_winrate(data['overallWins'], data['overallApplications']);
 
         });
@@ -420,24 +460,29 @@
     }
 
     //Show the corresponding table for the donor_with_num_grants chart
-    function show_win_loss_rate_table(drillupdown_data) {
+    function show_win_loss_rate_table(drillupdown_data, conf) {
         //var win_loss_rate_table = new tableObject(drillupdown_data[0].data, "win_loss_rate_table");
-        var win_loss_rate_table = new tableObject(drillupdown_data, "win_loss_rate_table");
-        $("#win_loss_rate_table_div").empty();
-        $("#win_loss_rate_table_div").append(win_loss_rate_table);
-        $("#win_loss_rate_table").DataTable();
+        var win_loss_rate_table = new tableObject(drillupdown_data, conf.rateTable);
+        $("#" + conf.rateTable + "_div").empty();
+        $("#" + conf.rateTable + "_div").append(win_loss_rate_table);
+        $("#" + conf.rateTable).DataTable();
     }
-    // TODO: add capture rate block here?
+
     // TODO: fiture out what the pieces of the grant id's mean.  ar != ac
     // TODO: when a country is clicked on the capture rate chart, the data table opens on the other chart
-
+    // TODO: select default chart type (nominal or percent)
+    // TODO: use bootstrap flex
+    // TODO: fix the no-show labels on the stacked bar when the stack is small
+    // TODO: y-axis label changes to default at the lowest level of drilldown, even though starting a nominal
+    // TODO: the overall capture rate isn't showing.
 
     // A drilldown stacked column chart that shows win / loss rate by region and country
     function draw_bar_chart(regions, countries, conf) {
+        console.log(conf)
         var series_data
         var drilldown_series
         console.log('current conf', conf)
-        set_win_loss_labels(conf);
+        // set_win_loss_labels(conf);
         if (regions && countries) {
             series_data = $.parseJSON(`{{ regions|safe }}`);
             drilldown_series = $.parseJSON(`{{ countries|safe }}`);
@@ -446,7 +491,7 @@
             var series_drilldown_data_raw =  $('#'+conf.drillDataDiv).html();
             //var series_drilldown_grants_data_raw = $("#win_loss_rates_series_chart_grants_data_div").html();
             series_data_raw  = series_data_raw.replace(/&amp;/g, '&');
-            console.log('sdr', series_data_raw)
+            // console.log('sdr', series_data_raw)
             series_drilldown_data_raw = series_drilldown_data_raw.replace(/&amp;/g, '&');
             try {
                 series_data = $.parseJSON(series_data_raw);
@@ -483,15 +528,19 @@
                 spacingBottom: 90,
                 events: {
                     drilldown: function (e) {
+                        console.log('event', e.point)
                         var drilldown_data;
                         var all_data;
+                        console.log('epoint', e.point)
                         var point_id_part_2 = e.point.drilldown.split("-")[1];
+                        console.log('pidp2', point_id_part_2)
 
                         if ($.isNumeric(e.point.drilldown)) {
                             // if drilldown point is numeric then grants bar is clicked.
                             window.open('https://gait.mercycorps.org/editgrant.vm?GrantID=' + e.point.gait_id, '_blank');
                         } else {
                             // if the xAxis label is clicked
+                            console.log('category', e.category)
                             if (e.category != undefined) {
                                 drilldown_data = $.grep(drilldown_series, function(event){
                                     var event_id_part2 = event.id.split("-")[1];
@@ -501,9 +550,19 @@
                                     }
                                     return false;
                                 });
+
+                                console.log('drilldowndata', drilldown_data)
+                                drilldown_data.forEach(function(element){
+                                  element.stacking = 'regular'
+                                })
+                                drilldown_data.forEach(function(element){
+                                  console.log('estacking', element.stacking)
+                                })
                                 // combine data from the loss and won series.
                                 all_data = drilldown_data[0].data.concat(drilldown_data[1].data);
+                                console.log('all-data', all_data)
                                 if (point_id_part_2.substring(0,2) == "ac") {
+                                    console.log('thishere', this)
                                     this.xAxis[0].update({visible: false});
                                     this.yAxis[0].update({title: {text: "Amount"}});
                                 }
@@ -514,14 +573,14 @@
                                 all_data = drilldown_data[0].data;
                             }
                             if (point_id_part_2.substring(0,2) != "ar"){
-                                show_win_loss_rate_table(all_data);
+                                show_win_loss_rate_table(all_data, conf);
                             }
                         }
                     },
                     drillup: function(e) {
                         this.xAxis[0].update({visible: true});
-                        this.yAxis[0].update({title: {text: "Percentage"}});
-                        $("#"+conf.rateTableDiv).empty();
+                        this.yAxis[0].update({title: {text: conf.yAxisTitle}});
+                        $("#"+conf.rateTable+"_div").empty();
                     },
                 },
             },
@@ -586,8 +645,9 @@
             //console.log("donors: " + donors);
             donors_raw = null;
         }
-
-        drilldown_levels = [];
+        console.log('before drilllevel', drilldown_levels)
+        var drilldown_levels = [];
+        console.log('before drilllevel', drilldown_levels)
         var numGrantsChartConfig = {
             chart: {
                 zoomType: 'x',
@@ -744,11 +804,12 @@
     }
 
     // Set Grant Win / Loss chart labels based on type of chart selected
-    function set_win_loss_labels(type){
-      $('#overallWinLabel').text(type.overallWinLabel);
-      $('#rateCalcMethod').text(type.rateCalcMethod);
-      $('#winLabel').html(type.winLabel);
-      $('#lossLabel').html(type.lossLabel);
+    function set_win_loss_labels(conf){
+      var target = conf.divID
+      $('#' + target + ' .overallWinLabel').text(conf.overallWinLabel);
+      $('#' + target + ' .rateCalcMethod').text(conf.rateCalcMethod);
+      $('#' + target + ' .winLabel').html(conf.winLabel);
+      $('#' + target + ' .lossLabel').html(conf.lossLabel);
     }
 
 
