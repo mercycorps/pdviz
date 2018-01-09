@@ -110,7 +110,6 @@
       yAxisTitle: "Percentage",
       stacking: "percent",
       dataLabelFormat: "{point.y}",
-      dataLabelFormat: "{point.y}",
       overallWinLabel: "Overall Win Rate",
       rateCalcMethod: "Win/Loss Rate calculation method: ",
       winLabel: 'WinRate = <abbr title="Grants that have status of Closed, Completed, or Funded">Funded Grants</abbr> \
@@ -469,12 +468,11 @@
     }
 
     // TODO: fiture out what the pieces of the grant id's mean.  ar != ac
-    // TODO: when a country is clicked on the capture rate chart, the data table opens on the other chart
-    // TODO: select default chart type (nominal or percent)
     // TODO: use bootstrap flex
     // TODO: fix the no-show labels on the stacked bar when the stack is small
-    // TODO: y-axis label changes to default at the lowest level of drilldown, even though starting a nominal
     // TODO: the overall capture rate isn't showing.
+    // TODO: shift drillup button
+    // TODO: labels don't reappear when drilling up from a regional drilldown
 
     // A drilldown stacked column chart that shows win / loss rate by region and country
     function draw_bar_chart(regions, countries, conf) {
@@ -508,7 +506,8 @@
                 console.log("drilldown series empty");
             }
         }
-        // console.log('series data', series_data)
+        console.log('series data', series_data)
+        console.log('drilldown series', drilldown_series)
         var winLossConfig = {
             chart: {
                 zoomType: 'x',
@@ -551,13 +550,7 @@
                                     return false;
                                 });
 
-                                console.log('drilldowndata', drilldown_data)
-                                drilldown_data.forEach(function(element){
-                                  element.stacking = 'regular'
-                                })
-                                drilldown_data.forEach(function(element){
-                                  console.log('estacking', element.stacking)
-                                })
+
                                 // combine data from the loss and won series.
                                 all_data = drilldown_data[0].data.concat(drilldown_data[1].data);
                                 console.log('all-data', all_data)
@@ -580,6 +573,8 @@
                     drillup: function(e) {
                         this.xAxis[0].update({visible: true});
                         this.yAxis[0].update({title: {text: conf.yAxisTitle}});
+                        console.log('drillupseries', this.series)
+                        //this.series[0].dataLabels.enabled = true;
                         $("#"+conf.rateTable+"_div").empty();
                     },
                 },

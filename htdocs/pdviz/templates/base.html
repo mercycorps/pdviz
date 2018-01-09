@@ -12,9 +12,9 @@
         <meta name="keywords" content="{% block meta-keywords %}{% endblock %}">
 
         {% block extra-meta %}{% endblock %}
-        
+
         <title>{% block title %} PDViz {% endblock %}</title>
-        
+
         <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
 
         <!-- Bootstrap -->
@@ -33,7 +33,7 @@
 
         <!-- Page-specific CSS -->
         {% block extra-css %}{% endblock %}
-        
+
     </head>
     <body>
         <div id="wrapper">
@@ -111,7 +111,7 @@
                                             <div class="alert dynamic-alert alert-{{message.level_tag}} alert-dismissible" role="alert">
                                             <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                                             {{ message|safe }}</div>
-                                        {% else %} 
+                                        {% else %}
                                             <div class="alert dynamic-alert alert-{{message.level_tag}} alert-dismissible" role="alert">
                                             <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                                             {{ message }}</div>
@@ -148,7 +148,7 @@
         {% endif %}
 
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-        <script type="text/javascript" src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
 
         <!-- JQuery UI -->
         <script type="text/javascript" src="{% static 'js/jquery-ui.min.js' %}"></script>
@@ -163,7 +163,7 @@
         <script type="text/javascript" src="{% static 'js/highcharts.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/drilldown.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/exporting.js' %}"></script>
-        <script type="text/javascript" src="{% static 'js/export-csv.js' %}"></script>
+        <!-- <script type="text/javascript" src="{% static 'js/export-csv.js' %}"></script> -->
 
         <!-- Plugin for hicharts to add grouping functionality -->
         <!-- <script type="text/javascript" src="{% static 'js/grouped-categories.js' %}"></script> -->
