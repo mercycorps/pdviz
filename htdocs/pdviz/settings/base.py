@@ -122,13 +122,13 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
-)
+# STATICFILES_DIRS = (
+#     os.path.join(BASE_DIR, "static"),
+# )
 STATIC_URL = '/static/'
 
 # https://docs.djangoproject.com/en/1.9/ref/settings/#std:setting-STATIC_ROOT
-# STATIC_ROOT = BASE_DIR + "/static/"
+STATIC_ROOT = BASE_DIR + "/static/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
@@ -157,6 +157,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
         #'rest_framework.permissions.IsAdminUser',
     ),
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
-

@@ -75,7 +75,7 @@
                                 </ul>
                             {% endcomment %}
                         {% else %}
-                        <form class="navbar-form navbar-right" role="form" method="post" action="{% url 'django.contrib.auth.views.login' %}">
+                        <form class="navbar-form navbar-right" role="form" method="post" action="{% url 'login' %}">
                             {% csrf_token %}
                             <div class="form-group">
                                 <input type="hidden" name="next" value="{{ next }}" />

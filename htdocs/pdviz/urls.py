@@ -21,10 +21,14 @@ from django.contrib import admin
 from django.contrib.auth.views import login
 
 from rest_framework import routers, serializers, viewsets
+from rest_framework_swagger.views import get_swagger_view
+
 
 from .views import *
 from dataviz.views import *
 from dataviz.api import *
+
+swagger_schema_view = get_swagger_view(title='PDViz')
 
 router = routers.DefaultRouter()
 router.register('grants', GrantViewSet, base_name='grants')
@@ -41,7 +45,7 @@ router.register('themes', ThemeViewSet, base_name='themes')
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/v1/', include(router.urls)),
-    url(r'^api/docs/', include('rest_framework_swagger.urls')),
+    url(r'^api/docs/', swagger_schema_view),
     url(r'^login/$', login, name='login'),
     url('^', include('django.contrib.auth.urls')),
     url(r'^$', HomeView.as_view(), name='home'),
