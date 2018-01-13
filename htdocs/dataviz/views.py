@@ -119,7 +119,6 @@ def get_regions(kwargs):
     seriesAmts = [{'name': 'WinAmts', 'data': win_amts_data}]
     seriesAmts.append({'name': 'LossAmts', 'data': loss_amts_data})
 
-
     return series, seriesAmts, overallWins, overallApplications, overallAmountWon, overallAmountTried
 
 
@@ -229,10 +228,8 @@ def get_countries(criteria):
 
         wins = c['num_funded'] or 0
         losses = (c['num_total'] or 0) - wins
-        print 'funded, total', c['amt_funded'], c['amt_total']
         win_amts = c['amt_funded'] or 0
         loss_amts = (c['amt_total'] or 0) - win_amts
-        print 'loss_amts', loss_amts
 
         # countries_per_region_winrate_drilldown.append({"name": c["name"], "y": float(win_rate if win_rate else 0), "drilldown": "wc"+str(c["country_id"])+"-ac"+ str(c["country_id"])})
         # countries_per_region_lossrate_drilldown.append({"name": c["name"], "y": float(loss_rate if loss_rate else 0), "drilldown": "lc"+str(c["country_id"])+"-ac"+ str(c["country_id"]) })
@@ -276,10 +273,6 @@ def get_countries(criteria):
     drilldown_winamt_series.append({'name': region_name, 'id': 'wr' + str(region)+"-ar"+str(region), 'type': 'column', 'stacking': '', 'data': countries_per_region_winamt_drilldown})
     drilldown_lossamt_series.append({'name': region_name, 'id': 'lr' + str(region)+"-ar"+str(region), 'type': 'column', 'stacking': '', 'data': countries_per_region_lossamt_drilldown})
 
-    print 'drill wins', json.dumps(drilldown_win_series)[:200]
-    print 'drill losses', json.dumps(drilldown_loss_series)[:200]
-    print 'drill win amts', json.dumps(drilldown_winamt_series)[:200]
-    print 'drill loss amts', json.dumps(drilldown_lossamt_series)[:200]
     drilldown_rate_series = drilldown_win_series + drilldown_loss_series + grants_win_series + grants_loss_series
     drilldown_amt_series = drilldown_winamt_series + drilldown_lossamt_series + grants_win_series + grants_loss_series
     return drilldown_rate_series, drilldown_amt_series

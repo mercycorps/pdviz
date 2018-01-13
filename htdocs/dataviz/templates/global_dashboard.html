@@ -53,8 +53,8 @@
             <div id="captureChart" class="panel panel-primary">
               <div class="panel-heading" style="display: flex; justify-content: space-between">
                 <div >
-                  Win / Loss Rate by Region and Country <br/>
-                  <span class="overallWinLabel">Overall Win Rate</span>: <span id="overallCaptureRate"></span>
+                  Capture Rate by Region and Country <br/>
+                  <span class="overallWinLabel">Overall Capture Rate ($mil)</span>: <span id="overallCaptureRate"></span>
                 </div>
                 <div class="chart-type-selectors" class="btn-group">
                   <button id="showCapturePercent" type="button" class="btn btn-primary active" aria-pressed="true">Percent</button>
@@ -296,7 +296,8 @@
         draw_chart();
         draw_bar_chart(false, false, activeCountConfig);
         draw_bar_chart(false, false, activeCaptureConfig);
-        show_overall_winrate({{overallWins}}, {{overallApplications}});
+        show_overall_win_rate({{overallWins}}, {{overallApplications}});
+        show_overall_capture_rate({{overallAmountWon}}, {{overallAmountTried}});
     });
 
     // Upon search form submission, format filter values so Django understands it.
@@ -369,7 +370,8 @@
             draw_chart();
             draw_bar_chart(false, false, activeCountConfig);
             draw_bar_chart(false, false, activeCaptureConfig);
-            show_overall_winrate(data['overallWins'], data['overallApplications']);
+            show_overall_win_rate(data['overallWins'], data['overallApplications']);
+            show_overall_capture_rate(data['overallAmountWon'], data['overallAmountTried']);
 
         });
     });
@@ -469,16 +471,15 @@
 
     // TODO: use bootstrap flex
     // TODO: fix the no-show labels on the stacked bar when the stack is small
-    // TODO: the overall capture rate isn't showing.
     // TODO: shift drillup button
     // TODO: hamburger menu not displaying
 
     // A drilldown stacked column chart that shows win / loss rate by region and country
     function draw_bar_chart(regions, countries, conf) {
-        console.log(conf)
+        // console.log(conf)
         var series_data
         var drilldown_series
-        console.log('current conf', conf)
+        // console.log('current conf', conf)
         // set_win_loss_labels(conf);
         if (regions && countries) {
             series_data = $.parseJSON(`{{ regions|safe }}`);
@@ -505,8 +506,7 @@
                 console.log("drilldown series empty");
             }
         }
-        console.log('series data', series_data)
-        console.log('drilldown series', drilldown_series)
+
         var winLossConfig = {
             chart: {
                 zoomType: 'x',
@@ -526,19 +526,15 @@
                 spacingBottom: 90,
                 events: {
                     drilldown: function (e) {
-                        console.log('event', e.point)
                         var drilldown_data;
                         var all_data;
-                        console.log('epoint', e.point)
                         var point_id_part_2 = e.point.drilldown.split("-")[1];
-                        console.log('pidp2', point_id_part_2)
 
                         if ($.isNumeric(e.point.drilldown)) {
                             // if drilldown point is numeric then grants bar is clicked.
                             window.open('https://gait.mercycorps.org/editgrant.vm?GrantID=' + e.point.gait_id, '_blank');
                         } else {
                             // if the xAxis label is clicked
-                            console.log('category', e.category)
                             if (e.category != undefined) {
                                 drilldown_data = $.grep(drilldown_series, function(event){
                                     var event_id_part2 = event.id.split("-")[1];
@@ -552,9 +548,7 @@
 
                                 // combine data from the loss and won series.
                                 all_data = drilldown_data[0].data.concat(drilldown_data[1].data);
-                                console.log('all-data', all_data)
                                 if (point_id_part_2.substring(0,2) == "ac") {
-                                    console.log('thishere', this)
                                     this.xAxis[0].update({visible: false});
                                     this.yAxis[0].update({title: {text: "Amount"}});
                                 }
@@ -572,7 +566,6 @@
                     drillup: function(e) {
                         this.xAxis[0].update({visible: true});
                         this.yAxis[0].update({title: {text: conf.yAxisTitle}});
-                        console.log('drillupseries', this.series)
                         //this.series[0].dataLabels.enabled = true;
                         $("#"+conf.rateTable+"_div").empty();
                     },
@@ -639,9 +632,7 @@
             //console.log("donors: " + donors);
             donors_raw = null;
         }
-        console.log('before drilllevel', drilldown_levels)
         var drilldown_levels = [];
-        console.log('before drilllevel', drilldown_levels)
         var numGrantsChartConfig = {
             chart: {
                 zoomType: 'x',
@@ -786,7 +777,7 @@
         }
     }
 
-    function show_overall_winrate(wins, total){
+    function show_overall_win_rate(wins, total){
       // console.log('showing overall winrate ' + rate );
       // TODO Make sure total is 0 (i.e. not None or somesuch)
       var winRate = "0.0%"
@@ -794,7 +785,18 @@
         winRate = ((wins/total)*100).toFixed(1) + '%';
       }
       $("#overallWinRate").text(wins + " / " + total + " (" + winRate + ")" );
+    }
 
+    function show_overall_capture_rate(wins, total){
+      // console.log('showing overall winrate ' + rate );
+      // TODO Make sure total is 0 (i.e. not None or somesuch)
+      var winRate = "0.0%"
+      if (total > 0) {
+        winRate = ((wins/total)*100).toFixed(1) + '%';
+      }
+      var winsF = wins.toLocaleString(undefined, {maximumFractionDigits:0})
+      var totalF = total.toLocaleString(undefined, {maximumFractionDigits:0})
+      $("#overallCaptureRate").text(winsF + " / " + totalF + " (" + winRate + ")" );
     }
 
     // Set Grant Win / Loss chart labels based on type of chart selected
@@ -805,6 +807,7 @@
       $('#' + target + ' .winLabel').html(conf.winLabel);
       $('#' + target + ' .lossLabel').html(conf.lossLabel);
     }
+
 
 
 </script>
