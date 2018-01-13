@@ -469,10 +469,8 @@
         $("#" + conf.rateTable).DataTable();
     }
 
-    // TODO: use bootstrap flex
     // TODO: fix the no-show labels on the stacked bar when the stack is small
     // TODO: shift drillup button
-    // TODO: hamburger menu not displaying
 
     // A drilldown stacked column chart that shows win / loss rate by region and country
     function draw_bar_chart(regions, countries, conf) {
@@ -779,7 +777,6 @@
 
     function show_overall_win_rate(wins, total){
       // console.log('showing overall winrate ' + rate );
-      // TODO Make sure total is 0 (i.e. not None or somesuch)
       var winRate = "0.0%"
       if (total > 0) {
         winRate = ((wins/total)*100).toFixed(1) + '%';
@@ -789,7 +786,6 @@
 
     function show_overall_capture_rate(wins, total){
       // console.log('showing overall winrate ' + rate );
-      // TODO Make sure total is 0 (i.e. not None or somesuch)
       var winRate = "0.0%"
       if (total > 0) {
         winRate = ((wins/total)*100).toFixed(1) + '%';
