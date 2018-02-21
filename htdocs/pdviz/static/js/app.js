@@ -1,6 +1,6 @@
 var $loading = $('#loading');
 
-/* 
+/*
  * A global ajaxComplete method that shows you any messages that are set in Django's view
  */
 $( document )
@@ -40,7 +40,8 @@ $(document).ready(function() {
     $("#id_theme").select2({placeholder: 'Theme', allowClear: true,});
     $("#id_methodology").select2({placeholder: 'Methodology', allowClear: true,});
     $("#id_status").select2({  placeholder: "Status", allowClear: true });
-    
+    $("#id_hq_admin").select2({  placeholder: "HQ Admin", allowClear: true });
+
     $('.dateinput').datepicker({  dateFormat: 'yy-mm-dd', });
 
 });
@@ -95,7 +96,7 @@ function createAlert (type, message, fade) {
     }
 }
 
-       
+
 var tableObject = function (json, id) {
     var headerCount = new Object();
 
@@ -175,7 +176,7 @@ var tableObject = function (json, id) {
     }
     return pTable;
 };
-/* 
+/*
  * ********* USAGE *******
  * <div id="test"> </div>
  * var table = "[{'Country':'mycity','Name':'abc','Age':'29','Email':'test@mail.com'}," +
@@ -188,9 +189,9 @@ var tableObject = function (json, id) {
  * document.getElementById("test").appendChild(c);
  *
  */
- 
- 
- 
+
+
+
 /*
  * Get a cookie by name.
  */

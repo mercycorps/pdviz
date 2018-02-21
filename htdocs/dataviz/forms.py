@@ -72,9 +72,11 @@ class GrantDonorFilterForm(forms.Form):
         widget = forms.SelectMultiple(),
     )
     hq_admin = forms.ChoiceField(
-        choices = (),
+        choices = [(hq['hq_admin'], hq['hq_admin']) for hq in Grant.objects.filter(hq_admin__isnull=False).exclude(hq_admin__exact = '').exclude(hq_admin__exact='Hong Kong').values('hq_admin').distinct().order_by('hq_admin')],
         required = False,
+        widget = forms.SelectMultiple(),
     )
+
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
         self.helper.form_class='form-horizontal'
@@ -102,8 +104,4 @@ class GrantDonorFilterForm(forms.Form):
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm'))
         self.helper.add_input(Reset('reset', 'Clear', css_id='id_search_form_reset_btn', css_class='btn-warning btn-sm'))
         super(GrantDonorFilterForm, self).__init__(*args, **kwargs)
-        choices_hq_admin = [("", "--HQadmin--"),]
-        choices =  [(hq['hq_admin'], hq['hq_admin']) for hq in Grant.objects.filter(hq_admin__isnull=False).exclude(hq_admin__exact = '').exclude(hq_admin__exact='Hong Kong').values('hq_admin').distinct()]
-        choices.sort()
-        choices_hq_admin.extend(choices)
-        self.fields['hq_admin'] = forms.ChoiceField(choices=choices_hq_admin, required=False)
+        

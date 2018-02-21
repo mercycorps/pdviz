@@ -77,6 +77,7 @@ class GrantSerializer(serializers.ModelSerializer):
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
+        fields = '__all__'
 
 
 class GrantsByCountrySerializer(serializers.ModelSerializer):
@@ -134,35 +135,42 @@ class DonorSerializer(serializers.ModelSerializer):
     grants_count = serializers.IntegerField()
     class Meta:
         model = Donor
+        fields = '__all__'
 
 
 class DonorCategorySerializer(serializers.ModelSerializer):
     donors_count = serializers.IntegerField()
     class Meta:
         model = DonorCategory
+        fields = '__all__'
 
 
 class DonorDepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = DonorDepartment
+        fields = '__all__'
 
 
 class SectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sector
+        fields = '__all__'
 
 
 class SubSectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubSector
         depth = 1
+        fields = '__all__'
 
 
 class MethodologySerializer(serializers.ModelSerializer):
     class Meta:
         model = Methodology
+        fields = '__all__'
 
 
 class ThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Theme
+        fields = '__all__'
