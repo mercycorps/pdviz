@@ -527,12 +527,12 @@
                     drilldown: function (e) {
                         var drilldown_data;
                         var all_data;
-                        var point_id_part_2 = e.point.drilldown.split("-")[1];
 
                         if ($.isNumeric(e.point.drilldown)) {
                             // if drilldown point is numeric then grants bar is clicked.
                             window.open('https://gait.mercycorps.org/editgrant.vm?GrantID=' + e.point.gait_id, '_blank');
                         } else {
+                            var point_id_part_2 = e.point.drilldown.split("-")[1];
                             // if the xAxis label is clicked
                             if (e.category != undefined) {
                                 drilldown_data = $.grep(drilldown_series, function(event){
@@ -598,7 +598,7 @@
                 drillUpButton: {
                     relativeTo: 'spacingBox',
                     position: {
-                        y: 20,
+                        y: 30,
                         x: 0
                     },
                 },
