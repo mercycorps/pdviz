@@ -8,8 +8,6 @@ local.py
 conf/
 extras/
 media/
-djangocosign/
-feedback/
 scripts/
 
 # C extensions

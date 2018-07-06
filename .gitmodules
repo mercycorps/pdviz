@@ -1,0 +1,6 @@
+[submodule "htdocs/feedback"]
+	path = htdocs/feedback
+	url = https://github.com/mercycorps/feedback.git
+[submodule "htdocs/djangocosign"]
+	path = htdocs/djangocosign
+	url = https://github.com/mercycorps/djangocosign.git
