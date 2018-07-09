@@ -9,6 +9,7 @@ conf/
 extras/
 media/
 scripts/
+assets/
 
 # C extensions
 *.so
