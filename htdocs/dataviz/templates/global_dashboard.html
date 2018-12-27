@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% load crispy_forms_tags %}
-
+<!-- TODO: make department react to donor selection-->
+<!-- TODO: deefaul text for department -->
 {% block content %}
     <div id="donor_categories_data_div" style="display: none;">{{ donor_categories|safe }}</div>
     <div id="donor_categories_drilldown_data_div" style="display: none;">{{ donors|safe }}</div>
@@ -218,6 +219,7 @@
         $("select#id_region").val('').trigger("change");
         $("select#id_country").val('').trigger("change");
         $("select#id_donor").val('').trigger("change");
+        $("select#id_donor_department").val('').trigger("change");
         $("#id_submission_date_from").val('');
         $("#id_submission_date_to").val('');
         $("#id_grants_amount_min").val('');
@@ -408,6 +410,13 @@
                 case 'donor=':
                     key = "Donor=";
                     var values = $( "#id_donor option:selected" ).map(function() {
+                        return $(this).text();
+                    }).get().join(', ');
+                    value = values;
+                    break;
+                case 'donordepartment=':
+                    key = "Donor Department=";
+                    var values = $( "#id_donor_department option:selected" ).map(function() {
                         return $(this).text();
                     }).get().join(', ');
                     value = values;

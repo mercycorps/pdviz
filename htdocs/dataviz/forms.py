@@ -28,13 +28,19 @@ class GrantDonorFilterForm(forms.Form):
         empty_label = None,
         widget = forms.SelectMultiple(),
     )
+    donor_department = forms.ModelChoiceField(
+        queryset=DonorDepartment.objects.all(),
+        required=False,
+        empty_label=None,
+        widget=forms.SelectMultiple(),
+    )
     submission_date_from = forms.DateField(
-        label = u' From Submission Date',
+        label = u'From Submission Date',
         required = False,
         widget = forms.DateInput()
     )
     submission_date_to = forms.DateField(
-        label = u' To Submission Date',
+        label = u'To Submission Date',
         required = False,
     )
     grants_amount_min = forms.IntegerField(
@@ -87,9 +93,10 @@ class GrantDonorFilterForm(forms.Form):
             Field('region', css_class="input-sm"),
             Field('country', css_class="input-sm"),
             Field('donor', css_class="input-sm"),
+            Field('donor_department', css_class="input-sm"),
             #Field(AppendedText('submission_date_from', '<span class="glyphicon glyphicon-calendar"></span>'), placeholder="From Submission date", css_class="input-sm"),
-            Field('submission_date_from', placeholder="From Submission date", css_class="input-sm"),
-            Field('submission_date_to', placeholder="To Submission date", css_class="input-sm"),
+            Field('submission_date_from', placeholder="Submission date from...", css_class="input-sm"),
+            Field('submission_date_to', placeholder="Submission date to...", css_class="input-sm"),
             Field('grants_amount_min', placeholder = 'Dollar value minimum', css_class='input-sm'),
             Field('grants_amount_max', placeholder = 'Dollar value maximum', css_class='input-sm'),
             Field('sector', css_class='input-sm'),
