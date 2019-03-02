@@ -36,6 +36,7 @@ router.register('grants_by_country', GrantsByCountryViewSet, base_name='grants_b
 router.register('donors', DonorViewSet, base_name='donors')
 router.register('countries', CountryViewSet, base_name='countries')
 router.register('donorcategories', DonorCategoryViewSet, base_name='donorcategories')
+router.register('donordepartments', DonorDepartmentViewSet, base_name='donordepartments')
 router.register('sector', SectorViewSet, base_name='sectors')
 router.register('subsector', SubSectorViewSet, base_name='subsectors')
 router.register('methodologies', MethodologyViewSet, base_name='methodologies')

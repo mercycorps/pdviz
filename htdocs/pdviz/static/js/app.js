@@ -82,6 +82,25 @@ $('body').on('change', 'select#id_sector', function() {
     });
 });
 
+
+$('body').on('change', 'select#id_donor', function() {
+    var selected_donor = $(this).val();
+    var url = '/api/v1/donordepartments/';
+    if (selected_donor != undefined && selected_donor != -1 && selected_donor != '' && selected_donor != 0) {
+        url = url + '?donor=' + selected_donor;
+    }
+    $.getJSON(url, function(depts) {
+        var options = "<option value=''></option>";
+        var dept_options = depts['results'];
+        for (var i = 0; i < dept_options.length; i++) {
+            options += '<option value="' + dept_options[i].department_id + '">' + dept_options[i].name + '</option>';
+        }
+        $('select#id_donor_department').html(options);
+        $("select#id_donor_department").val('').trigger("change");
+    });
+});
+
+
 function createAlert (type, message, fade) {
     $("#alerts").append(
         $(

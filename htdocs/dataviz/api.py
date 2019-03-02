@@ -58,6 +58,17 @@ class DonorViewSet(viewsets.ModelViewSet):
         return Donor.objects.filter(**kwargs).annotate(grants_count=Count('grants'))
 
 
+class DonorDepartmentViewSet(viewsets.ModelViewSet):
+    serializer_class = DonorDepartmentSerializer
+
+    def get_queryset(self):
+        queryset = DonorDepartment.objects.all()
+        donor_id = self.request.query_params.get('donor', None)
+        if donor_id:
+            queryset = queryset.filter(donor=donor_id)
+        return queryset
+
+
 class DonorCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = DonorCategorySerializer
 
