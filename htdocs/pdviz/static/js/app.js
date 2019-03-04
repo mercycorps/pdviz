@@ -90,7 +90,7 @@ $('body').on('change', 'select#id_donor', function() {
         url = url + '?donor=' + selected_donor;
     }
     $.getJSON(url, function(depts) {
-        var options = "<option value=''></option>";
+        var options = "";
         var dept_options = depts['results'];
         for (var i = 0; i < dept_options.length; i++) {
             options += '<option value="' + dept_options[i].department_id + '">' + dept_options[i].name + '</option>';
