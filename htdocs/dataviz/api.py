@@ -63,9 +63,10 @@ class DonorDepartmentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = DonorDepartment.objects.all()
-        donor_id = self.request.query_params.get('donor', None)
-        if donor_id:
-            queryset = queryset.filter(donor=donor_id)
+        donor_ids = self.request.query_params.get('donor', None)
+        if donor_ids:
+            donor_list = donor_ids.split(',')
+            queryset = queryset.filter(donor__in=donor_list)
         return queryset
 
 

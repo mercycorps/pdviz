@@ -111,7 +111,7 @@ function createAlert (type, message, fade) {
         )
     );
     if (fade == true) {
-        // Remove the alert after 30 seconds if the user does not close it.
+        // Remove the alert after 30 se1ds if the user does not close it.
         $(".dynamic-alert").delay(3000).fadeOut("slow", function () { $(this).remove(); });
     }
 }

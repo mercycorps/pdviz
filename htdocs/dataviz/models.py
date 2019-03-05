@@ -205,6 +205,7 @@ class Grant(models.Model):
     won_grants = GrantsWonManager()
     lost_grants = GrantsLostManager()
     both_won_n_loss_grants = BothWonLostGrants()
+    department = models.ForeignKey(DonorDepartment, db_column="DepartmentID", related_name='grants', null=True)
 
     def __unicode__(self):
         return self.title or ''

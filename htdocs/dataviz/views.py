@@ -421,7 +421,7 @@ class GlobalDashboard(TemplateView):
 class GlobalDashboardData(View):
 
     def get(self, request, *args, **kwargs):
-        #print(self.request.GET)
+
         donor_categories = get_donor_categories_dataset(self.request.GET)
         donors_list = get_donors_dataset(self.request.GET)
         grants_list = get_grants_dataset(self.request.GET)
