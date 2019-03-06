@@ -34,6 +34,10 @@
                     Win / Loss Rate by Region and Country <br/>
                     <span class="overallWinLabel">Overall Win Rate</span>: <span id="overallWinRate"></span>
                   </div>
+                  <div >
+                    Decided Ratio <br/>
+                    <span class="overallWinLabel">Decided: </span>: <span id="overallDecidedRate"></span>
+                  </div>
                   <div class="chart-type-selectors" class="btn-group">
                     <button id="showCountPercent" type="button" class="btn btn-primary active" aria-pressed="true">Percent</button>
                     <button id="showCountNominal" type="button" class="btn btn-primary">Nominal</button>
@@ -300,7 +304,8 @@
         draw_chart();
         draw_bar_chart(false, false, activeCountConfig);
         draw_bar_chart(false, false, activeCaptureConfig);
-        show_overall_win_rate({{overallWins}}, {{overallApplications}});
+        show_overall_win_rate({{overallWins}}, {{overallDecided}});
+        show_overall_decided_ratio({{overallDecided}}, {{overallAllGrants}});
         show_overall_capture_rate({{overallAmountWon}}, {{overallAmountTried}});
     });
 
@@ -374,7 +379,7 @@
             draw_chart();
             draw_bar_chart(false, false, activeCountConfig);
             draw_bar_chart(false, false, activeCaptureConfig);
-            show_overall_win_rate(data['overallWins'], data['overallApplications']);
+            show_overall_win_rate(data['overallWins'], data['overallDecided']);
             show_overall_capture_rate(data['overallAmountWon'], data['overallAmountTried']);
 
         });
@@ -793,6 +798,15 @@
         winRate = ((wins/total)*100).toFixed(1) + '%';
       }
       $("#overallWinRate").text(wins + " / " + total + " (" + winRate + ")" );
+    }
+
+    function show_overall_decided_ratio(decided, total){
+      // console.log('showing overall winrate ' + rate );
+      var decidedRate = "0.0%"
+      if (total > 0) {
+        decidedRate = ((decided/total)*100).toFixed(1) + '%';
+      }
+      $("#overallDecidedRate").text(decided + " / " + total + " (" + decidedRate + ")" );
     }
 
     function show_overall_capture_rate(wins, total){
