@@ -35,6 +35,7 @@ $(document).ready(function() {
     $("#id_region").select2({ placeholder: "Region", allowClear: true });
     $("#id_country").select2({ placeholder: "Country", allowClear: true });
     $("#id_donor").select2({ placeholder: "Donor", allowClear: true });
+    $("#id_donor_department").select2({ placeholder: "Donor Department", allowClear: true });
     $("#id_sector").select2({placeholder: "Sector", allowClear: true,});
     $("#id_subsector").select2({placeholder: "Area of Focus", allowClear: true,});
     $("#id_theme").select2({placeholder: 'Theme', allowClear: true,});
@@ -81,6 +82,25 @@ $('body').on('change', 'select#id_sector', function() {
     });
 });
 
+
+$('body').on('change', 'select#id_donor', function() {
+    var selected_donor = $(this).val();
+    var url = '/api/v1/donordepartments/';
+    if (selected_donor != undefined && selected_donor != -1 && selected_donor != '' && selected_donor != 0) {
+        url = url + '?donor=' + selected_donor;
+    }
+    $.getJSON(url, function(depts) {
+        var options = "";
+        var dept_options = depts['results'];
+        for (var i = 0; i < dept_options.length; i++) {
+            options += '<option value="' + dept_options[i].department_id + '">' + dept_options[i].name + '</option>';
+        }
+        $('select#id_donor_department').html(options);
+        $("select#id_donor_department").val('').trigger("change");
+    });
+});
+
+
 function createAlert (type, message, fade) {
     $("#alerts").append(
         $(
@@ -91,7 +111,7 @@ function createAlert (type, message, fade) {
         )
     );
     if (fade == true) {
-        // Remove the alert after 30 seconds if the user does not close it.
+        // Remove the alert after 30 se1ds if the user does not close it.
         $(".dynamic-alert").delay(3000).fadeOut("slow", function () { $(this).remove(); });
     }
 }

@@ -7,8 +7,6 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
     """
 
     kwargs = {}
-    #print(prefix)
-
     for k in params:
         if k == 'format':
             pass
@@ -27,6 +25,8 @@ def prepare_related_donor_fields_to_lookup_fields(params, prefix):
                 kwargs['donors__donor_id__in'] = params[k].split(',')
             else:
                 kwargs[prefix + 'donor_id__in'] = params[k].split(',')
+        elif k == 'donor_department':
+            kwargs[prefix + 'department__department_id__in'] = params[k].split(',')
         elif k == 'sector':
             kwargs[prefix + 'sectors__sector_id'] = params[k]
         elif k == 'subsector':
