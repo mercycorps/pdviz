@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 
+# This doesn't seem to be used, delete eventually
 class JSONResponseMixin(object):
     """
     A mixin that can be used to render a JSON response.
