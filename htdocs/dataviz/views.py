@@ -3,6 +3,7 @@ import json
 from collections import OrderedDict
 
 from django.db.models import DecimalField, FloatField, IntegerField, ExpressionWrapper, F, Case, When
+from django.db.models.functions import Coalesce
 from django.db.models.expressions import RawSQL
 from django.http import JsonResponse
 from django.views.generic import TemplateView, View
@@ -319,14 +320,13 @@ def get_grants_dataset(kwargs):
     WON_TYPES = ['Completed', 'Closed', 'Funded']
     LOST_TYPE = 'Rejected'
 
-    # Using default of 0 on the aggregates is necessary for filtered results that may return nothing.
     aggregates = grants.aggregate(
-        won_count=Sum(Case(When(status__in=WON_TYPES, then=1), default=0, output_field=IntegerField())),
-        lost_count=Sum(Case(When(status=LOST_TYPE, then=1), default=0, output_field=IntegerField())),
-        won_amt=Sum(Case(When(status__in=WON_TYPES, then='amount_usd'), default=0, output_field=IntegerField())),
-        lost_amt=Sum(Case(When(status=LOST_TYPE, then='amount_usd'), default=0, output_field=IntegerField())),
+        won_count=Coalesce(Sum(Case(When(status__in=WON_TYPES, then=1), output_field=IntegerField())), 0),
+        lost_count=Coalesce(Sum(Case(When(status=LOST_TYPE, then=1), output_field=IntegerField())), 0),
+        won_amt=Coalesce(Sum(Case(When(status__in=WON_TYPES, then='amount_usd'), output_field=IntegerField())), 0),
+        lost_amt=Coalesce(Sum(Case(When(status=LOST_TYPE, then='amount_usd'), output_field=IntegerField())), 0),
         all_count_total=Count('grant_id'),
-        all_amt_total=Sum('amount_usd', default=0, output_field=IntegerField())
+        all_amt_total=Coalesce(Sum('amount_usd', default=0, output_field=IntegerField()), 0)
     )
     aggregates['won_lost_count'] = aggregates['won_count'] + aggregates['lost_count']
     aggregates['won_lost_amt'] = aggregates['won_amt'] + aggregates['lost_amt']
