@@ -9,6 +9,10 @@ from crispy_forms.bootstrap import *
 from .models import *
 
 class GrantDonorFilterForm(forms.Form):
+    '''
+    IMPORTANT:  If you add a field to the filters, you probably also want to include the field in the
+    prepare_related_donor_fields_to_lookup_fields function.
+    '''
     region = forms.ModelChoiceField(
         queryset = Region.objects.all(),
         required = False,
