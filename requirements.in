@@ -1,0 +1,41 @@
+Django
+pip-tools
+mysqlclient
+django-crispy-forms
+
+django-rest-swagger
+djangorestframework
+python-memcached
+
+# django-filter
+# Jinja2
+# Markdown
+# MarkupSafe
+# MySQL-python
+
+# PyYAML
+# certifi
+# chardet
+# coreapi
+# coreschema
+# django-braces
+
+# gdata
+# google-api-python-client
+# httplib2
+# idna
+# itypes
+# oauth2client
+# openapi-codec
+# pyasn1
+# pyasn1-modules
+# python-ldap
+
+# pytz
+# requests
+# rsa
+# selenium
+# simplejson
+# six
+# uritemplate
+# urllib3
