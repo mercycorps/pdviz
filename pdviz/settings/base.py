@@ -44,27 +44,36 @@ INSTALLED_APPS = (
     'crispy_forms',
     'djangocosign',
     'dataviz',
-    'feedback',
+    # 'feedback',
 )
 
 # to clear cache:
 # py manage.py shell
 # >>> from django.core.cache import cache
 # >>> cache._cache.flush_all()
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
+    # 'django.contrib.sessions.middleware.SessionMiddleware',
+    # #'django.middleware.cache.UpdateCacheMiddleware',
+    # 'django.middleware.common.CommonMiddleware',
+    # #'django.middleware.cache.FetchFromCacheMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # 'django.contrib.auth.middleware.RemoteUserMiddleware',
+    # 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    # 'django.contrib.messages.middleware.MessageMiddleware',
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.middleware.security.SecurityMiddleware',
+
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    #'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.cache.FetchFromCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.RemoteUserMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'pdviz.middleware.AjaxMessaging',
-    'pdviz.middleware.TimingMiddleware',
+    # TODO: update or remove custom middleware
+    # 'pdviz.middleware.AjaxMessaging',
+    # 'pdviz.middleware.TimingMiddleware',
 )
 
 ROOT_URLCONF = 'pdviz.urls'

@@ -1,7 +1,8 @@
 import json
 import time
 from django.contrib import messages
-
+# TODO: These need to be deleted or revised.  They are not valid for Django 2.2.
+# TODO: Update to this? https://gist.github.com/DmytroLitvinov/39d9a1a93a46eb9da1e17d8e73f35e11
 class AjaxMessaging(object):
     """
     To make django error messages set by django.contrib.messages framework
@@ -49,6 +50,7 @@ class AjaxMessaging(object):
                     response.content = json.dumps(content)
         return response
 
+# TODO: Delete?  Copied from https://github.com/timsavage/django-extras
 class TimingMiddleware(object):
     """
     Appends the X-PROCESSING_TIME_MS header to all responses.

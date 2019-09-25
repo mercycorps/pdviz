@@ -28,8 +28,8 @@ class DonorCategory(models.Model):
 class Donor(models.Model):
     donor_id = models.PositiveIntegerField(primary_key=True, db_column="DonorID", validators=[validate_positive,])
     name = models.CharField(db_column="Donor", max_length=3, null=True)
-    category = models.ForeignKey(DonorCategory, db_column="DonorCategoryID", related_name="donors")
-
+    category = models.ForeignKey(
+        DonorCategory, db_column="DonorCategoryID", related_name="donors", on_delete=models.PROTECT)
     class Meta:
         managed = False
         db_table = "donortbl"
@@ -45,7 +45,7 @@ class Donor(models.Model):
 
 class DonorDepartment(models.Model):
     department_id = models.PositiveIntegerField(primary_key=True, db_column="DepartmentID", validators=[validate_positive,])
-    donor = models.ForeignKey(Donor, db_column="DonorID")
+    donor = models.ForeignKey(Donor, db_column="DonorID", on_delete=models.CASCADE)
     name = models.CharField(db_column="Department", max_length=255)
 
     class Meta:
@@ -73,7 +73,7 @@ class Region(models.Model):
 class Country(models.Model):
     country_id = models.PositiveIntegerField(primary_key=True, db_column="CountryID", validators=[validate_positive,])
     name = models.CharField(db_column="Country", max_length=100)
-    region = models.ForeignKey(Region, db_column="RegionID", related_name="countries")
+    region = models.ForeignKey(Region, db_column="RegionID", related_name="countries", on_delete=models.CASCADE)
     iso2 = models.CharField(db_column="CountryCode", max_length=2)
 
     class Meta:
@@ -111,8 +111,8 @@ class SubSector(models.Model):
         return self.name or ''
 
 class SectorSubSector(models.Model):
-    sector = models.ForeignKey(Sector, db_column="SectorID")
-    subsector = models.ForeignKey(SubSector, db_column="SubSectorID")
+    sector = models.ForeignKey(Sector, db_column="SectorID", on_delete=models.CASCADE)
+    subsector = models.ForeignKey(SubSector, db_column="SubSectorID", on_delete=models.CASCADE)
 
     class Meta:
         managed = False
@@ -185,7 +185,7 @@ class Grant(models.Model):
     amount_icr = models.DecimalField(db_column="ICRAmount", max_digits=20, decimal_places=4, null=True)
     status = models.CharField(db_column="FundingStatus", max_length=50, null=True)
     hq_admin = models.CharField(db_column="HQadmin", max_length=3, null=True)
-    donor = models.ForeignKey(Donor, db_column="DonorID", related_name='grants', null=True)
+    donor = models.ForeignKey(Donor, db_column="DonorID", related_name='grants', null=True, on_delete=models.PROTECT)
     submission_date = models.DateField(db_column="SubmissionDate", null=True)
     start_date = models.DateField(db_column="StartDate", null=True)
     end_date = models.DateField(db_column="EndDate", null=True)
@@ -205,7 +205,8 @@ class Grant(models.Model):
     won_grants = GrantsWonManager()
     lost_grants = GrantsLostManager()
     both_won_n_loss_grants = BothWonLostGrants()
-    department = models.ForeignKey(DonorDepartment, db_column="DepartmentID", related_name='grants', null=True)
+    department = models.ForeignKey(
+        DonorDepartment, db_column="DepartmentID", related_name='grants', null=True, on_delete=models.PROTECT)
 
     def __unicode__(self):
         return self.title or ''
@@ -216,8 +217,8 @@ class Grant(models.Model):
         #ordering = ['title',]
 
 class GrantTheme(models.Model):
-    grant = models.ForeignKey(Grant, db_column="GrantID")
-    theme = models.ForeignKey(Theme, db_column="ThemeID")
+    grant = models.ForeignKey(Grant, db_column="GrantID", on_delete=models.CASCADE)
+    theme = models.ForeignKey(Theme, db_column="ThemeID", on_delete=models.CASCADE)
 
     class Meta:
         managed = False
@@ -225,8 +226,8 @@ class GrantTheme(models.Model):
         unique_together = (('grant', 'theme'),)
 
 class GrantMethodology(models.Model):
-    grant = models.ForeignKey(Grant, db_column="GrantID")
-    methodology = models.ForeignKey(Methodology, db_column="MethodologyID")
+    grant = models.ForeignKey(Grant, db_column="GrantID", on_delete=models.CASCADE)
+    methodology = models.ForeignKey(Methodology, db_column="MethodologyID", on_delete=models.CASCADE)
 
     class Meta:
         managed = False
@@ -234,10 +235,10 @@ class GrantMethodology(models.Model):
 
 
 class GrantSector(models.Model):
-    grant = models.ForeignKey(Grant, db_column="GrantID")
-    sector = models.ForeignKey(Sector, db_column="SectorID")
-    subsector = models.ForeignKey(SubSector, db_column="SubSectorID", null=True)
-    sector_type = models.ForeignKey(SectorType, db_column="SectorTypeID", null=True)
+    grant = models.ForeignKey(Grant, db_column="GrantID", on_delete=models.CASCADE)
+    sector = models.ForeignKey(Sector, db_column="SectorID", on_delete=models.CASCADE)
+    subsector = models.ForeignKey(SubSector, db_column="SubSectorID", null=True, on_delete=models.CASCADE)
+    sector_type = models.ForeignKey(SectorType, db_column="SectorTypeID", null=True, on_delete=models.CASCADE)
 
     class Meta:
         managed = False
@@ -246,8 +247,8 @@ class GrantSector(models.Model):
 
 
 class GrantCountry(models.Model):
-    grant = models.ForeignKey(Grant, db_column="GrantID")
-    country = models.ForeignKey(Country, db_column="CountryID")
+    grant = models.ForeignKey(Grant, db_column="GrantID", on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, db_column="CountryID", on_delete=models.CASCADE)
 
     class Meta:
         managed = False
