@@ -28,7 +28,7 @@ from .views import *
 from dataviz.views import *
 from dataviz.api import *
 
-import feedback
+# import feedback
 
 swagger_schema_view = get_swagger_view(title='PDViz')
 
@@ -55,8 +55,8 @@ urlpatterns = [
     path(r'global_dashboard/', cache_page(60*60*12)(GlobalDashboard.as_view()), name='global_dashboard'),
     path(r'global_dashboard_data/', cache_page(60*60*12)(GlobalDashboardData.as_view()), name='global_dashboard_data'),
     #url(r'^dataviz/countries_by_region/(?P<region>[-\w]+)/$', CountriesByRegion.as_view(), name='cbg'),
-    # TODO:  add back feedback module
-    # path(r'^feedback/', feedback.urls),
+    # TODO:  add back feedback module?
+    # path(r'^feedback/', include(feedback.urls)),
 
 ]
 

@@ -94,7 +94,7 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
                 'pdviz.context_processors.google_analytics',
-                'feedback.context_processors.base_context_processor',
+                # 'feedback.context_processors.base_context_processor',
             ],
         },
     },
