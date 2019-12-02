@@ -1,4 +1,5 @@
 from operator import and_, or_
+from functools import reduce
 from django.db.models import Q
 
 from rest_framework import viewsets, pagination

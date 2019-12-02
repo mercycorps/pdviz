@@ -1,8 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'pdviz/base.html' %}
 {% load staticfiles %}
 {% load crispy_forms_tags %}
 <!-- TODO: make department react to donor selection-->
 <!-- TODO: default text for department -->
+<!-- TODO: clean up file -->
 {% block content %}
     <div id="donor_categories_data_div" style="display: none;">{{ donor_categories|safe }}</div>
     <div id="donor_categories_drilldown_data_div" style="display: none;">{{ donors|safe }}</div>
@@ -38,7 +39,7 @@
                     Decided Ratio <br/>
                     <span class="overallWinLabel">Decided:</span> <span id="overallDecidedRate"></span>
                   </div>
-                  <div class="chart-type-selectors" class="btn-group">
+                  <div class="chart-type-selectors btn-group">
                     <button id="showCountPercent" type="button" class="btn btn-primary active" aria-pressed="true">Percent</button>
                     <button id="showCountNominal" type="button" class="btn btn-primary">Nominal</button>
                   </div>
@@ -61,7 +62,7 @@
                   Capture Rate by Region and Country <br/>
                   <span class="overallWinLabel">Overall Capture Rate ($mil)</span>: <span id="overallCaptureRate"></span>
                 </div>
-                <div class="chart-type-selectors" class="btn-group">
+                <div class="chart-type-selectors btn-group">
                   <button id="showCapturePercent" type="button" class="btn btn-primary active" aria-pressed="true">Percent</button>
                   <button id="showCaptureNominal" type="button" class="btn btn-primary">Nominal</button>
                 </div>
@@ -110,7 +111,7 @@
       container: 'body'
     });
 
-    var countPercentConfig = {
+    let countPercentConfig = {
       title: "Win / Loss Rates Per Region and Country",
       yAxisTitle: "Percentage",
       stacking: "percent",
@@ -127,7 +128,7 @@
       divID: "countChart"
     };
 
-    var countNominalConfig = {
+    let countNominalConfig = {
       title: "Wins and Losses Per Region and Country",
       yAxisTitle: "Grant Count",
       stacking: "normal",
@@ -143,7 +144,7 @@
       divID: "countChart"
     };
 
-    var capturePercentConfig = {
+    let capturePercentConfig = {
       title: "Capture Rate Per Region and Country",
       yAxisTitle: "Percentage",
       stacking: "percent",
@@ -159,7 +160,7 @@
       divID: "captureChart"
     };
 
-    var captureNominalConfig = {
+    let captureNominalConfig = {
       title: "Value of Grants Won/Lost Per Region and Country",
       yAxisTitle: "Cumulative Grant Values",
       stacking: "normal",
@@ -175,13 +176,13 @@
       divID: "captureChart"
     };
 
-    var activeCountConfig = countPercentConfig
-    var activeCaptureConfig = capturePercentConfig
+    let activeCountConfig = countPercentConfig;
+    let activeCaptureConfig = capturePercentConfig;
 
     // var drilldown_levels = [];
 
     /// Base configuration for hicharts
-    var baseConfig = {
+    let baseConfig = {
         credits: {
             text: 'mercycorps.org',
             href: 'http://www.mercycorps.org',
@@ -215,7 +216,7 @@
             }
         },
 
-    }
+    };
 
     // On the search form reset event, clear all of the select2 dorpdowns.
     $("body").on("reset", "#grants_donor_filter_form", function(e) {
@@ -241,7 +242,7 @@
         e.preventDefault();
         $('#showCountNominal').removeClass("active").removeAttr("aria-pressed", "true");
         $('#showCountPercent').addClass("active").attr("aria-pressed", "true");
-        activeCountConfig = countPercentConfig
+        activeCountConfig = countPercentConfig;
         set_win_loss_labels(countPercentConfig);
         draw_bar_chart(false, false, countPercentConfig);
     });
@@ -250,7 +251,7 @@
         e.preventDefault();
         $('#showCountPercent').removeClass("active").removeAttr("aria-pressed", "true");
         $('#showCountNominal').addClass("active").attr("aria-pressed", "true");
-        activeCountConfig = countNominalConfig
+        activeCountConfig = countNominalConfig;
         set_win_loss_labels(countNominalConfig);
         draw_bar_chart(false, false, countNominalConfig);
     });
@@ -259,7 +260,7 @@
         e.preventDefault();
         $('#showCaptureNominal').removeClass("active").removeAttr("aria-pressed", "true");
         $('#showCapturePercent').addClass("active").attr("aria-pressed", "true");
-        activeCountConfig = capturePercentConfig
+        activeCountConfig = capturePercentConfig;
         set_win_loss_labels(capturePercentConfig);
         draw_bar_chart(false, false, capturePercentConfig);
     });
@@ -268,7 +269,7 @@
         e.preventDefault();
         $('#showCapturePercent').removeClass("active").removeAttr("aria-pressed", "true");
         $('#showCaptureNominal').addClass("active").attr("aria-pressed", "true");
-        activeCountConfig = captureNominalConfig
+        activeCountConfig = captureNominalConfig;
         set_win_loss_labels(captureNominalConfig);
         draw_bar_chart(false, false, captureNominalConfig);
     });

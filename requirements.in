@@ -6,6 +6,10 @@ django-crispy-forms
 django-rest-swagger
 djangorestframework
 python-memcached
+python3-saml
+social-auth-app-django
+social-auth-core[saml]
+PyYAML
 
 # django-filter
 # Jinja2

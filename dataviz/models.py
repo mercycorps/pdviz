@@ -21,7 +21,7 @@ class DonorCategory(models.Model):
         managed = False
         db_table = 'donorcategorytbl'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -39,7 +39,7 @@ class Donor(models.Model):
     def num_of_grants(self):
         return self.grants.aggregate(num_grants=Count('grant_id'))['num_grants']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name or ''
 
 
@@ -53,7 +53,7 @@ class DonorDepartment(models.Model):
         db_table = 'donordepttbl'
         ordering = ['name',]
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name or ''
 
 
@@ -66,7 +66,7 @@ class Region(models.Model):
         db_table = "regiontbl"
         ordering = ['name',]
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name or ''
 
 
@@ -81,7 +81,7 @@ class Country(models.Model):
         db_table = "countrytbl"
         ordering = ['name',]
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name or ''
 
 
@@ -94,7 +94,7 @@ class Sector(models.Model):
         db_table = "n_sectortbl"
         ordering = ['name',]
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name or ''
 
 
@@ -107,7 +107,7 @@ class SubSector(models.Model):
         managed = False
         db_table = 'n_subsectortbl'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name or ''
 
 class SectorSubSector(models.Model):
@@ -127,7 +127,7 @@ class SectorType(models.Model):
         managed = False
         db_table = "n_sectortypetbl"
 
-    def __unicode__(self):
+    def __str__(self):
         return self.sector_type or ''
 
 
@@ -139,7 +139,7 @@ class Theme(models.Model):
         managed = False
         db_table = 'n_themetbl'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name or ''
 
 
@@ -151,7 +151,7 @@ class Methodology(models.Model):
         managed = False
         db_table = 'n_methodologytbl'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name or ''
 
 class GrantsWonManager(models.Manager):
@@ -208,7 +208,7 @@ class Grant(models.Model):
     department = models.ForeignKey(
         DonorDepartment, db_column="DepartmentID", related_name='grants', null=True, on_delete=models.PROTECT)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title or ''
 
     class Meta:
