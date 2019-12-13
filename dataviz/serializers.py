@@ -3,7 +3,7 @@ import locale
 from rest_framework import serializers
 from .models import *
 
-locale.setlocale(locale.LC_ALL, 'en_US')
+locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
 class GrantSerializerPlain(serializers.ModelSerializer):
     gait_id = serializers.SerializerMethodField("get_grant_id")
