@@ -3,7 +3,7 @@ import json
 from collections import OrderedDict
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import DecimalField, FloatField, IntegerField, ExpressionWrapper, F, Case, When
+from django.db.models import DecimalField, FloatField, IntegerField, ExpressionWrapper, F, Case, When, Sum
 from django.db.models.functions import Coalesce
 from django.db.models.expressions import RawSQL
 from django.http import JsonResponse
