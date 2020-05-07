@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'pdviz/base.html' %}
 {% load staticfiles %}
 {% block content %}
 
@@ -10,8 +10,9 @@
         <p>
             The purpose of this tool is to enable <abbr title="Regional Program Directors">RPDs</abbr> and other proposal development decision-makers to plan better and more strategically around which proposal development opportunities to pursue.
         </p>
-        <p>
-            PDViz is an internally developed tool and further development of it will mostly depend on users feedback. To provide feedback, please click on the <a href="{% url 'feedback_list' %}">"Feedback"</a> link at the bottom right corner of the page.
-        </p>
+{#       TODO: add info on how to get help#}
+{#        <p>#}
+{#            PDViz is an internally developed tool and further development of it will mostly depend on users feedback. To provide feedback, please click on the <a href="{% url 'feedback_list' %}">"Feedback"</a> link at the bottom right corner of the page.#}
+{#        </p>#}
     </div>
 {% endblock content %}
