@@ -2,7 +2,8 @@ import json
 
 from collections import OrderedDict
 
-from django.db.models import DecimalField, FloatField, IntegerField, ExpressionWrapper, F, Case, When
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import DecimalField, FloatField, IntegerField, ExpressionWrapper, F, Case, When, Sum
 from django.db.models.functions import Coalesce
 from django.db.models.expressions import RawSQL
 from django.http import JsonResponse
@@ -377,7 +378,7 @@ def get_grants_dataset(kwargs):
     return series, grants, aggregates
 
 
-class GlobalDashboard(TemplateView):
+class GlobalDashboard(LoginRequiredMixin, TemplateView):
     template_name='global_dashboard.html'
 
     def get_context_data(self, **kwargs):
@@ -418,10 +419,9 @@ class GlobalDashboard(TemplateView):
         return context
 
 
-class GlobalDashboardData(View):
+class GlobalDashboardData(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
-
         donor_categories = get_donor_categories_dataset(self.request.GET)
         donors_list = get_donors_dataset(self.request.GET)
         series, grants, aggregates = get_grants_dataset(self.request.GET)

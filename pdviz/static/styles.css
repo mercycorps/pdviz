@@ -1,0 +1,49 @@
+.page-title {
+    margin-top: 3em;
+}
+
+.login {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 576px;
+
+}
+.login .page-title {
+        margin-bottom: 3em;
+    }
+
+.login__option {
+    margin-bottom: 2em;
+    padding: 1em;
+}
+
+.login__option.btn {
+    white-space: inherit;
+
+}
+.login__help {
+    margin-top: 3em;
+}
+
+.btn-lg {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    border-radius: 4px;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+.btn-info {
+    color: #fff;
+    background-color: #00a49f;
+    border-color: #00a49f;
+}
+
+.login .btn-neutral {
+    color: #212429;
+    background-color: #ebedf0;
+    border-color: #ebedf0;
+}

@@ -1,0 +1,76 @@
+
+{% load i18n %}
+{% load static %}
+<!doctype html>
+
+
+<html lang="en">
+    <head title="PDViz Login">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="{% static "styles.css" %}">
+    </head>
+    <body>
+    <div class="login">
+
+        <header class="page-title">
+            {% blocktrans %}
+            <h1><small>Welcome to</small> PDViz</h1>
+            {% endblocktrans %}
+        </header>
+
+        <a href="{{ okta_url }}" class="login__option btn btn-lg btn-block btn-info mt-5">
+            {# Translators: a button directing Mercy Corps users to log in #}
+            {% blocktrans %}
+            <i class="fas fa-sign-in-alt"></i><small>Log in with <strong>Okta</strong></small>
+            {% endblocktrans %}
+        </a>
+
+        <a href="#username-form" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="username-form" class="login__option btn btn-lg btn-block btn-neutral">
+            <i class="fa fa-sign-in-alt"></i><small>{% trans "Log in with a username and password" %}</small>
+        </a>
+
+        <div class="{% if form.errors %}show{% endif %} collapse" id="username-form">
+            <section class="login__option login__option--email card card-body">
+
+                {% if form.errors %}
+                <div class="alert alert-danger text-small" role="alert">
+                    {% url "password_reset" as password_reset_url %}
+                    {% blocktrans %}
+                    <p>Please enter a correct username and password. Note that both fields may be case-sensitive. Did you forget your password? <a href="{{ password_reset_url }}">Click here to reset it.</a></p>
+                    {% endblocktrans %}
+                </div>
+                {% endif %}
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                        <input
+                                class="form-control"
+                                id="{{ form.username.id_for_label }}"
+                                name="{{ form.username.html_name }}"
+                                value="{{ form.username.value|default:''}}"
+                                type="text">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                        <input class="form-control" id="{{ form.password.id_for_label }}" name="{{ form.password.html_name }}" value="" type="password">
+                    </div>
+
+                    <input type="submit" class="btn btn-medium" value="{% trans "Log in" %}">
+
+                </form>
+            </section>
+        </div>
+
+    </div>
+    </body>
+    <footer>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    </footer>
+</html>

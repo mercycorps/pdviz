@@ -2,8 +2,11 @@
 __pycache__/
 *.py[cod]
 *.DS_Store
+
+# Private files
 db.sqlite3
 local.py
+saml_config.yml
 
 conf/
 extras/
