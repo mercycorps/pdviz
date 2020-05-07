@@ -34,7 +34,7 @@ def get_regions(kwargs):
         num_total=Count(
             Case(
                 When(
-                    Q(countries__grants__status__isnull = False) &
+                    Q(countries__grants__status__isnull=False) &
                     ~Q(countries__grants__status='Concept') &
                     ~Q(countries__grants__status='Development') &
                     ~Q(countries__grants__status='No-Response') &
