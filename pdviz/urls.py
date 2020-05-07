@@ -12,16 +12,16 @@ from dataviz.views import GlobalDashboard, GlobalDashboardData
 
 
 router = routers.DefaultRouter()
-router.register('grants', GrantViewSet, base_name='grants')
-router.register('grants_by_country', GrantsByCountryViewSet, base_name='grants_by_country')
-router.register('donors', DonorViewSet, base_name='donors')
-router.register('countries', CountryViewSet, base_name='countries')
-router.register('donorcategories', DonorCategoryViewSet, base_name='donorcategories')
-router.register('donordepartments', DonorDepartmentViewSet, base_name='donordepartments')
-router.register('sector', SectorViewSet, base_name='sectors')
-router.register('subsector', SubSectorViewSet, base_name='subsectors')
-router.register('methodologies', MethodologyViewSet, base_name='methodologies')
-router.register('themes', ThemeViewSet, base_name='themes')
+router.register('grants', GrantViewSet, basename='grants')
+router.register('grants_by_country', GrantsByCountryViewSet, basename='grants_by_country')
+router.register('donors', DonorViewSet, basename='donors')
+router.register('countries', CountryViewSet, basename='countries')
+router.register('donorcategories', DonorCategoryViewSet, basename='donorcategories')
+router.register('donordepartments', DonorDepartmentViewSet, basename='donordepartments')
+router.register('sector', SectorViewSet, basename='sectors')
+router.register('subsector', SubSectorViewSet, basename='subsectors')
+router.register('methodologies', MethodologyViewSet, basename='methodologies')
+router.register('themes', ThemeViewSet, basename='themes')
 
 
 urlpatterns = [
