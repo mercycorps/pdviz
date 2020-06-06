@@ -15,7 +15,7 @@ cryptography==2.9.2       # via social-auth-core
 defusedxml==0.6.0         # via python3-openid, python3-saml, social-auth-core
 django-crispy-forms==1.9.0  # via -r requirements.in
 django-rest-swagger==2.2.0  # via -r requirements.in
-django==3.0.6             # via -r requirements.in, djangorestframework
+django==3.0.7             # via -r requirements.in, djangorestframework
 djangorestframework==3.11.0  # via -r requirements.in, django-rest-swagger
 idna==2.9                 # via requests
 isodate==0.6.0            # via python3-saml
