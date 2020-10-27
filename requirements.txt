@@ -11,7 +11,7 @@ chardet==3.0.4            # via requests
 click==7.1.2              # via pip-tools
 coreapi==2.3.3            # via django-rest-swagger, openapi-codec
 coreschema==0.0.4         # via coreapi
-cryptography==2.9.2       # via social-auth-core
+cryptography==3.2         # via social-auth-core
 defusedxml==0.6.0         # via python3-openid, python3-saml, social-auth-core
 django-crispy-forms==1.9.0  # via -r requirements.in
 django-rest-swagger==2.2.0  # via -r requirements.in
