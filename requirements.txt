@@ -21,7 +21,7 @@ idna==2.9                 # via requests
 isodate==0.6.0            # via python3-saml
 itypes==1.2.0             # via coreapi
 jinja2==2.11.2            # via coreschema
-lxml==4.5.0               # via xmlsec
+lxml==4.6.2               # via xmlsec
 markupsafe==1.1.1         # via jinja2
 mysqlclient==1.4.6        # via -r requirements.in
 oauthlib==3.1.0           # via requests-oauthlib, social-auth-core
