@@ -1,37 +1,16 @@
 # pdviz
-Proposal Development Visualization
-
-#### Deployment
-* Install dependencies from requirements.txt file
-* Clone the dependent repos, [feedback](https://github.com/mercycorps/feedback) and [djangocosign](https://github.com/mercycorps/djangocosign)
-* Make sure the local.py file is up-to-date.
-* 
-
-
-
-
-
-
-
-
-
-
-# pdviz
 
 Proposal Development Visualization
 
 ## SETUP INSTRUCTIONS
-
 ### TESTED ENVIRONMENT
 - Python 3.6.x - 3.8.x
 - djangorestframework-3.12.4
 - Django 3.2.7
 
-
 ### DEPENDENCIES
 1. Install python3-dev
 2. Install mysql
-
 
 ## INSTALL DJANGO CODEBASE
 ### Clone the repo and create a virtualenv for python3
@@ -53,6 +32,7 @@ $ pip-sync requirements.txt
 
 ### Copy local_example.py to local.py and modify as needed.
 Modify at minimum the following fields:
+
     ```yaml
     SECRET_KEY: "your_key_here"
     SETTINGS_DIR: "XXXXXXXXXXX"
