@@ -59,9 +59,7 @@ To enable the Okta login on a server, the values for each of the settings in the
 
 ## Creating a local user
 You will need to create a local user so you can log in.
-You can use MySQL to create a local superuser
 
-#### Using MySQL
 Use the `createsuperuser` command and enter in a username and password to be used to login. When it asks for an email, you can just hit the Enter key to skip the question (email not needed to login).
 ```bash
 $ python manage.py createsuperuser
