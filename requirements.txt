@@ -44,7 +44,7 @@ itypes==1.2.0
     # via coreapi
 jinja2==3.0.2
     # via coreschema
-lxml==4.6.3
+lxml==4.6.4
     # via
     #   python3-saml
     #   xmlsec
